@@ -1,0 +1,49 @@
+CREATE TABLE IF NOT EXISTS characters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    aliases TEXT,
+    vector BLOB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS chapters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sentences (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chapter_id INTEGER NOT NULL,
+    sentence_index INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    sentence_type TEXT,
+    speaker_id INTEGER,
+    emotion TEXT,
+    speed REAL DEFAULT 1.0,
+    tone TEXT,
+    is_edited BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chapter_id) REFERENCES chapters(id),
+    FOREIGN KEY (speaker_id) REFERENCES characters(id)
+);
+
+CREATE TABLE IF NOT EXISTS sfx_words (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    word TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    chapter_id INTEGER NOT NULL,
+    step TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+);

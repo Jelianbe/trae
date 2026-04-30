@@ -1,0 +1,201 @@
+好的，我们为当前的 NER 增强逻辑增加一个**可选模块：连续 nr 合并**，专门处理被 HanLP 误拆的外国人名（或任何连续人名）。
+
+由于我们一直强调“规则优先、统计兜底”，这个模块将作为 `_enhance_entities` 的**第四层防护**，仅在 HanLP 未覆盖、且前面的单字姓氏规则也未触发的区域启用。
+
+---
+
+## 一、连续 nr 合并规则的设计目标
+
+- **触发条件**：连续两个或多个 token 的词性都是 `nr`，且它们之间没有被 HanLP NER 或已有的规则实体覆盖。
+- **合并策略**：将连续的 `nr` 词组合并成为一个 `PER` 实体。
+- **安全防护**：
+  - 间隔中如出现其他词性的词（除了标点/特殊符号），则停止合并。
+  - 合并后的文本不能与已有实体文本冲突。
+  - 合并不能跨越句子边界（但通常在单个句子内操作）。
+
+---
+
+## 二、代码实现
+
+在 `_enhance_entities` 函数末尾（或作为独立步骤，先于之前的规则之前执行），添加以下逻辑：
+
+```python
+def _merge_consecutive_persons(self, tokens, pos_tags, covered_indices):
+    """
+    合并连续出现的 nr，处理如 '艾米' '莉亚' -> '艾米莉亚'
+    仅在未被任何规则或模型覆盖的区域执行。
+    """
+    merged_entities = []
+    i = 0
+    while i < len(tokens):
+        if i in covered_indices:
+            i += 1
+            continue
+        
+        if pos_tags[i] == 'NR' or pos_tags[i] == 'nr':
+            start = i
+            person_parts = [tokens[i]]
+            i += 1
+            
+            # 收集连续的 nr，允许中间出现标点符号或连接符
+            while i < len(tokens):
+                if i in covered_indices:
+                    break
+                next_pos = pos_tags[i]
+                next_token = tokens[i]
+                
+                # 如果是 nr，直接加入
+                if next_pos == 'NR' or next_pos == 'nr':
+                    person_parts.append(next_token)
+                    i += 1
+                # 如果遇到点号、连字符等常见分隔符，且下一个仍是 nr，则跳过符号并继续
+                elif (next_token in ('·', '-', '/', '.') 
+                      and i+1 < len(tokens) 
+                      and (pos_tags[i+1] == 'NR' or pos_tags[i+1] == 'nr')):
+                    # 可选：保留分隔符，或者去掉。这里选择去掉以合并成完整名字
+                    # 跳过这个符号，继续检查下一个 token
+                    i += 1
+                    # 不加入 person_parts，但会继续循环收集
+                else:
+                    break
+            
+            # 如果收集到多个部分，则合并为一个实体
+            if len(person_parts) > 1:
+                merged_text = ''.join(person_parts)
+                merged_entities.append(Entity(
+                    text=merged_text,
+                    type='PER',
+                    start=start,
+                    end=i
+                ))
+                # 将这些索引标记为已覆盖，防止后面规则再处理
+                for idx in range(start, i):
+                    covered_indices.add(idx)
+                # 注意：i 已经指向合并后的下一个位置，无需增加
+            else:
+                # 只有一个 nr，可能是一个单独的人名，保留原样，但无需合并
+                # 但为了标记已覆盖，可以创建一个单字/单词实体？ 
+                # 根据设计，我们只做合并，单字 nr 可能被其他规则处理或忽略。
+                # 为了安全，不创建实体，只标记 covered_indices 避免重复
+                # 实际中，这个单字 nr 就是独立人名，但不应该被强行合并。
+                # 所以不采取任何操作，让后续规则（如称谓）处理它。
+                # 注意：不能把单个 nr 标记为 covered，否则称谓规则可能失效。
+                # 这里选择不标记，回到 i-1 位置。
+                i = start + 1  # 回退，然后继续
+                # 由于我们已经移动了 i，需要重置，但 while 循环会递增，所以调整：
+                # 实际上我们已经在收集循环中移动了 i，发现长度<=1，我们需要将 i 调整回 start+1，然后进入外层循环的下一次迭代。
+                # 简单点：将 i 重置为 start+1，并跳过此次创建。
+                # 最好的办法：不创建实体，也不标记覆盖，让单个 nr 保持不变。
+                pass
+        else:
+            i += 1
+    
+    return merged_entities
+```
+
+然而，上述方法有索引管理复杂的风险。我们重新设计一个更清晰的实现，将其作为 `_enhance_entities` 的预处理阶段：
+
+```python
+def _enhance_entities(self, tokens, pos_tags, base_entities):
+    enhanced = list(base_entities)
+    covered = set()
+    for e in base_entities:
+        for idx in range(e.start, e.end):
+            covered.add(idx)
+
+    # ========== 第四层：连续 nr 合并（可选增强） ==========
+    i = 0
+    while i < len(tokens):
+        if i in covered:
+            i += 1
+            continue
+        
+        if pos_tags[i] in ('NR', 'nr'):
+            start = i
+            parts = [tokens[i]]
+            j = i + 1
+            while j < len(tokens) and j not in covered:
+                p = pos_tags[j]
+                if p in ('NR', 'nr'):
+                    parts.append(tokens[j])
+                    j += 1
+                elif tokens[j] in ('·', '-', '.', '/') and j+1 < len(tokens) and pos_tags[j+1] in ('NR', 'nr'):
+                    # 跳过分隔符，但为了保留名字完整性，可以吞掉分隔符
+                    j += 1
+                else:
+                    break
+            
+            if len(parts) > 1:
+                merged = ''.join(parts)
+                # 检查是否与已有实体文本冲突
+                if not any(e.text == merged for e in enhanced):
+                    enhanced.append(Entity(
+                        text=merged,
+                        type='PER',
+                        start=start,
+                        end=j
+                    ))
+                    # 覆盖索引
+                    for idx in range(start, j):
+                        covered.add(idx)
+                    i = j
+                    continue
+            # 单个 nr 不合并，也不做任何事，继续
+        i += 1
+
+    # ========== 原有的单字姓氏规则 ==========
+    # 保持之前的逻辑，但跳过 covered 部分
+    i = 0
+    SINGLE_CHAR_SURNAMES = { ... }
+    while i < len(tokens):
+        if i in covered:
+            i += 1
+            continue
+        token = tokens[i]
+        pos = pos_tags[i]
+        if (pos in ('NR', 'nr') and len(token) == 1 
+            and token in SINGLE_CHAR_SURNAMES
+            and i+1 < len(tokens) and (i+1) not in covered):
+            
+            next_token = tokens[i+1]
+            # ... 称谓、家族后缀、地点后缀的合并，并标记 covered
+        i += 1
+
+    return enhanced
+```
+
+**关键点**：
+- 连续 nr 合并**优先于**单字姓氏规则，因为它可能捕获“艾米莉亚”这种多段名字，避免后面的规则将“艾米”当作单姓去合并称谓（如果后面恰好有称谓的话）。
+- 分隔符处理允许“约翰·史密斯”被重组，去掉点号。
+- 只合并长度 >1 的连续 nr，避免创建单字实体。
+
+---
+
+## 三、效果示例
+
+| 文本 | HanLP 分词 | 增强后实体 |
+|------|------------|------------|
+| 艾米莉亚走进房间 | 艾米/nr 莉亚/nr | PER: 艾米莉亚 |
+| 约翰·史密斯到来 | 约翰/nr ·/w 史密斯/nr | PER: 约翰史密斯 (或可保留点号) |
+| 张小凡和李铁说话 | 张/nr 小凡/nr 和/c 李铁/nr | PER: 张小凡, PER: 李铁 (张+小凡合并；李铁为多字不合并) |
+| 王管家已等候多时 | 王/nr 管家/n 已/d ... | 连续 nr 不触发，因为只有一个 nr，但单字姓氏规则会合并成 PER: 王管家 |
+
+注意：在“张小凡”的例子中，HanLP 可能将“张”标为 nr，“小凡”标为 nr，连续 nr 合并会创建“张小凡”，正确。但如果 HanLP 将“张小凡”整体标为 nr，那自然更好。这个规则是保底。
+
+---
+
+## 四、风险与边界
+
+- **误合并风险**：如果两个不同的人名连续出现且没有标点分隔（比如“李白杜甫”），会被合并成一个实体。但这在小说中极少见，通常会有停顿词或标点。可通过检查上下文是否有并列连词（“和”、“与”）来规避，但不作为初版需求。
+- **命名规范**：外国人名中的点号被我们吞掉，输出“约翰史密斯”可能不如“约翰·史密斯”可读。我们可以选择保留点号：`'·'.join(parts)` 或更精细的判断。推荐保留，这样 TTS 也能正确处理。
+- **与 HanLP 覆盖的协作**：如果 HanLP 已经将“艾米莉亚”整体识别为 PERSON，那么它的索引会被 covered，连续 nr 合并就不会触发，避免重复。
+
+---
+
+## 五、集成建议
+
+由于你目前的目标是中文网文为主，这个“连续 nr 合并”可以作为**可选增强模块**，默认关闭，未来如果需要处理西方奇幻小说时再开启。可以在 `NLPBasics` 构造函数中增加一个参数 `enable_foreign_name_merge=False`，然后在 `_enhance_entities` 中根据开关决定是否执行该步骤。
+
+---
+
+是否需要我将修正后的完整 `_enhance_entities` 函数（包含所有四层防护）整理出来，并附带针对“重楼”、“南宫问天”、“艾米莉亚”等边界场景的单元测试用例？
