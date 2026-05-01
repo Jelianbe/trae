@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from pipeline.character_manager import CharacterManager, Character, get_character_manager
 from pipeline.nlp_basics import get_nlp
+from pipeline.semantic_ranker import SemanticRanker, get_semantic_ranker
 
 
 @dataclass
@@ -60,13 +61,20 @@ SPEAKER_PATTERNS = [
 
 
 class SpeakerMatcher:
-    def __init__(self, character_manager: CharacterManager = None):
+    def __init__(
+        self,
+        character_manager: CharacterManager = None,
+        semantic_ranker: SemanticRanker = None,
+        l2_threshold: float = 0.7,
+    ):
         self.char_manager = character_manager or get_character_manager()
         self.nlp = get_nlp()
         self._character_activity: Dict[int, int] = defaultdict(int)
         self._recent_speakers: List[str] = []
         self._recent_mentions: List[str] = []
         self._current_chapter_id: Optional[int] = None
+        self.semantic_ranker = semantic_ranker or get_semantic_ranker()
+        self.l2_threshold = l2_threshold
     
     @contextmanager
     def chapter_context(self, chapter_id: int):
@@ -202,6 +210,61 @@ class SpeakerMatcher:
         
         return None
     
+    def match_by_semantic(self, sentence: str) -> Optional[MatchResult]:
+        """L2 语义匹配阶段。
+
+        使用句子嵌入模型对候选角色进行语义相似度排序。
+        候选包括所有角色的名称和别名。
+
+        Args:
+            sentence: 输入句子（通常包含对话和上下文）
+
+        Returns:
+            匹配结果，如果没有候选超过阈值则返回 None
+        """
+        all_chars = self.char_manager.get_all_characters()
+        if not all_chars:
+            return None
+
+        # 构建候选列表：每个角色的名称和别名
+        candidates = []
+        char_map = {}  # 候选字符串 -> Character
+        for char in all_chars:
+            # 添加角色名称
+            candidates.append(char.name)
+            char_map[char.name] = char
+            # 添加别名
+            for alias in char.aliases:
+                candidates.append(alias)
+                char_map[alias] = char
+
+        # 使用语义排序器
+        results = self.semantic_ranker.rank(
+            sentence=sentence,
+            candidates=candidates,
+            threshold=self.l2_threshold,
+        )
+
+        if not results:
+            return None
+
+        # 取最高相似度的结果
+        best_candidate, best_score = results[0]
+        matched_char = char_map.get(best_candidate)
+
+        if matched_char:
+            # 将语义相似度映射到置信度 (0.6-0.8 范围)
+            confidence = 0.6 + (best_score - self.l2_threshold) * 0.5
+            confidence = min(confidence, 0.8)
+
+            return MatchResult(
+                character=matched_char,
+                confidence=confidence,
+                match_type='semantic',
+            )
+
+        return None
+    
     def match_by_pronoun(self, pronoun: str, context: DialogueContext) -> Optional[MatchResult]:
         gender = None
         for g, pronouns in PRONOUNS.items():
@@ -279,6 +342,12 @@ class SpeakerMatcher:
                 result = self.match_by_alias(name)
                 if result:
                     return result
+        
+        # L2 semantic matching (after L0/L1, before address inference)
+        if context.chapter_id is not None and self.semantic_ranker.is_available():
+            result = self.match_by_semantic(context.text)
+            if result:
+                return result
         
         result = self._infer_from_address(context)
         if result:

@@ -6,7 +6,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pipeline.nlp_basics import (
     NLPBasics, NLPResult, Token, Entity,
-    analyze, tokenize, pos_tag, get_entities, get_persons
+    analyze, tokenize, pos_tag, get_entities, get_persons,
+    is_chapter_title_pattern, filter_chapter_title_entities
 )
 
 
@@ -183,3 +184,153 @@ class TestEntityExtraction:
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+
+
+class TestChapterTitlePattern:
+    """Tests for is_chapter_title_pattern function."""
+
+    def test_chapter_number_chinese(self):
+        """Test '第一章' is detected as chapter title."""
+        assert is_chapter_title_pattern("第一章") is True
+
+    def test_chapter_number_arabic(self):
+        """Test '第1章' is detected as chapter title."""
+        assert is_chapter_title_pattern("第1章") is True
+
+    def test_volume_chinese(self):
+        """Test '卷一' is detected as chapter title."""
+        assert is_chapter_title_pattern("卷一") is True
+
+    def test_volume_arabic(self):
+        """Test '卷1' is detected as chapter title."""
+        assert is_chapter_title_pattern("卷1") is True
+
+    def test_chapter_with_hui(self):
+        """Test '第一百回' is detected as chapter title."""
+        assert is_chapter_title_pattern("第一百回") is True
+
+    def test_chapter_with_jie(self):
+        """Test '第2节' is detected as chapter title."""
+        assert is_chapter_title_pattern("第2节") is True
+
+    def test_normal_name_not_matched(self):
+        """Test '林轩' is not detected as chapter title."""
+        assert is_chapter_title_pattern("林轩") is False
+
+    def test_number_in_body_not_matched(self):
+        """Test '三天' (number in body text) is not detected as chapter title."""
+        assert is_chapter_title_pattern("三天") is False
+
+    def test_complex_chapter_title(self):
+        """Test '第一章 觉醒' is detected as chapter title (prefix match)."""
+        assert is_chapter_title_pattern("第一章 觉醒") is True
+
+    def test_volume_with_title(self):
+        """Test '卷一 风起云涌' is detected as chapter title."""
+        assert is_chapter_title_pattern("卷一 风起云涌") is True
+
+    def test_location_name_not_matched(self):
+        """Test '北京' is not detected as chapter title."""
+        assert is_chapter_title_pattern("北京") is False
+
+    def test_organization_not_matched(self):
+        """Test '天龙帮' is not detected as chapter title."""
+        assert is_chapter_title_pattern("天龙帮") is False
+
+
+class TestFilterChapterTitleEntities:
+    """Tests for filter_chapter_title_entities function."""
+
+    def test_filter_chapter_one(self):
+        """Test '第一章' entity is filtered out."""
+        entities = [
+            Entity(text="第一章", type="LOC", start=0, end=3),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        assert len(filtered) == 0
+
+    def test_filter_volume_one(self):
+        """Test '卷一' entity is filtered out."""
+        entities = [
+            Entity(text="卷一", type="LOC", start=0, end=2),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        assert len(filtered) == 0
+
+    def test_preserve_normal_name(self):
+        """Test normal name like '林轩' is preserved."""
+        entities = [
+            Entity(text="林轩", type="PER", start=0, end=2),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        assert len(filtered) == 1
+        assert filtered[0].text == "林轩"
+
+    def test_preserve_numbers_in_body(self):
+        """Test numbers in body text like '三天' are preserved."""
+        entities = [
+            Entity(text="三天", type="NUM", start=0, end=2),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        assert len(filtered) == 1
+        assert filtered[0].text == "三天"
+
+    def test_mixed_entities(self):
+        """Test mixed entities are filtered correctly."""
+        entities = [
+            Entity(text="第一章", type="LOC", start=0, end=3),
+            Entity(text="林轩", type="PER", start=10, end=12),
+            Entity(text="卷二", type="LOC", start=20, end=22),
+            Entity(text="北京", type="LOC", start=30, end=32),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        
+        assert len(filtered) == 2
+        assert filtered[0].text == "林轩"
+        assert filtered[1].text == "北京"
+
+    def test_empty_entities(self):
+        """Test empty entity list returns empty."""
+        filtered = filter_chapter_title_entities([])
+        assert filtered == []
+
+    def test_all_chapter_titles_filtered(self):
+        """Test all chapter title patterns are filtered."""
+        entities = [
+            Entity(text="第1章", type="LOC", start=0, end=4),
+            Entity(text="第100回", type="LOC", start=10, end=16),
+            Entity(text="第一百章", type="LOC", start=20, end=24),
+            Entity(text="卷1", type="LOC", start=30, end=33),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        assert len(filtered) == 0
+
+    def test_with_chapter_objects(self):
+        """Test filtering with Chapter objects for position-based filtering."""
+        from pipeline.chapter_splitter import Chapter
+        
+        chapters = [
+            Chapter(index=0, title="第一章 觉醒", content="content", start_pos=0, end_pos=100),
+        ]
+        
+        entities = [
+            Entity(text="第一章", type="LOC", start=0, end=3),
+            Entity(text="觉醒", type="PER", start=4, end=6),  # In title range
+            Entity(text="林轩", type="PER", start=10, end=12),  # In content
+        ]
+        filtered = filter_chapter_title_entities(entities, chapters=chapters)
+        
+        # Only 林轩 should remain (第一章 is pattern match, 觉醒 is in title range)
+        assert len(filtered) == 1
+        assert filtered[0].text == "林轩"
+
+    def test_preserve_entity_with_similar_pattern(self):
+        """Test entities that contain chapter-like text but are not chapter titles."""
+        # This tests edge cases where chapter-like text appears in body
+        entities = [
+            Entity(text="三", type="NUM", start=0, end=1),
+            Entity(text="一", type="NUM", start=2, end=3),
+        ]
+        filtered = filter_chapter_title_entities(entities)
+        # Single characters should not match chapter patterns
+        assert len(filtered) == 2

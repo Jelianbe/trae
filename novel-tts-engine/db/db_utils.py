@@ -1,10 +1,12 @@
 import sqlite3
 import json
+import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
 
 DB_PATH = Path(__file__).parent.parent / "novel_tts.db"
+logger = logging.getLogger(__name__)
 
 
 @contextmanager
@@ -18,8 +20,17 @@ def get_connection():
     try:
         yield conn
         conn.commit()
-    except Exception:
+    except sqlite3.IntegrityError as e:
         conn.rollback()
+        logger.error(f"数据库完整性错误: {e}", exc_info=True)
+        raise
+    except sqlite3.OperationalError as e:
+        conn.rollback()
+        logger.error(f"数据库操作错误: {e}", exc_info=True)
+        raise
+    except sqlite3.Error as e:
+        conn.rollback()
+        logger.error(f"数据库错误: {e}", exc_info=True)
         raise
     finally:
         conn.close()

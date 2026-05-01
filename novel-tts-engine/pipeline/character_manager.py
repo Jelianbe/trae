@@ -210,9 +210,10 @@ class CharacterManager:
                     first_appearance=row[4]
                 )
             
+            # 使用参数化查询，避免SQL注入
             cursor.execute(
                 "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE aliases LIKE ?",
-                (f'%"{alias}"%',)
+                (f'%{alias}%',)
             )
             row = cursor.fetchone()
             
@@ -247,33 +248,32 @@ class CharacterManager:
     
     def update_character(self, char_id: int, name: str = None, 
                          aliases: Set[str] = None, gender: str = None) -> bool:
-        with self._get_connection() as conn:
+        # 验证 gender 参数
+        if gender is not None and gender not in ('male', 'female', 'unknown'):
+            raise ValueError(f"Invalid gender: {gender}. Must be 'male', 'female', or 'unknown'")
+        
+        with self._transaction() as conn:
             cursor = conn.cursor()
             
-            updates = []
-            params = []
-            
+            # 使用参数化查询，避免SQL注入
             if name is not None:
-                updates.append("name = ?")
-                params.append(name)
+                cursor.execute(
+                    "UPDATE characters SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (name, char_id)
+                )
             
             if aliases is not None:
-                updates.append("aliases = ?")
-                params.append(json.dumps(list(aliases), ensure_ascii=False))
+                cursor.execute(
+                    "UPDATE characters SET aliases = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (json.dumps(list(aliases), ensure_ascii=False), char_id)
+                )
             
             if gender is not None:
-                updates.append("gender = ?")
-                params.append(gender)
+                cursor.execute(
+                    "UPDATE characters SET gender = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                    (gender, char_id)
+                )
             
-            if not updates:
-                return False
-            
-            params.append(char_id)
-            cursor.execute(
-                f"UPDATE characters SET {', '.join(updates)}, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-                params
-            )
-            conn.commit()
             return cursor.rowcount > 0
     
     def add_alias(self, char_id: int, alias: str) -> bool:
