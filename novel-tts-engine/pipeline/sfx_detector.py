@@ -1,8 +1,11 @@
 import re
 import json
-from typing import List, Tuple, Optional, Set
+import logging
+from typing import List, Tuple, Optional, Set, Dict
 from dataclasses import dataclass
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -27,6 +30,7 @@ DEFAULT_SFX_WORDS = {
     '嘘', '咳', '哼', '哈', '嘿',
     '咚咚', '当当', '叮叮', '啪啪', '砰砰',
     '哗啦啦', '轰隆隆', '滴答答', '淅沥沥',
+    '呼',
     
     '桀桀', '喝喝', '嘶嘶', '嗬嗬', '吼吼', '嗷嗷',
     '噗', '噗嗤', '噗通', '噼啪', '噼噼啪啪',
@@ -196,6 +200,8 @@ class SfxDetector:
 
     def __init__(self, dict_path: str = None):
         self.sfx_words: Set[str] = set()
+        self._trie: Dict[str, any] = {}
+        self._trie_built: bool = False
         self._load_dictionary(dict_path)
 
     def _load_dictionary(self, dict_path: str = None):
@@ -211,30 +217,54 @@ class SfxDetector:
                         self.sfx_words.update(data)
                     elif isinstance(data, dict) and 'words' in data:
                         self.sfx_words.update(data['words'])
-                print(f"拟声词词典加载成功: {len(self.sfx_words)} 个词")
+                logger.info(f"拟声词词典加载成功: {len(self.sfx_words)} 个词")
             except Exception as e:
-                print(f"拟声词词典加载失败: {e}")
+                logger.warning(f"拟声词词典加载失败: {e}")
+        
+        self._build_trie()
+    
+    def _build_trie(self):
+        """构建trie树用于快速匹配"""
+        self._trie = {}
+        for word in self.sfx_words:
+            if word not in self.SFX_EXCLUDE:
+                node = self._trie
+                for char in word:
+                    if char not in node:
+                        node[char] = {}
+                    node = node[char]
+                node['#'] = word  # 标记词尾
+        self._trie_built = True
 
     def detect(self, text: str) -> List[SfxWord]:
         results = []
         
-        for word in self.sfx_words:
-            if word in self.SFX_EXCLUDE:
-                continue
-            
-            pos = 0
-            while True:
-                pos = text.find(word, pos)
-                if pos == -1:
-                    break
-                
-                sfx_type = self._get_sfx_type(word)
-                results.append(SfxWord(
-                    text=word,
-                    position=pos,
-                    sfx_type=sfx_type
-                ))
-                pos += len(word)
+        if self._trie_built:
+            for i in range(len(text)):
+                node = self._trie
+                if text[i] in node:
+                    node = node[text[i]]
+                    if '#' in node:
+                        word = node['#']
+                        sfx_type = self._get_sfx_type(word)
+                        results.append(SfxWord(
+                            text=word,
+                            position=i,
+                            sfx_type=sfx_type
+                        ))
+                    for j in range(i + 1, len(text)):
+                        if text[j] in node:
+                            node = node[text[j]]
+                            if '#' in node:
+                                word = node['#']
+                                sfx_type = self._get_sfx_type(word)
+                                results.append(SfxWord(
+                                    text=word,
+                                    position=i,
+                                    sfx_type=sfx_type
+                                ))
+                        else:
+                            break
         
         for pattern in self.SFX_PATTERNS:
             for match in pattern.finditer(text):
@@ -268,13 +298,26 @@ class SfxDetector:
         results.sort(key=lambda x: (x.position, -len(x.text)))
         
         unique = []
-        last_end = -1
-        
         for sfx in results:
             sfx_end = sfx.position + len(sfx.text)
-            if sfx.position >= last_end:
+            
+            skip = False
+            for existing in unique:
+                existing_end = existing.position + len(existing.text)
+                
+                # 检查是否是完全相同的匹配（文本和位置都相同）
+                if sfx.text == existing.text and sfx.position == existing.position:
+                    skip = True
+                    break
+                
+                # 检查是否被现有匹配完全包含
+                if (existing.position <= sfx.position and 
+                    sfx_end <= existing_end):
+                    skip = True
+                    break
+            
+            if not skip:
                 unique.append(sfx)
-                last_end = sfx_end
         
         return unique
 

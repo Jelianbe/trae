@@ -1,7 +1,15 @@
+-- Novel-TTS-Engine Database Schema
+-- Last updated: 2026-04-30
+-- Note: PRAGMA foreign_keys = ON must be set in application code
+
 CREATE TABLE IF NOT EXISTS characters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     aliases TEXT,
+    gender TEXT DEFAULT 'unknown' CHECK(gender IN ('male', 'female', 'unknown')),
+    first_appearance INTEGER,
+    activity_weight REAL DEFAULT 1.0 CHECK(activity_weight >= 0 AND activity_weight <= 10.0),
+    is_confirmed INTEGER DEFAULT 1,
     vector BLOB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -11,7 +19,7 @@ CREATE TABLE IF NOT EXISTS chapters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     content TEXT,
-    status TEXT DEFAULT 'pending',
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'splitting', 'analyzing', 'generating', 'completed', 'failed')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -29,8 +37,9 @@ CREATE TABLE IF NOT EXISTS sentences (
     is_edited BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id),
-    FOREIGN KEY (speaker_id) REFERENCES characters(id)
+    FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE,
+    FOREIGN KEY (speaker_id) REFERENCES characters(id) ON DELETE SET NULL,
+    UNIQUE(chapter_id, sentence_index)
 );
 
 CREATE TABLE IF NOT EXISTS sfx_words (
@@ -45,5 +54,16 @@ CREATE TABLE IF NOT EXISTS progress (
     step TEXT NOT NULL,
     status TEXT DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE,
+    UNIQUE(chapter_id, step)
 );
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_sentences_chapter ON sentences(chapter_id);
+CREATE INDEX IF NOT EXISTS idx_sentences_speaker ON sentences(speaker_id);
+CREATE INDEX IF NOT EXISTS idx_sentences_chapter_index ON sentences(chapter_id, sentence_index);
+CREATE INDEX IF NOT EXISTS idx_progress_chapter_step ON progress(chapter_id, step);
+CREATE INDEX IF NOT EXISTS idx_characters_gender ON characters(gender);
+CREATE INDEX IF NOT EXISTS idx_characters_first_appearance ON characters(first_appearance);
+CREATE INDEX IF NOT EXISTS idx_sfx_words_word ON sfx_words(word);

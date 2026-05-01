@@ -4,10 +4,21 @@ from dataclasses import dataclass
 import os
 import re
 import warnings
+import logging
 
 warnings.filterwarnings('ignore')
 
+logger = logging.getLogger(__name__)
+
 HANLP_MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', 'models', 'hanlp')
+
+# Chapter title patterns that should be filtered from NER results
+CHAPTER_TITLE_PATTERNS = [
+    re.compile(r'^第[一二三四五六七八九十百千万零\d]+[章节回卷]'),
+    re.compile(r'^卷[一二三四五六七八九十百千万零\d]+'),
+    re.compile(r'^第[一二三四五六七八九十\d]+'),
+    re.compile(r'^\d+[章节回卷]'),
+]
 
 
 @dataclass
@@ -24,6 +35,7 @@ class Entity:
     type: str
     start: int
     end: int
+    confidence: float = 1.0
 
 
 @dataclass
@@ -84,10 +96,10 @@ class NLPBasics:
                 hanlp.pretrained.mtl.CLOSE_TOK_POS_NER_SRL_DEP_SDP_CON_ELECTRA_SMALL_ZH
             )
             self._initialized = True
-            print("HanLP模型加载成功")
+            logger.info("HanLP模型加载成功")
         except Exception as e:
-            print(f"HanLP模型加载失败: {e}")
-            print("将使用简化模式...")
+            logger.warning(f"HanLP模型加载失败: {e}")
+            logger.warning("将使用简化模式...")
             self._initialized = False
 
     def analyze(self, text: str) -> NLPResult:
@@ -137,7 +149,7 @@ class NLPBasics:
                 if os.getenv('DEBUG_NER'):
                     print(f"[DEBUG] 解析后实体: {[(e.text, e.type) for e in hanlp_entities]}")
                 
-                enhanced_entities = self._enhance_entities(tokens, pos_tags, hanlp_entities)
+                enhanced_entities = self._enhance_entities(tokens, pos_tags, hanlp_entities, raw_text=sent)
                 
                 if os.getenv('DEBUG_NER'):
                     print(f"[DEBUG] 增强后实体: {[(e.text, e.type) for e in enhanced_entities]}")
@@ -153,7 +165,7 @@ class NLPBasics:
                 raw_text=text
             )
         except Exception as e:
-            print(f"HanLP分析失败: {e}")
+            logger.warning(f"HanLP分析失败: {e}")
             return self._analyze_simple(text, sentences)
 
     def _parse_ner_result(self, ner_result: List) -> List[Entity]:
@@ -164,6 +176,7 @@ class NLPBasics:
                 entity_type = ner_item[1]
                 start = ner_item[2] if len(ner_item) >= 3 else 0
                 end = ner_item[3] if len(ner_item) >= 4 else start + 1
+                confidence = ner_item[4] if len(ner_item) >= 5 else 0.9
                 
                 normalized_type = self._normalize_entity_type(entity_type)
                 
@@ -171,7 +184,8 @@ class NLPBasics:
                     text=entity_text,
                     type=normalized_type,
                     start=start,
-                    end=end
+                    end=end,
+                    confidence=confidence
                 ))
         
         return entities
@@ -189,7 +203,7 @@ class NLPBasics:
         return type_map.get(entity_type.upper(), entity_type)
 
     def _enhance_entities(self, tokens: List[str], pos_tags: List[str], 
-                          base_entities: List[Entity]) -> List[Entity]:
+                          base_entities: List[Entity], raw_text: Optional[str] = None) -> List[Entity]:
         rule_entities = []
         rule_covered_indices = set()
         rule_entity_texts = set()
@@ -280,7 +294,8 @@ class NLPBasics:
                     text=combined,
                     type='PER',
                     start=i,
-                    end=i + 2
+                    end=i + 2,
+                    confidence=0.95
                 ))
                 rule_entity_texts.add(combined)
                 rule_covered_indices.update([i, i + 1])
@@ -292,7 +307,8 @@ class NLPBasics:
                     text=combined,
                     type='ORG',
                     start=i,
-                    end=i + 2
+                    end=i + 2,
+                    confidence=0.90
                 ))
                 rule_entity_texts.add(combined)
                 rule_covered_indices.update([i, i + 1])
@@ -304,7 +320,8 @@ class NLPBasics:
                     text=combined,
                     type='LOC',
                     start=i,
-                    end=i + 2
+                    end=i + 2,
+                    confidence=0.85
                 ))
                 rule_entity_texts.add(combined)
                 rule_covered_indices.update([i, i + 1])
@@ -327,6 +344,9 @@ class NLPBasics:
                 enhanced.append(e)
                 entity_texts.add(e.text)
         
+        # Filter out chapter title entities
+        enhanced = filter_chapter_title_entities(enhanced)
+        
         return enhanced
 
     def _analyze_simple(self, text: str, sentences: List[str]) -> NLPResult:
@@ -346,6 +366,9 @@ class NLPBasics:
                     all_pos_tags.append((word, pos))
         
         entities = self._extract_entities_from_pos(all_tokens)
+        
+        # Filter out chapter title entities
+        entities = filter_chapter_title_entities(entities)
         
         return NLPResult(
             tokens=all_tokens,
@@ -452,3 +475,101 @@ def get_locations(text: str) -> List[str]:
 
 def get_organizations(text: str) -> List[str]:
     return get_nlp().get_organizations(text)
+
+
+def is_chapter_title_pattern(text: str) -> bool:
+    """Check if text matches chapter title patterns.
+
+    Args:
+        text: Text to check.
+
+    Returns:
+        True if text matches chapter title patterns, False otherwise.
+
+    Examples:
+        >>> is_chapter_title_pattern("第一章")
+        True
+        >>> is_chapter_title_pattern("卷一")
+        True
+        >>> is_chapter_title_pattern("林轩")
+        False
+    """
+    return any(pattern.match(text) for pattern in CHAPTER_TITLE_PATTERNS)
+
+
+def filter_chapter_title_entities(
+    entities: List[Entity],
+    chapters: Optional[List] = None,
+    raw_text: Optional[str] = None,
+) -> List[Entity]:
+    """Filter out entities that are chapter titles.
+
+    Removes entities that match chapter title patterns (e.g., "第一章", "卷一")
+    while preserving normal entities in the body text.
+
+    Args:
+        entities: List of entities to filter.
+        chapters: Optional list of Chapter objects for position-based filtering.
+        raw_text: Optional raw text for title position matching.
+
+    Returns:
+        Filtered list of entities with chapter title entities removed.
+
+    Examples:
+        >>> from pipeline.nlp_basics import Entity, Chapter
+        >>> entities = [
+        ...     Entity(text="第一章", type="LOC", start=0, end=3),
+        ...     Entity(text="林轩", type="PER", start=10, end=12),
+        ... ]
+        >>> filtered = filter_chapter_title_entities(entities)
+        >>> [e.text for e in filtered]
+        ['林轩']
+    """
+    if not entities:
+        return []
+
+    # Build a set of chapter title strings for quick lookup
+    chapter_title_texts = set()
+    chapter_title_positions = []  # (start_pos, end_pos) tuples
+
+    if chapters:
+        for chapter in chapters:
+            if hasattr(chapter, 'title'):
+                chapter_title_texts.add(chapter.title)
+            if hasattr(chapter, 'start_pos') and hasattr(chapter, 'end_pos'):
+                chapter_title_positions.append(
+                    (chapter.start_pos, chapter.end_pos)
+                )
+
+    filtered = []
+    for entity in entities:
+        # Check if entity text matches chapter title patterns
+        if is_chapter_title_pattern(entity.text):
+            logger.debug(f"过滤章节标题实体: {entity.text} ({entity.type})")
+            continue
+
+        # Check if entity text matches known chapter titles
+        if entity.text in chapter_title_texts:
+            logger.debug(f"过滤已知章节标题: {entity.text}")
+            continue
+
+        # Check if entity is within a chapter title position range
+        # Chapter titles are typically at the start_pos of each chapter
+        in_title_range = False
+        if chapters:
+            for chapter in chapters:
+                if hasattr(chapter, 'title') and hasattr(chapter, 'start_pos'):
+                    # Check if entity position overlaps with chapter title
+                    title_start = chapter.start_pos
+                    title_end = title_start + len(chapter.title)
+                    if entity.start >= title_start and entity.end <= title_end:
+                        in_title_range = True
+                        break
+
+        if in_title_range:
+            logger.debug(f"过滤章节标题范围内的实体: {entity.text}")
+            continue
+
+        filtered.append(entity)
+
+    return filtered

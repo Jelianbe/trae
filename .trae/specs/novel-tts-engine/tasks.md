@@ -148,7 +148,7 @@
 
 ### 阶段三：角色库 + 说话人匹配
 
-## [待开始] T-007: 角色库管理实现
+## [已完成] T-007: 角色库管理实现
 - **Priority**: P0
 - **Depends On**: T-002, T-004, M2
 - **Description**: 
@@ -157,11 +157,11 @@
   - 支持角色别名管理
 - **Acceptance Criteria Addressed**: AC-005
 - **Test Requirements**:
-  - `programmatic` TR-T007-01: 角色库CRUD操作正常
-  - `programmatic` TR-T007-02: 角色别名正确映射
+  - `programmatic` TR-T007-01: 角色库CRUD操作正常 ✅ 已完成
+  - `programmatic` TR-T007-02: 角色别名正确映射 ✅ 已完成
 - **Notes**: 角色向量化使用FastText
 
-## [待开始] T-008: 说话人匹配器实现
+## [已完成] T-008: 说话人匹配器实现
 - **Priority**: P0
 - **Depends On**: T-005, T-007, M2
 - **Description**: 
@@ -170,8 +170,8 @@
   - 使用BGE-small L2进行语义相似度排序
 - **Acceptance Criteria Addressed**: AC-005
 - **Test Requirements**:
-  - `programmatic` TR-T008-01: 明确对话匹配准确率≥95%
-  - `programmatic` TR-T008-02: 交织对话正确拆分
+  - `programmatic` TR-T008-01: 明确对话匹配准确率≥95% ✅ 已完成
+  - `programmatic` TR-T008-02: 交织对话正确拆分 ✅ 已完成
 - **Notes**: BGE-small使用ONNX版本
 
 ---
