@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "novel-tts-engine"
+version = "3.12.0"
+description = "小说TTS引擎 - 智能文本分析和语音合成"
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "streamlit>=1.28.0",
+    "hanlp>=2.1.0",
+    "numpy>=1.24.0",
+    "psutil>=5.9.0",
+    "jieba>=0.42.0",
+    "transformers>=4.35.0",
+    "torch>=2.1.0",
+    "optimum>=1.14.0",
+    "onnxruntime>=1.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

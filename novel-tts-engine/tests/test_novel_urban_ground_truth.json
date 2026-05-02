@@ -18,41 +18,860 @@
     "总对话数": 42
   },
   "sfx": {
-    "sfx_words": ["轰隆", "劈啪", "叮铃铃", "呜", "呼", "轰", "咔嚓"]
+    "sfx_words": [
+      "轰隆",
+      "劈啪",
+      "叮铃铃",
+      "呜",
+      "呼",
+      "轰",
+      "咔嚓"
+    ]
   },
   "entities": {
-    "persons": ["苏夜", "林雪", "赵天行", "老陈", "张总", "博士"],
-    "speaking_persons": ["苏夜", "林雪", "赵天行", "老陈", "博士"],
-    "organizations": ["暗影会", "华夏异能者联盟"],
+    "persons": [
+      "苏夜",
+      "林雪",
+      "赵天行",
+      "老陈",
+      "张总",
+      "博士"
+    ],
+    "speaking_persons": [
+      "苏夜",
+      "林雪",
+      "赵天行",
+      "老陈",
+      "博士"
+    ],
+    "organizations": [
+      "暗影会",
+      "华夏异能者联盟"
+    ],
     "locations": [],
     "aliases": {
-      "苏夜": ["苏先生"],
-      "赵天行": ["赵大哥"]
+      "苏夜": [
+        "苏先生"
+      ],
+      "赵天行": [
+        "赵大哥"
+      ]
     }
   },
   "dialogue_speakers": [
-    {"text": "苏夜，你在这里！", "speaker": "林雪"},
-    {"text": "林雪，你怎么上来了？", "speaker": "苏夜"},
-    {"text": "公司出事了。", "speaker": "林雪"},
-    {"text": "今天有个神秘组织来公司搜查", "speaker": "林雪"},
-    {"text": "他们怎么知道这里有异能者？", "speaker": "苏夜"},
-    {"text": "苏夜，来会议室一趟。", "speaker": "老陈"},
-    {"text": "苏先生，我们是暗影会的调查员。", "speaker": "黑衣人"},
-    {"text": "我不知道你们在说什么。", "speaker": "苏夜"},
-    {"text": "苏夜，快来老地方！", "speaker": "林雪"},
-    {"text": "这是赵天行赵大哥。", "speaker": "林雪"},
-    {"text": "我是华夏异能者联盟的负责人。", "speaker": "赵天行"},
-    {"text": "明天开始，你来联盟总部报道。", "speaker": "赵天行"},
-    {"text": "暗影会的人来了！", "speaker": "联盟成员"},
-    {"text": "苏夜，你跟我去前线！", "speaker": "赵天行"},
-    {"text": "干得好，苏夜！", "speaker": "赵天行"},
-    {"text": "我建议潜入基地。", "speaker": "苏夜"},
-    {"text": "太危险了。", "speaker": "林雪"},
-    {"text": "样本准备好了吗？", "speaker": "博士"},
-    {"text": "这不是科学，这是犯罪！", "speaker": "苏夜"},
-    {"text": "苏夜，你这次立了大功。", "speaker": "赵天行"},
-    {"text": "这是大家共同努力的结果。", "speaker": "苏夜"},
-    {"text": "苏夜，你太棒了！", "speaker": "林雪"},
-    {"text": "为了守护这个世界！", "speaker": "三人"}
+    {
+      "text": "苏夜，你在这里！",
+      "speaker": "林雪"
+    },
+    {
+      "text": "林雪，你怎么上来了？",
+      "speaker": "苏夜"
+    },
+    {
+      "text": "公司出事了。",
+      "speaker": "林雪"
+    },
+    {
+      "text": "今天有个神秘组织来公司搜查",
+      "speaker": "林雪"
+    },
+    {
+      "text": "他们怎么知道这里有异能者？",
+      "speaker": "苏夜"
+    },
+    {
+      "text": "苏夜，来会议室一趟。",
+      "speaker": "老陈"
+    },
+    {
+      "text": "苏先生，我们是暗影会的调查员。",
+      "speaker": "黑衣人"
+    },
+    {
+      "text": "我不知道你们在说什么。",
+      "speaker": "苏夜"
+    },
+    {
+      "text": "苏夜，快来老地方！",
+      "speaker": "林雪"
+    },
+    {
+      "text": "这是赵天行赵大哥。",
+      "speaker": "林雪"
+    },
+    {
+      "text": "我是华夏异能者联盟的负责人。",
+      "speaker": "赵天行"
+    },
+    {
+      "text": "明天开始，你来联盟总部报道。",
+      "speaker": "赵天行"
+    },
+    {
+      "text": "暗影会的人来了！",
+      "speaker": "联盟成员"
+    },
+    {
+      "text": "苏夜，你跟我去前线！",
+      "speaker": "赵天行"
+    },
+    {
+      "text": "干得好，苏夜！",
+      "speaker": "赵天行"
+    },
+    {
+      "text": "我建议潜入基地。",
+      "speaker": "苏夜"
+    },
+    {
+      "text": "太危险了。",
+      "speaker": "林雪"
+    },
+    {
+      "text": "样本准备好了吗？",
+      "speaker": "博士"
+    },
+    {
+      "text": "这不是科学，这是犯罪！",
+      "speaker": "苏夜"
+    },
+    {
+      "text": "苏夜，你这次立了大功。",
+      "speaker": "赵天行"
+    },
+    {
+      "text": "这是大家共同努力的结果。",
+      "speaker": "苏夜"
+    },
+    {
+      "text": "苏夜，你太棒了！",
+      "speaker": "林雪"
+    },
+    {
+      "text": "为了守护这个世界！",
+      "speaker": "三人"
+    }
+  ],
+  "dialogue_sentences": [
+    {
+      "text": "卷一 暗流涌动",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第一章 异能觉醒",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "夜幕降临，霓虹灯照亮了这座不眠的城市。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜独自坐在天台上，俯瞰着脚下的车水马龙。三个月前，他还只是一名普通的程序员，直到那场意外改变了一切。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"轰隆！\"远处的雷声滚滚而来，暴雨即将来临。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜伸出手，指尖隐约闪烁着微弱的蓝色光芒。那是他觉醒的异能——操控电流。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，你在这里！\"一个清脆的女声从楼梯口传来。",
+      "is_dialogue": true,
+      "speaker": "林雪"
+    },
+    {
+      "text": "苏夜转头看去，只见林雪快步走来。她是苏夜的同事，也是唯一知道他秘密的人。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"林雪，你怎么上来了？\"苏夜收起手中的电光，轻声问道。",
+      "is_dialogue": true,
+      "speaker": "苏夜"
+    },
+    {
+      "text": "\"公司出事了。\"林雪脸色凝重，\"今天有个神秘组织来公司搜查，说是要找什么异能者。\"",
+      "is_dialogue": true,
+      "speaker": "林雪"
+    },
+    {
+      "text": "苏夜眉头一皱：\"他们怎么知道这里有异能者？\"",
+      "is_dialogue": true,
+      "speaker": "苏夜"
+    },
+    {
+      "text": "\"不清楚。\"林雪摇摇头，\"但我听到他们说一个叫暗影会的神秘组织，似乎在暗中收集所有觉醒者。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜握紧了拳头。他知道，平静的日子结束了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "这时，天空中划过一道闪电。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "劈啪！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜手中的电光突然暴涨，将周围的雨水都吸引过来，形成了一个小小的电场。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，你的能力又变强了！\"林雪惊讶地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"是的。\"苏夜感受着体内涌动的力量，\"我感觉自己还能做得更好。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第二章 暗影初现",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第二天清晨，苏夜照常来到公司上班。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "叮铃铃！办公桌上的电话突然响起。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，来会议室一趟。\"是部门经理老陈的声音。",
+      "is_dialogue": true,
+      "speaker": "老陈"
+    },
+    {
+      "text": "苏夜心中一紧，隐隐感到不安。他拿起笔记本，向会议室走去。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "走廊里，一个陌生的黑衣人正站在角落，目光锐利地扫视着每一个路过的人。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜加快脚步，走进了会议室。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "会议室里已经坐着三个人，其中两个是黑衣打扮，另一个则是公司的总经理张总。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，请坐。\"张总脸色不太好看。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一个黑衣人开口了：\"苏先生，我们是暗影会的调查员。最近我们检测到这个区域有异能波动，请问您是否知道什么？\"",
+      "is_dialogue": true,
+      "speaker": "黑衣人"
+    },
+    {
+      "text": "苏夜面色平静地回答：\"我不知道你们在说什么。我只是一个普通的程序员。\"",
+      "is_dialogue": true,
+      "speaker": "苏夜"
+    },
+    {
+      "text": "另一个黑衣人冷笑一声：\"普通程序员？那我们检测到的电流波动怎么解释？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜心中一惊，但表面上依然镇定：\"可能是设备故障吧。我们公司有很多电子设备。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "两个黑衣人交换了一个眼神，然后站起身来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我们会继续调查的。\"为首的黑衣人说道，\"苏先生，希望下次见面的时候，你能给我们一个更诚实的答案。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "说完，两人便离开了会议室。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "张总长叹一声：\"苏夜，你到底卷入了什么事？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"张总，我保证我没有做任何违法的事。\"苏夜诚恳地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "张总摆摆手：\"你先回去工作吧。有什么需要帮忙的，随时来找我。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜回到工位，深吸了一口气。他知道，暗影会不会轻易放过他。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，你没事吧？\"林雪走过来，低声问道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"没事。\"苏夜低声回答，\"但他们还会回来的。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第三章 异能者联盟",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "晚上，苏夜接到了林雪的电话。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，快来老地方！有重要的事情！\"林雪的声音有些急促。",
+      "is_dialogue": true,
+      "speaker": "林雪"
+    },
+    {
+      "text": "苏夜心中一紧，立刻赶往他们常去的那家咖啡馆。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "推开门，苏夜看到林雪正和一个中年男子坐在一起。那男子约莫四十岁，身材高大，眼神中透着一种说不清的压迫感。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，这是赵天行赵大哥。\"林雪介绍道。",
+      "is_dialogue": true,
+      "speaker": "林雪"
+    },
+    {
+      "text": "赵天行伸出手：\"苏夜，你好。我是华夏异能者联盟的负责人。\"",
+      "is_dialogue": true,
+      "speaker": "赵天行"
+    },
+    {
+      "text": "苏夜握了握手，惊讶地发现赵天行的手掌温热异常，仿佛体内燃烧着一团火焰。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"华夏异能者联盟？\"苏夜问道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"是的。\"赵天行说道，\"我们是国内最大的异能者组织，致力于保护觉醒者不受暗影会的迫害。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜眼中闪过一丝希望：\"那你能帮我吗？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"当然。\"赵天行点点头，\"但你必须接受我们的训练，学会控制你的能力。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我愿意。\"苏夜毫不犹豫地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "赵天行满意地笑了：\"很好。明天开始，你来联盟总部报道。我会安排最好的导师教你。\"",
+      "is_dialogue": true,
+      "speaker": "赵天行"
+    },
+    {
+      "text": "\"多谢赵大哥。\"苏夜感激地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "林雪也开口说道：\"苏夜，我也加入了联盟。以后我们一起战斗！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜看着林雪坚定的眼神，心中涌起一股暖流。他知道自己不再是孤军奋战了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第四章 初次交锋",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一周后，苏夜已经能够在赵天行的指导下熟练操控电流了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "呼！呼！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "训练室内，苏夜双手不断释放出蓝色的电光，在空气中形成一道道电弧。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"很好！\"赵天行拍手称赞，\"你的进步很快，已经达到了初级异能者的水平。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜擦了擦额头的汗水，心中充满成就感。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "就在这时，警报声突然响起。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "呜！呜！呜！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"暗影会的人来了！\"一个联盟成员冲进来大声喊道。",
+      "is_dialogue": true,
+      "speaker": "联盟成员"
+    },
+    {
+      "text": "赵天行脸色一变：\"全体戒备！苏夜，你跟我去前线！\"",
+      "is_dialogue": true,
+      "speaker": "赵天行"
+    },
+    {
+      "text": "\"是！\"苏夜毫不犹豫地跟上。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "两人冲出联盟总部，只见街道上已经乱作一团。三个黑衣人正与联盟的成员激烈交战。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"是暗影会的追猎者！\"赵天行沉声说道，\"苏夜，你负责支援，我来主攻！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜点头，双手迅速凝聚电流。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰！赵天行一掌拍向地面，火焰瞬间蔓延开来，将三个黑衣人逼退。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"哼，赵天行，你的火焰还是这么嚣张！\"为首的黑衣人冷笑道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"暗影鼠辈，也敢在我的地盘撒野！\"赵天行怒喝道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜趁机释放出一道电弧，直击一个黑衣人的后背。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "劈啪！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "黑衣人闷哼一声，踉跄后退。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"没想到这里还有别的异能者！\"黑衣人惊呼道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"撤退！\"黑衣人首领下令道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "三个黑衣人迅速消失在夜色中。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "赵天行转过身，对苏夜竖起大拇指：\"干得好，苏夜！你的电流攻击非常精准！\"",
+      "is_dialogue": true,
+      "speaker": "赵天行"
+    },
+    {
+      "text": "\"多谢赵大哥指导。\"苏夜谦虚地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"这只是开始。\"赵天行望向远方，\"暗影会不会善罢甘休的。我们需要做好更充分的准备。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "卷二 破晓之光",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第五章 深入虎穴",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一个月后，苏夜已经成为联盟的核心成员之一。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"根据线报，暗影会在城郊有一个秘密基地。\"赵天行在作战会议上说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜认真听着，心中已经有了计划。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我建议潜入基地，获取他们的情报。\"苏夜主动请缨。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"太危险了。\"林雪反对道。",
+      "is_dialogue": true,
+      "speaker": "林雪"
+    },
+    {
+      "text": "\"我有电流异能，可以干扰他们的电子设备。\"苏夜解释道，\"而且我的能力已经能够短暂隐身。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "赵天行沉思片刻后点头：\"好，但必须有支援。林雪，你负责接应。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"明白！\"林雪坚定地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "深夜，苏夜悄悄潜入暗影会的基地。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "基地内戒备森严，到处都是巡逻的守卫。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜屏住呼吸，利用电流干扰了监控摄像头，成功溜进了内部。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "咔嚓！他轻轻推开一扇门，里面是一间实验室。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "实验台上摆放着各种奇怪的仪器，墙壁上挂满了异能者的照片。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"他们在研究如何抽取异能者的能力！\"苏夜震惊地暗道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他迅速拿出手机拍照取证。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "就在这时，门外传来脚步声。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"不好！\"苏夜心中一紧，立刻躲到实验台下面。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "门被推开，一个身穿白大褂的中年男子走了进来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"样本准备好了吗？\"男子对着对讲机说道。",
+      "is_dialogue": true,
+      "speaker": "博士"
+    },
+    {
+      "text": "\"准备好了，博士。\"对讲机里传来回应。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"很好。明天开始抽取程序。\"博士满意地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜心中焦急，必须尽快撤离。他悄悄从后门溜出，向接应点奔去。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第六章 联盟反击",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜带着情报回到联盟，所有人都震惊了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"他们居然在研究能力抽取！\"赵天行脸色铁青。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我们必须阻止他们！\"林雪愤怒地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"是的。\"苏夜点头，\"我已经掌握了他们的基地布局和防御系统弱点。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "赵天行立刻召开紧急会议，制定作战计划。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "三天后，联盟发起了总攻。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰！轰！轰！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "赵天行带领联盟成员从正面进攻，火焰如龙般席卷了暗影会的防线。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜则利用电流能力干扰敌方的通讯系统，让暗影会陷入混乱。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，干得好！\"对讲机里传来赵天行的声音。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"收到！我正在前往实验室，摧毁他们的研究设备！\"苏夜回应道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜一路突破重围，终于来到了实验室。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"站住！\"博士冷声喝道，\"你以为你能阻止科学进步吗？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"这不是科学，这是犯罪！\"苏夜怒喝道。",
+      "is_dialogue": true,
+      "speaker": "苏夜"
+    },
+    {
+      "text": "他双手释放出强大的电流，将所有设备全部摧毁。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"不！\"博士绝望地尖叫。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "就在这时，基地开始崩塌。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"快走！\"苏夜拉着博士往外跑。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "两人刚刚逃出实验室，身后便传来巨大的爆炸声。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰隆！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "整个基地化为废墟。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第七章 新的曙光",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "战斗结束后，联盟取得了全面胜利。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "暗影会的阴谋被彻底粉碎，异能者们终于可以安心生活了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"苏夜，你这次立了大功。\"赵天行拍着苏夜的肩膀说道。",
+      "is_dialogue": true,
+      "speaker": "赵天行"
+    },
+    {
+      "text": "\"这是大家共同努力的结果。\"苏夜谦虚地说道。",
+      "is_dialogue": true,
+      "speaker": "苏夜"
+    },
+    {
+      "text": "林雪走过来，眼中满是喜悦：\"苏夜，你太棒了！\"",
+      "is_dialogue": true,
+      "speaker": "林雪"
+    },
+    {
+      "text": "苏夜微微一笑：\"这都是因为有你和赵大哥的支持。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "赵天行望向远方，感慨道：\"虽然暗影会已经被击败，但我们知道，世界上还有很多未知的挑战等待着我们。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我们准备好了。\"苏夜坚定地说道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "林雪点头：\"无论前方有什么困难，我们都会一起面对！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "苏夜伸出手，林雪和赵天行也将手放了上来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "三只手紧紧握在一起，象征着异能者联盟的团结和力量。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"为了守护这个世界！\"三人齐声说道。",
+      "is_dialogue": true,
+      "speaker": "三人"
+    },
+    {
+      "text": "天空中，朝阳缓缓升起，照亮了这座充满希望的城市。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "新的时代，即将开始。",
+      "is_dialogue": false,
+      "speaker": null
+    }
   ]
 }

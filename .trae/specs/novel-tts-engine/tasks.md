@@ -198,7 +198,7 @@
 ## [已完成] T-016: 实体链接模块
 - **Priority**: P0
 - **Depends On**: T-007
-- **Status**: ⏳ 待开始
+- **Status**: ✅ 已完成
 - **Description**: 
   - 实现entity_linker.py
   - 过滤单字人名误检
@@ -209,12 +209,12 @@
   - `programmatic` TR-T016-01: 单字人名过滤率100%
   - `programmatic` TR-T016-02: 角色库匹配准确率≥90%
   - `programmatic` TR-T016-03: 都市NER≥75%
-- **Notes**: 不引入新依赖
+- **Notes**: 代码已存在于 pipeline/entity_linker.py，已接入主流程
 
 ## [已完成] T-017: 角色聚类模块
 - **Priority**: P0
 - **Depends On**: T-007
-- **Status**: ⏳ 待开始
+- **Status**: ✅ 已完成
 - **Description**: 
   - 实现entity_clusterer.py
   - 基于BGE-small语义编码 + 上下文相似度
@@ -225,12 +225,12 @@
   - `programmatic` TR-T017-01: 西幻NER≥70%
   - `programmatic` TR-T017-02: 聚类准确率≥85%
   - `programmatic` TR-T017-03: 编码时间<5秒
-- **Notes**: 不引入新依赖，复用已有BGE-small和CharacterManager
+- **Notes**: 代码已存在于 pipeline/entity_clusterer.py，已接入评估流程
 
 ## [已完成] T-018: 说话人匹配增强
 - **Priority**: P1
 - **Depends On**: T-016, T-017
-- **Status**: ⏳ 待开始
+- **Status**: ⚠️ 部分完成
 - **Description**: 
   - 在SpeakerMatcher内部建立_dialogue_history_cache
   - 第一轮扫描全文建立角色对话历史
@@ -239,12 +239,12 @@
 - **Test Requirements**:
   - `programmatic` TR-T018-01: 都市说话人匹配≥85%
   - `programmatic` TR-T018-02: 西幻说话人匹配≥75%
-- **Notes**: 当前L2缓存只在评估脚本中建立
+- **Notes**: 评估脚本中已实现两遍扫描，但 SpeakerMatcher 内部未建立 _dialogue_history_cache
 
 ## [已完成] T-019: 群体说话人处理
 - **Priority**: P2
 - **Depends On**: 无
-- **Status**: ⏳ 待开始
+- **Status**: ❌ 未开始
 - **Description**: 
   - 规则层处理"三人"、"众人"等群体说话人
   - 映射为特殊标记（GROUP:3、GROUP:CROWD）
@@ -252,7 +252,7 @@
 - **Test Requirements**:
   - `programmatic` TR-T019-01: 群体说话人识别率100%
   - `programmatic` TR-T019-02: 不干扰正常说话人匹配
-- **Notes**: 规则层，简单快速
+- **Notes**: "三人"、"众人"等群体说话人规则尚未实现
 
 ---
 

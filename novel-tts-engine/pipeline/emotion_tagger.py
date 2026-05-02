@@ -2,6 +2,7 @@
 """情绪标注器：规则标注六种基础情绪"""
 
 import re
+import threading
 from typing import Dict, Optional
 
 EMOTION_PATTERNS: Dict[str, list] = {
@@ -36,7 +37,7 @@ class EmotionTagger:
     
     def tag(self, text: str, speaker: str = None) -> str:
         """
-        对文本进行情绪标注。
+        对文本进行情绪标注（单标签模式）。
         
         Args:
             text: 文本内容
@@ -61,14 +62,54 @@ class EmotionTagger:
                 best_emotion = emotion
         
         return best_emotion
+    
+    def tag_multi_label(self, text: str) -> Dict[str, float]:
+        """
+        多标签情绪标注，返回所有匹配的情绪及其置信度。
+        
+        Args:
+            text: 文本内容
+        
+        Returns:
+            情绪字典，格式为 {情绪类型: 置信度}
+            例如: {"joy": 0.8, "surprise": 0.3}
+        """
+        if not text:
+            return {DEFAULT_EMOTION: 1.0}
+        
+        emotions = {}
+        
+        for emotion, patterns in EMOTION_PATTERNS.items():
+            score = 0.0
+            for pattern in patterns:
+                if re.search(pattern, text):
+                    score += 0.2
+            
+            if score > 0:
+                emotions[emotion] = min(score, 1.0)
+        
+        if not emotions:
+            emotions[DEFAULT_EMOTION] = 1.0
+        
+        return emotions
 
 
 _emotion_tagger: Optional[EmotionTagger] = None
+_emotion_tagger_lock = threading.Lock()
 
 
 def get_emotion_tagger() -> EmotionTagger:
-    """获取或创建全局情绪标注器实例"""
+    """获取或创建全局情绪标注器实例（线程安全，双重检查锁）"""
     global _emotion_tagger
     if _emotion_tagger is None:
-        _emotion_tagger = EmotionTagger()
+        with _emotion_tagger_lock:
+            if _emotion_tagger is None:
+                _emotion_tagger = EmotionTagger()
     return _emotion_tagger
+
+
+def reset_emotion_tagger() -> None:
+    """重置全局情绪标注器实例，用于测试或重新初始化"""
+    global _emotion_tagger
+    with _emotion_tagger_lock:
+        _emotion_tagger = None

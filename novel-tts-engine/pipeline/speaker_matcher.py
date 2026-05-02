@@ -1,6 +1,6 @@
 import re
 from typing import List, Optional, Dict, Tuple, Set
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from collections import defaultdict
 from contextlib import contextmanager
 
@@ -18,12 +18,8 @@ class DialogueContext:
     text: str
     speaker_hint: Optional[str] = None
     prev_speaker: Optional[str] = None
-    mentioned_characters: List[str] = None
+    mentioned_characters: List[str] = field(default_factory=list)
     chapter_id: Optional[int] = None
-    
-    def __post_init__(self):
-        if self.mentioned_characters is None:
-            self.mentioned_characters = []
 
 
 @dataclass
@@ -48,6 +44,25 @@ GROUP_SPEAKERS = {
     '大家': 'GROUP:CROWD',
     '齐声': 'GROUP:CROWD',
     '所有人': 'GROUP:CROWD',
+}
+
+TITLE_TRIGGERS = {
+    '管家', '长老', '大师兄', '大师姐', '二师兄', '二师姐', '小师弟', '小师妹',
+    '师兄', '师姐', '师弟', '师妹', '师尊', '师父', '徒弟', '徒儿',
+    '公子', '小姐', '少爷', '夫人', '老爷', '奶奶', '将军', '丞相',
+    '陛下', '殿下', '教主', '掌门', '帮主', '族长',
+}
+
+ACTION_TRIGGERS = {
+    '冷笑', '沉声道', '点头', '摇头', '皱眉', '微笑', '大笑', '叹气',
+    '挥手', '抬手', '转身', '站起', '坐下', '握拳', '抱拳', '拱手',
+    '目光', '眼神', '脸色', '神情', '语气', '声音', '语气冰冷',
+    '微微一笑', '哈哈大笑', '叹了口气', '皱了皱眉', '点了点头',
+}
+
+ADDRESS_TRIGGERS = {
+    '师弟', '师妹', '师兄', '师姐', '徒儿', '徒弟', '师傅', '师父',
+    '公子', '小姐', '少爷', '大人', '前辈', '晚辈', '阁下',
 }
 
 SPEAKER_HINTS = {
@@ -275,8 +290,9 @@ class SpeakerMatcher:
 
         if matched_char:
             # 将语义相似度映射到置信度 (0.6-0.8 范围)
+            # 添加 max(0.6, ...) 下限保护，确保置信度不低于 0.6
             confidence = 0.6 + (best_score - self.l2_threshold) * 0.5
-            confidence = min(confidence, 0.8)
+            confidence = max(0.6, min(confidence, 0.8))
 
             return MatchResult(
                 character=matched_char,
@@ -284,6 +300,95 @@ class SpeakerMatcher:
                 match_type='semantic',
             )
 
+        return None
+    
+    def match_by_trigger_words(self, text: str, context: DialogueContext) -> Optional[MatchResult]:
+        """
+        FO-06: 触发词机制匹配
+        
+        在句子中搜索头衔/动作/称呼触发词，结合上下文匹配说话人。
+        仅在上下文信息充足时使用，避免过度匹配。
+        
+        Args:
+            text: 待匹配的句子
+            context: 对话上下文
+        
+        Returns:
+            匹配结果，如果没有找到触发词匹配则返回None
+        """
+        # 1. 头衔触发词：当文本中明确出现"X管家"、"Y师兄"等格式时才匹配
+        # 需要是"修饰语+头衔"的形式，不能只有头衔本身
+        title_patterns = [
+            (r'(\S{1,3})(管家|长老|师兄|师姐|师弟|师妹)', 'title_with_modifier'),
+            (r'(\S{1,3})(公子|小姐|少爷|夫人|老爷)', 'title_with_modifier'),
+        ]
+        
+        import re
+        for pattern, match_type in title_patterns:
+            match = re.search(pattern, text)
+            if match:
+                modifier = match.group(1).strip()
+                title = match.group(2)
+                full_name = modifier + title
+                
+                # 尝试匹配角色名或别名
+                char = self.char_manager.get_character_by_name(full_name)
+                if char:
+                    return MatchResult(
+                        character=char,
+                        confidence=0.80,
+                        match_type=f'trigger_{match_type}'
+                    )
+                
+                # 尝试匹配修饰语对应的角色
+                if modifier:
+                    char = self.char_manager.get_character_by_name(modifier)
+                    if char:
+                        return MatchResult(
+                            character=char,
+                            confidence=0.75,
+                            match_type=f'trigger_{match_type}'
+                        )
+        
+        # 2. 动作触发词：仅在最近有明确说话人且动作词紧接角色名时使用
+        # 格式如："林轩皱眉"、"陈风最后说道"
+        if context.prev_speaker:
+            prev_char = self.char_manager.get_character_by_name(context.prev_speaker)
+            if prev_char:
+                idx = text.find(prev_char.name)
+                if idx >= 0:
+                    # 检查角色名前后20字内是否有动作触发词
+                    context_window = text[max(0, idx-20):idx+20+len(prev_char.name)]
+                    if any(action in context_window for action in ACTION_TRIGGERS):
+                        return MatchResult(
+                            character=prev_char,
+                            confidence=0.65,
+                            match_type='trigger_action_prev_speaker'
+                        )
+        
+        # 3. 称呼触发词：如果对话中包含对其他角色的称呼，且最近只有一个候选说话人
+        for addr in ADDRESS_TRIGGERS:
+            if addr in text:
+                # 查找被称呼的角色
+                for char in self.char_manager.get_all_characters():
+                    if addr in char.aliases or char.name.endswith(addr):
+                        # 说话人是最近活跃但不是被称呼者的角色
+                        # 仅当最近活跃角色只有1个候选时才匹配
+                        unique_recent = []
+                        for recent in reversed(self._recent_speakers[-3:]):
+                            if recent != char.name:
+                                speaker = self.char_manager.get_character_by_name(recent)
+                                if speaker and speaker not in unique_recent:
+                                    unique_recent.append(speaker)
+                        
+                        # 只有唯一候选时才返回
+                        if len(unique_recent) == 1:
+                            return MatchResult(
+                                character=unique_recent[0],
+                                confidence=0.70,
+                                match_type='trigger_address'
+                            )
+        
         return None
     
     def match_by_pronoun(self, pronoun: str, context: DialogueContext) -> Optional[MatchResult]:
@@ -296,6 +401,12 @@ class SpeakerMatcher:
         if not gender:
             return None
         
+        # FO-03: 局部对话窗口代词消解（3次发言内唯一性别候选）
+        local_result = self._match_pronoun_in_local_window(gender)
+        if local_result:
+            return local_result
+        
+        # 回退到原有逻辑
         if context.prev_speaker:
             prev_char = self.char_manager.get_character_by_name(context.prev_speaker)
             if prev_char and prev_char.gender == gender:
@@ -330,6 +441,49 @@ class SpeakerMatcher:
                 character=candidates[0][0],
                 confidence=0.4,
                 match_type='pronoun_activity'
+            )
+        
+        return None
+    
+    def _match_pronoun_in_local_window(self, gender: str) -> Optional[MatchResult]:
+        """
+        FO-03: 局部对话窗口代词消解
+        
+        查找最近3次发言内，若只有1个角色性别匹配，直接返回该角色。
+        
+        Args:
+            gender: 代词性别 ('male', 'female', 'unknown')
+        
+        Returns:
+            匹配结果，如果窗口内无唯一性别候选则返回None
+        """
+        if not self._recent_speakers:
+            return None
+        
+        # 获取最近3次发言的说话人
+        recent_3 = self._recent_speakers[-3:]
+        
+        # 解析为角色对象并过滤性别
+        candidates = []
+        for name in recent_3:
+            char = self.char_manager.get_character_by_name(name)
+            if char and char.gender == gender:
+                candidates.append(char)
+        
+        # 去重（同一角色可能连续发言多次）
+        unique_candidates = []
+        seen_ids = set()
+        for char in candidates:
+            if char.id not in seen_ids:
+                seen_ids.add(char.id)
+                unique_candidates.append(char)
+        
+        # 若只有1个角色性别匹配，直接返回
+        if len(unique_candidates) == 1:
+            return MatchResult(
+                character=unique_candidates[0],
+                confidence=0.90,
+                match_type='pronoun_local_window'
             )
         
         return None
@@ -369,6 +523,11 @@ class SpeakerMatcher:
             result = self.match_by_semantic(context.text)
             if result:
                 return result
+        
+        # FO-06: 触发词机制（在语义匹配后，作为补充增强）
+        trigger_result = self.match_by_trigger_words(context.text, context)
+        if trigger_result:
+            return trigger_result
         
         result = self._infer_from_address(context)
         if result:

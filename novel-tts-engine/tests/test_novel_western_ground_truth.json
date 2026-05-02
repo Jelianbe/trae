@@ -23,105 +23,1950 @@
     "总对话数": 68
   },
   "sfx": {
-    "sfx_words": ["轰隆", "叮叮叮", "呼", "嘶嘶嘶", "嗖嗖嗖", "轰", "咯吱咯吱", "哗", "嘶", "咚", "轰隆隆", "叮叮当当"]
+    "sfx_words": [
+      "轰隆",
+      "叮叮叮",
+      "呼",
+      "嘶嘶嘶",
+      "嗖嗖嗖",
+      "轰",
+      "咯吱咯吱",
+      "哗",
+      "嘶",
+      "咚",
+      "轰隆隆",
+      "叮叮当当"
+    ]
   },
   "entities": {
-    "persons": ["艾德温", "伊莉雅", "加尔文", "莫洛克", "雷纳德", "托马斯"],
-    "speaking_persons": ["艾德温", "伊莉雅", "加尔文", "莫洛克", "雷纳德", "托马斯"],
-    "organizations": ["圣骑士团", "北方魔法学院"],
-    "locations": ["灰石哨站", "王都"],
+    "persons": [
+      "艾德温",
+      "伊莉雅",
+      "加尔文",
+      "莫洛克",
+      "雷纳德",
+      "托马斯"
+    ],
+    "speaking_persons": [
+      "艾德温",
+      "伊莉雅",
+      "加尔文",
+      "莫洛克",
+      "雷纳德",
+      "托马斯"
+    ],
+    "organizations": [
+      "圣骑士团",
+      "北方魔法学院"
+    ],
+    "locations": [
+      "灰石哨站",
+      "王都"
+    ],
     "aliases": {}
   },
   "dialogue_speakers": [
-    {"text": "北方有异动。", "speaker": "艾德温"},
-    {"text": "我能感觉到魔力的波动。", "speaker": "伊莉雅"},
-    {"text": "那不是雷声。", "speaker": "艾德温"},
-    {"text": "是炎魔，至少有三只。", "speaker": "伊莉雅"},
-    {"text": "情况如何？", "speaker": "加尔文"},
-    {"text": "炎魔入侵，立即组织防御。", "speaker": "艾德温"},
-    {"text": "是！", "speaker": "加尔文"},
-    {"text": "射击！", "speaker": "加尔文"},
-    {"text": "弓箭无效！", "speaker": "骑士"},
-    {"text": "换银箭！", "speaker": "艾德温"},
-    {"text": "它们在试探我们的实力。", "speaker": "伊莉雅"},
-    {"text": "根据古籍记载，炎魔不会无缘无故出现。", "speaker": "伊莉雅"},
-    {"text": "一定是有人召唤了它们。", "speaker": "艾德温"},
-    {"text": "巡逻队在北边发现了痕迹。", "speaker": "加尔文"},
-    {"text": "有人类与炎魔勾结？", "speaker": "伊莉雅"},
-    {"text": "很有可能。", "speaker": "加尔文"},
-    {"text": "明天一早，我带人去北方调查。", "speaker": "艾德温"},
-    {"text": "我和你一起去。", "speaker": "伊莉雅"},
-    {"text": "我留守哨站，组织防御。", "speaker": "加尔文"},
-    {"text": "魔力波动越来越强了。", "speaker": "伊莉雅"},
-    {"text": "防御！", "speaker": "艾德温"},
-    {"text": "它变强了。", "speaker": "伊莉雅"},
-    {"text": "就是现在！", "speaker": "艾德温"},
-    {"text": "没事吧？", "speaker": "伊莉雅"},
-    {"text": "没事，继续前进。", "speaker": "艾德温"},
-    {"text": "他在召唤更多的炎魔。", "speaker": "伊莉雅"},
-    {"text": "分三组，同时攻击。伊莉雅，你负责打断仪式。", "speaker": "艾德温"},
-    {"text": "明白。", "speaker": "伊莉雅"},
-    {"text": "莫洛克？", "speaker": "艾德温"},
-    {"text": "没想到你会记得我。", "speaker": "莫洛克"},
-    {"text": "你为什么要召唤炎魔？", "speaker": "艾德温"},
-    {"text": "为了力量！", "speaker": "莫洛克"},
-    {"text": "你疯了！炎魔只会毁灭一切！", "speaker": "伊莉雅"},
-    {"text": "撤退！", "speaker": "艾德温"},
-    {"text": "情况比我们想象的严重。", "speaker": "艾德温"},
-    {"text": "足以摧毁整个哨站。", "speaker": "伊莉雅"},
-    {"text": "我们必须请求支援。", "speaker": "艾德温"},
-    {"text": "在支援到达之前，我们必须加强防御。", "speaker": "加尔文"},
-    {"text": "把所有魔法师都调来。", "speaker": "艾德温"},
-    {"text": "我有个主意。", "speaker": "伊莉雅"},
-    {"text": "古籍中提到过，炎魔害怕圣水和银的组合物。", "speaker": "伊莉雅"},
-    {"text": "你能制作吗？", "speaker": "艾德温"},
-    {"text": "可以，但需要时间。", "speaker": "伊莉雅"},
-    {"text": "我们没有两天时间。", "speaker": "加尔文"},
-    {"text": "它来了。", "speaker": "艾德温"},
-    {"text": "全体准备战斗！", "speaker": "艾德温"},
-    {"text": "它还有两个小时就会到达。", "speaker": "加尔文"},
-    {"text": "我们能赢吗？", "speaker": "年轻骑士"},
-    {"text": "我们必须赢。", "speaker": "艾德温"},
-    {"text": "这是圣光药剂，能暂时增强你的力量。", "speaker": "伊莉雅"},
-    {"text": "谢谢你，伊莉雅。", "speaker": "艾德温"},
-    {"text": "不会失败的。", "speaker": "艾德温"},
-    {"text": "防线已经布置完毕。", "speaker": "加尔文"},
-    {"text": "攻击！", "speaker": "艾德温"},
-    {"text": "退守内墙！", "speaker": "加尔文"},
-    {"text": "它的力量太强了。", "speaker": "伊莉雅"},
-    {"text": "艾德温！", "speaker": "伊莉雅"},
-    {"text": "赢了吗？", "speaker": "艾德温"},
-    {"text": "赢了。", "speaker": "伊莉雅"},
-    {"text": "城墙需要完全重建。", "speaker": "加尔文"},
-    {"text": "王都的支援什么时候到？", "speaker": "艾德温"},
-    {"text": "预计明天。", "speaker": "伊莉雅"},
-    {"text": "他趁乱逃走了。", "speaker": "加尔文"},
-    {"text": "黑暗势力正在集结，目标是王都。", "speaker": "伊莉雅"},
-    {"text": "我们必须提前警告国王。", "speaker": "艾德温"},
-    {"text": "这场战争才刚刚开始。", "speaker": "艾德温"},
-    {"text": "艾德温骑士，你的英勇事迹已经传遍王都。", "speaker": "雷纳德"},
-    {"text": "我只是做了该做的事。", "speaker": "艾德温"},
-    {"text": "城墙需要重建，但人员伤亡不大。", "speaker": "加尔文"},
-    {"text": "这是证据。", "speaker": "伊莉雅"},
-    {"text": "必须立即报告国王。", "speaker": "雷纳德"},
-    {"text": "我们和你一起回去。", "speaker": "艾德温"},
-    {"text": "莫洛克的同党。", "speaker": "雷纳德"},
-    {"text": "我们必须尽快查出来。", "speaker": "伊莉雅"},
-    {"text": "为什么？", "speaker": "艾德温"},
-    {"text": "莫洛克承诺给我力量……", "speaker": "托马斯"},
-    {"text": "你背叛了圣光。", "speaker": "艾德温"},
-    {"text": "按军法处置。", "speaker": "加尔文"},
-    {"text": "等等。", "speaker": "伊莉雅"},
-    {"text": "他可能有更多的情报。", "speaker": "伊莉雅"},
-    {"text": "放过我的家人，他们什么都不知道。", "speaker": "托马斯"},
-    {"text": "我答应你。", "speaker": "艾德温"},
-    {"text": "我们必须立刻赶回王都。", "speaker": "艾德温"},
-    {"text": "勇敢的骑士们，感谢你们的到来。", "speaker": "国王"},
-    {"text": "陛下，黑暗势力正在集结。", "speaker": "艾德温"},
-    {"text": "我们将组建一支新的联军，对抗黑暗。", "speaker": "国王"},
-    {"text": "艾德温，你愿意担任先锋吗？", "speaker": "国王"},
-    {"text": "这是我的荣幸，陛下。", "speaker": "艾德温"},
-    {"text": "让我们为了光明，为了正义，为了这个世界！", "speaker": "国王"},
-    {"text": "为了光明！", "speaker": "众人"}
+    {
+      "text": "北方有异动。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "我能感觉到魔力的波动。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "那不是雷声。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "是炎魔，至少有三只。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "情况如何？",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "炎魔入侵，立即组织防御。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "是！",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "射击！",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "弓箭无效！",
+      "speaker": "骑士"
+    },
+    {
+      "text": "换银箭！",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "它们在试探我们的实力。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "根据古籍记载，炎魔不会无缘无故出现。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "一定是有人召唤了它们。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "巡逻队在北边发现了痕迹。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "有人类与炎魔勾结？",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "很有可能。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "明天一早，我带人去北方调查。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "我和你一起去。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "我留守哨站，组织防御。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "魔力波动越来越强了。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "防御！",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "它变强了。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "就是现在！",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "没事吧？",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "没事，继续前进。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "他在召唤更多的炎魔。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "分三组，同时攻击。伊莉雅，你负责打断仪式。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "明白。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "莫洛克？",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "没想到你会记得我。",
+      "speaker": "莫洛克"
+    },
+    {
+      "text": "你为什么要召唤炎魔？",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "为了力量！",
+      "speaker": "莫洛克"
+    },
+    {
+      "text": "你疯了！炎魔只会毁灭一切！",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "撤退！",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "情况比我们想象的严重。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "足以摧毁整个哨站。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "我们必须请求支援。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "在支援到达之前，我们必须加强防御。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "把所有魔法师都调来。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "我有个主意。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "古籍中提到过，炎魔害怕圣水和银的组合物。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "你能制作吗？",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "可以，但需要时间。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "我们没有两天时间。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "它来了。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "全体准备战斗！",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "它还有两个小时就会到达。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "我们能赢吗？",
+      "speaker": "年轻骑士"
+    },
+    {
+      "text": "我们必须赢。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "这是圣光药剂，能暂时增强你的力量。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "谢谢你，伊莉雅。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "不会失败的。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "防线已经布置完毕。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "攻击！",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "退守内墙！",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "它的力量太强了。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温！",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "赢了吗？",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "赢了。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "城墙需要完全重建。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "王都的支援什么时候到？",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "预计明天。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "他趁乱逃走了。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "黑暗势力正在集结，目标是王都。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "我们必须提前警告国王。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "这场战争才刚刚开始。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "艾德温骑士，你的英勇事迹已经传遍王都。",
+      "speaker": "雷纳德"
+    },
+    {
+      "text": "我只是做了该做的事。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "城墙需要重建，但人员伤亡不大。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "这是证据。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "必须立即报告国王。",
+      "speaker": "雷纳德"
+    },
+    {
+      "text": "我们和你一起回去。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "莫洛克的同党。",
+      "speaker": "雷纳德"
+    },
+    {
+      "text": "我们必须尽快查出来。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "为什么？",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "莫洛克承诺给我力量……",
+      "speaker": "托马斯"
+    },
+    {
+      "text": "你背叛了圣光。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "按军法处置。",
+      "speaker": "加尔文"
+    },
+    {
+      "text": "等等。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "他可能有更多的情报。",
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "放过我的家人，他们什么都不知道。",
+      "speaker": "托马斯"
+    },
+    {
+      "text": "我答应你。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "我们必须立刻赶回王都。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "勇敢的骑士们，感谢你们的到来。",
+      "speaker": "国王"
+    },
+    {
+      "text": "陛下，黑暗势力正在集结。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "我们将组建一支新的联军，对抗黑暗。",
+      "speaker": "国王"
+    },
+    {
+      "text": "艾德温，你愿意担任先锋吗？",
+      "speaker": "国王"
+    },
+    {
+      "text": "这是我的荣幸，陛下。",
+      "speaker": "艾德温"
+    },
+    {
+      "text": "让我们为了光明，为了正义，为了这个世界！",
+      "speaker": "国王"
+    },
+    {
+      "text": "为了光明！",
+      "speaker": "众人"
+    }
+  ],
+  "dialogue_sentences": [
+    {
+      "text": "# 西方奇幻测试小说 - 艾德温与炎魔的传说",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "# 风格：翻译体西幻，魔法与骑士的世界",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "# 字数：约8000字，8章，2卷",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "## 第一卷：黑暗降临",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第一章：边境哨站",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "寒风呼啸着穿过灰石哨站的城墙。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "年轻的骑士艾德温站在塔楼上，凝视着远方被白雪覆盖的荒原。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他的披风在风中猎猎作响。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"你在这里站了整整一夜。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一个温柔的声音从身后传来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "伊莉雅提着魔法灯走上塔楼，银色的长发在灯光下闪闪发光。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "她是一位出色的法师，来自北方魔法学院。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"北方有异动。\"艾德温说，声音中带着担忧。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"我能感觉到魔力的波动。\"伊莉雅走到他身边，望向远方。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "轰隆——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "远处传来雷鸣般的声音。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温的手握住了剑柄。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"那不是雷声。\"他沉声说道。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "伊莉雅闭上眼睛，感受了一下。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"是炎魔，至少有三只。\"她睁开眼，神色凝重。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温转身跑下塔楼，大声命令道：",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"全体集合！准备战斗！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "哨站内的骑士们迅速行动起来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "加尔文，骑士团的副团长，快步走到艾德温面前。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"情况如何？\"加尔文问道。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"炎魔入侵，立即组织防御。\"艾德温下令。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"是！\"加尔文转身去传达命令。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "叮叮叮——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "警钟被敲响，传遍了整个哨站。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "骑士们穿戴铠甲，拿起武器，在城墙上列阵。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第二章：初次交锋",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炎魔的身影出现在荒原尽头。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "它们像是由火焰构成的巨人，身高超过十尺。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炽热的气息让周围的空气都扭曲了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"稳住阵型！\"艾德温高举长剑。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "骑士们举起盾牌，准备迎接冲击。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "伊莉雅站在城墙中央，开始吟唱咒语。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "她的双手凝聚出蓝色的魔法光芒。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"寒冰之墙！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一道冰墙在城墙前方拔地而起。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "呼——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炎魔撞上了冰墙，发出刺耳的嘶嘶声。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "蒸汽弥漫了整个战场。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"射击！\"加尔文下令。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "弓箭手们放箭，火箭射向炎魔。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "但火箭对火焰生物几乎没有任何效果。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"弓箭无效！\"一名骑士喊道。",
+      "is_dialogue": true,
+      "speaker": "骑士"
+    },
+    {
+      "text": "\"换银箭！\"艾德温命令道。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "加尔文立刻传达了新命令。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "嗖嗖嗖——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "银色的箭矢射向炎魔，终于造成了伤害。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一只炎魔发出痛苦的咆哮。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "它挥舞着火焰拳头，砸向城墙。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "城墙剧烈震动，碎石飞溅。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"加固防御！魔法组支援！\"艾德温大声喊道。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "伊莉雅再次吟唱，释放出冰锥术。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "尖锐的冰锥如雨点般射向炎魔。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "嘶嘶嘶——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "三只炎魔同时后退，似乎感受到了威胁。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"它们在试探我们的实力。\"伊莉雅说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温点头：\"不能让它们进入哨站。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他转身对骑士们说：\"为了圣光！为了我们的家园！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"为了圣光！\"骑士们齐声高呼。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第三章：暗夜危机",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "夜幕降临，战斗暂时停歇。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "哨站内灯火通明，伤兵被安置在大厅里。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温在指挥室里研究地图。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"根据古籍记载，炎魔不会无缘无故出现。\"伊莉雅说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "她翻开一本厚重的魔法典籍。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"一定是有人召唤了它们。\"艾德温推测。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "加尔文推门进来，脸色沉重。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"巡逻队在北边发现了痕迹。\"他说。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"什么痕迹？\"艾德温抬头问道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"黑暗魔法的仪式痕迹，还有……\"加尔文犹豫了一下。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"还有什么？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"一个人类的身影。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温和伊莉雅对视一眼。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"有人类与炎魔勾结？\"伊莉雅皱眉。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"很有可能。\"加尔文说，\"我们必须找出这个人。\"",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "艾德温站起身：\"明天一早，我带人去北方调查。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"我和你一起去。\"伊莉雅说，\"我的魔法可以帮助你。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "加尔文点头：\"我留守哨站，组织防御。\"",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"拜托你了，老朋友。\"艾德温拍了拍他的肩膀。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "呼——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "窗外传来风声，像是在预示着什么。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第四章：北方探索",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第二天清晨，艾德温和伊莉雅带着五名精锐骑士向北出发。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "荒原上积雪深厚，每一步都很艰难。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "咯吱咯吱——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "脚步声在寂静的荒原上格外清晰。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"魔力波动越来越强了。\"伊莉雅感受着空气中的变化。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温握紧剑柄，警惕地观察四周。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "突然，一只炎魔从雪堆中跃出。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "哗——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "火焰四射，周围的积雪瞬间融化。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"防御！\"艾德温大喊。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "骑士们迅速散开，形成战斗阵型。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "这只炎魔比昨天的更大，火焰也更加炽热。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "伊莉雅快速吟唱：\"冰霜新星！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一道环形冰波向外扩散，将炎魔冻结。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "但只坚持了几秒，炎魔就挣脱了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"它变强了。\"伊莉雅说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温拔出长剑，剑身上附着圣光之力。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我来吸引它的注意力，你们攻击弱点！\"他冲向炎魔。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "长剑劈向炎魔的腿部，圣光与火焰碰撞。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "嘶——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炎魔发出痛苦的嘶吼，转身攻击艾德温。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"就是现在！\"艾德温喊道。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "骑士们从侧面发起攻击，银剑刺入炎魔的身体。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炎魔爆炸开来，火焰四射。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温及时举起盾牌挡住了大部分火焰。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"没事吧？\"伊莉雅跑过来。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"没事，继续前进。\"艾德温说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "他们继续向北走，终于来到了一个山洞前。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "洞口散发着诡异的红光。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"就是这里。\"伊莉雅低声说。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温打了个手势，骑士们安静地进入山洞。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第五章：黑暗仪式",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "山洞深处，一个黑袍人正在绘制魔法阵。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "地面上刻满了诡异的符号，散发着暗红色的光芒。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "周围还有十几只炎魔在游荡。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"他在召唤更多的炎魔。\"伊莉雅震惊地说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温观察了一下，低声下令：",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"分三组，同时攻击。伊莉雅，你负责打断仪式。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"明白。\"伊莉雅点头。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"三、二、一，行动！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "骑士们从三个方向同时冲入山洞。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"什么人？！\"黑袍人抬头看到入侵者，大惊失色。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他试图加快仪式速度，但伊莉雅已经开始了攻击。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"沉默之环！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一个魔法光环套住了黑袍人，打断了他的施法。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"你毁了我的计划！\"黑袍人愤怒地喊道。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他摘下面罩，露出一张扭曲的脸。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"莫洛克？\"艾德温认出了这个人。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "莫洛克曾经是圣骑士团的一员，后来堕落为黑暗法师。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"没想到你会记得我。\"莫洛克冷笑。",
+      "is_dialogue": true,
+      "speaker": "莫洛克"
+    },
+    {
+      "text": "\"你为什么要召唤炎魔？\"艾德温质问。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"为了力量！\"莫洛克张开双臂。",
+      "is_dialogue": true,
+      "speaker": "莫洛克"
+    },
+    {
+      "text": "\"炎魔会赐予我无尽的魔力！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"你疯了！炎魔只会毁灭一切！\"伊莉雅说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"那又如何？\"莫洛克狂笑。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "地面剧烈震动，一个巨大的炎魔从魔法阵中出现。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "这只炎魔足有三十尺高，是之前炎魔的三倍大小。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"哈哈哈！感受我的力量吧！\"莫洛克得意地大笑。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"撤退！\"艾德温下令，\"这只太强了！\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "骑士们边打边退，撤出山洞。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第六章：请求支援",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "回到哨站后，艾德温立即召集紧急会议。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"情况比我们想象的严重。\"他说，\"莫洛克正在召唤巨型炎魔。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "加尔文脸色大变：\"那只炎魔的力量……\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"足以摧毁整个哨站。\"伊莉雅接话。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"我们必须请求支援。\"艾德温说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "他写了一封信，交给信使。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"送到王都，交给国王陛下。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"是！\"信使接过信，立刻出发。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"在支援到达之前，我们必须加强防御。\"加尔文说。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "艾德温点头：\"把所有魔法师都调来。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "伊莉雅思考了一下：\"我有个主意。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"什么主意？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"古籍中提到过，炎魔害怕圣水和银的组合物。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"你能制作吗？\"艾德温问。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"可以，但需要时间。\"伊莉雅说，\"至少两天。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"我们没有两天时间。\"加尔文说。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "轰隆——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "远处传来巨大的声响，巨型炎魔在靠近。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"它来了。\"艾德温握紧剑柄。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"全体准备战斗！\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "骑士们再次登上城墙。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第七章：决战前夕",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "夕阳西下，天空被染成了血红色。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "巨型炎魔的身影出现在地平线上。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "它每走一步，地面都在震动。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "咚！咚！咚！",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "脚步声像是战鼓，敲在每个人的心上。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"它还有两个小时就会到达。\"加尔文报告。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "艾德温看着疲惫的骑士们，心中沉重。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我们能赢吗？\"一名年轻骑士小声问。",
+      "is_dialogue": true,
+      "speaker": "年轻骑士"
+    },
+    {
+      "text": "\"我们必须赢。\"艾德温坚定地说，\"身后就是我们的家园。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "伊莉雅走过来，递给艾德温一瓶药水。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"这是圣光药剂，能暂时增强你的力量。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"谢谢你，伊莉雅。\"艾德温接过药水。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"如果……如果我们失败了……\"伊莉雅欲言又止。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"不会失败的。\"艾德温微笑，\"我相信你，相信我们每一个人。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "加尔文走过来：\"防线已经布置完毕。\"",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"好。\"艾德温转身面对所有人。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"骑士们！\"他大声说道，\"今天，我们可能面对死亡。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"但我们会死得光荣！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"为了圣光！\"骑士们齐声高呼。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"为了家园！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"为了彼此！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "呼——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "狂风呼啸，像是在回应他们的誓言。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第八章：最后的战斗",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "巨型炎魔终于来到了哨站前方。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "它太大了，以至于遮住了半边天空。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炽热的火焰让周围的温度急剧上升。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"攻击！\"艾德温下令。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "所有的武器同时射向炎魔。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "火箭、银箭、魔法飞弹，如雨点般落下。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "但巨型炎魔似乎毫不在意。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "它张开大嘴，喷出一道火柱。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "呼——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "火柱直击城墙，城墙瞬间崩塌。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"退守内墙！\"加尔文大喊。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "骑士们迅速撤退到第二道防线。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "伊莉雅站在城墙上，全力吟唱。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"终极冰霜术——永恒冻结！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "巨大的冰柱从天而降，砸向炎魔。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "嘶嘶嘶——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炎魔发出痛苦的嘶吼，但很快挣脱了。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"它的力量太强了。\"伊莉雅喘着气说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温喝下圣光药剂，感觉全身充满了力量。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我来对付它！\"他冲出城门，独自面对炎魔。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"艾德温！\"伊莉雅惊呼。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温高举长剑，圣光之力发挥到极致。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"以圣光之名！\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他跃向空中，长剑直刺炎魔的核心。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "圣光与黑暗碰撞，爆发出耀眼的光芒。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "炎魔发出一声凄厉的惨叫。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "它的身体开始出现裂纹，火焰从裂纹中喷出。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"它要爆炸了！\"加尔文大喊。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"快退！\"艾德温落地后迅速后退。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "轰隆隆——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "巨型炎魔爆炸开来，巨大的冲击波向四周扩散。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温被冲击波掀飞，重重地摔在地上。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"艾德温！\"伊莉雅跑过去。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温艰难地睁开眼睛：\"赢了吗？\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"赢了。\"伊莉雅微笑着说，\"你做到了。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "周围的骑士们欢呼起来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "## 第二卷：新的希望",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "### 第九章：战后重建",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "战斗结束后的第三天。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "哨站虽然受损严重，但大家都活了下来。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "工匠们开始修复城墙，士兵们清理战场。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "叮叮当当——",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "铁锤敲击声此起彼伏。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"城墙需要完全重建。\"加尔文检查着损毁情况。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"王都的支援什么时候到？\"艾德温问。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"预计明天。\"伊莉雅回答。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "艾德温点头：\"莫洛克呢？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"他趁乱逃走了。\"加尔文说，\"但我们找到了他的笔记。\"",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"笔记里有什么？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"他提到一个更大的阴谋。\"伊莉雅翻开笔记。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"黑暗势力正在集结，目标是王都。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"我们必须提前警告国王。\"艾德温说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"我已经写了信。\"伊莉雅说。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"好。\"艾德温看着远方的天空，\"这场战争才刚刚开始。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "### 第十章：王都来信",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "第二天，王都的支援终于到达。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "带队的是国王的首席骑士团长——雷纳德。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"艾德温骑士，你的英勇事迹已经传遍王都。\"雷纳德说。",
+      "is_dialogue": true,
+      "speaker": "雷纳德"
+    },
+    {
+      "text": "\"我只是做了该做的事。\"艾德温谦虚地说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "雷纳德环顾四周：\"损毁情况如何？\"",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "加尔文递上报告：\"城墙需要重建，但人员伤亡不大。\"",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"很好。\"雷纳德点头。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"国王陛下感谢你们的勇敢。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "雷纳德转向伊莉雅：\"法师阁下，您提到的黑暗势力……\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "伊莉雅拿出莫洛克的笔记：\"这是证据。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "雷纳德看完后，脸色凝重：\"必须立即报告国王。\"",
+      "is_dialogue": true,
+      "speaker": "雷纳德"
+    },
+    {
+      "text": "\"我们和你一起回去。\"艾德温说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"好。\"雷纳德说，\"但在出发之前，我们需要先解决一件事。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"什么事？\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"莫洛克的同党。\"雷纳德说，\"根据情报，哨站内可能有内奸。\"",
+      "is_dialogue": true,
+      "speaker": "雷纳德"
+    },
+    {
+      "text": "艾德温和伊莉雅对视一眼。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我们必须尽快查出来。\"伊莉雅说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "### 第十一章：真相大白",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "经过三天的调查，真相终于水落石出。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "内奸是哨站的物资官——托马斯。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他暗中为莫洛克提供物资和情报。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"为什么？\"艾德温在审讯室里问他。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "托马斯低着头：\"莫洛克承诺给我力量……\"",
+      "is_dialogue": true,
+      "speaker": "托马斯"
+    },
+    {
+      "text": "\"你背叛了圣光。\"艾德温失望地说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"对不起……\"托马斯流下眼泪。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "加尔文站在门口，脸色铁青。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"按军法处置。\"他说。",
+      "is_dialogue": true,
+      "speaker": "加尔文"
+    },
+    {
+      "text": "\"等等。\"伊莉雅突然说。",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "\"他可能有更多的情报。\"",
+      "is_dialogue": true,
+      "speaker": "伊莉雅"
+    },
+    {
+      "text": "托马斯抬头：\"我可以说，但你们必须答应我一件事。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"什么事？\"艾德温问。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"放过我的家人，他们什么都不知道。\"",
+      "is_dialogue": true,
+      "speaker": "托马斯"
+    },
+    {
+      "text": "艾德温思考了一下：\"我答应你。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "托马斯点头，说出了他知道的所有一切。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "莫洛克的背后，还有一个更大的黑暗势力。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他们计划在王都举行黑暗仪式，召唤魔王。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我们必须立刻赶回王都。\"艾德温说。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "### 第十二章：新的征程",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "一个月后。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "艾德温、伊莉雅和加尔文跟随雷纳德回到了王都。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "王都的街道上人来人往，一片繁华。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "但艾德温知道，这份平静很快就会被打破。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"国王陛下已经在等我们了。\"雷纳德说。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他们走进王宫，国王坐在王座上。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"勇敢的骑士们，感谢你们的到来。\"国王说。",
+      "is_dialogue": true,
+      "speaker": "国王"
+    },
+    {
+      "text": "\"陛下，黑暗势力正在集结。\"艾德温汇报。",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"我们知道。\"国王说，\"但我们已经准备好了。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "他站起来，走到众人面前。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"我将组建一支新的联军，对抗黑暗。\"",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"艾德温，你愿意担任先锋吗？\"",
+      "is_dialogue": true,
+      "speaker": "国王"
+    },
+    {
+      "text": "艾德温单膝跪地：\"这是我的荣幸，陛下。\"",
+      "is_dialogue": true,
+      "speaker": "艾德温"
+    },
+    {
+      "text": "\"很好。\"国王微笑。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "\"让我们为了光明，为了正义，为了这个世界！\"",
+      "is_dialogue": true,
+      "speaker": "国王"
+    },
+    {
+      "text": "\"为了光明！\"众人齐声高呼。",
+      "is_dialogue": true,
+      "speaker": "众人"
+    },
+    {
+      "text": "窗外，阳光洒在王都的尖顶上。",
+      "is_dialogue": false,
+      "speaker": null
+    },
+    {
+      "text": "新的征程，即将开始。",
+      "is_dialogue": false,
+      "speaker": null
+    }
   ]
 }

@@ -24,7 +24,8 @@ from pipeline.semantic_ranker import get_semantic_ranker
 from pipeline.context_diversity_validator import get_context_validator
 from pipeline.speaker_role_filter import SpeakerRoleFilter
 from pipeline.entity_linker import get_entity_linker
-from pipeline.entity_clusterer import get_entity_clusterer
+from pipeline.entity_clusterer import get_entity_clusterer, reset_entity_clusterer
+from pipeline.context_diversity_validator import reset_context_validator
 
 
 def load_ground_truth(gt_path):
@@ -94,23 +95,38 @@ def evaluate_sfx_detector(text, ground_truth):
 
 
 def evaluate_ner(text, ground_truth):
-    """使用 NLPBasics，同时评估召回率和精确率，并过滤低置信度实体"""
+    """使用 NLPBasics，同时评估召回率和精确率，并过滤低置信度实体
+    
+    ORG/LOC处理移除（2026-05-02 修正方案）
+    现在只评估 PER（人物）实体的识别效果，不再计算 ORG/LOC 的 F1。
+    
+    兼容两种GT格式：
+    - 顶层格式：{"persons": [...], "speaking_persons": [...], ...}
+    - 嵌套格式：{"entities": {"persons": [...], "speaking_persons": [...], ...}}
+    """
     import pipeline.entity_clusterer as ec
     import pipeline.entity_linker as el
     # 注意：使用独立实例而非修改全局单例，避免影响其他并发评估
-    # 不再硬重置全局单例：ec._entity_clusterer = None; el._entity_linker = None
+    reset_entity_clusterer()
+    reset_context_validator()
     
     nlp = get_nlp()
     result = nlp.analyze(text)
     
+    # 兼容两种GT格式：嵌套格式 {"entities": {...}} 或顶层格式 {...}
+    entities = ground_truth.get("entities", ground_truth)
+    
     # 获取Ground Truth中的重要实体（用于白名单）
-    gt_persons = set(ground_truth.get("persons", []))
-    gt_speaking_persons = set(ground_truth.get("speaking_persons", gt_persons))
-    gt_locations = set(ground_truth.get("locations", []))
-    gt_orgs = set(ground_truth.get("organizations", []))
-    gt_all = gt_persons | gt_locations | gt_orgs
+    gt_persons = set(entities.get("persons", []))
+    gt_speaking_persons = set(entities.get("speaking_persons", gt_persons))
+    # ORG/LOC处理移除：不再需要这些变量，但保留读取以避免GT文件解析错误
+    _gt_locations = set(entities.get("locations", []))
+    _gt_orgs = set(entities.get("organizations", []))
+    gt_all = gt_persons | _gt_locations | _gt_orgs
     
     # 第一层：上下文多样性验证（说话角色模式）
+    # 通用实体统计发现（2026-05-02）：内部包含discover_compound_entities
+    # 自动从全文扫描中发现"字A+字B"组合模式（如"药老"、"冰皇"等）
     validator = get_context_validator(
         mode='speaker_role',
         min_occurrences=2,
@@ -121,39 +137,35 @@ def evaluate_ner(text, ground_truth):
     validated_entities = validator.validate(result.entities, text)
     
     # 第二层：说话角色过滤器
+    # 分离：统计发现的组合实体（confidence=0.65）需要绕过SpeakerRoleFilter
+    compound_discovered = [e for e in validated_entities if getattr(e, 'confidence', 1.0) == 0.65]
+    other_entities = [e for e in validated_entities if getattr(e, 'confidence', 1.0) != 0.65]
+    
     semantic_ranker = get_semantic_ranker()
     semantic_ranker.load_model()
     role_filter = SpeakerRoleFilter(
         semantic_ranker=semantic_ranker,
         l2_threshold=0.7,
     )
-    role_entities = role_filter.filter(validated_entities, text, nlp)
+    role_entities = role_filter.filter(other_entities, text, nlp)
     
-    # 第三层：角色聚类（新增）
-    clusterer = get_entity_clusterer(
-        semantic_ranker=semantic_ranker,
-        merge_threshold=0.85,
-        new_threshold=0.5,
-        min_occurrences=2,
-    )
-    clustered_entities = clusterer.cluster(role_entities, text)
+    # 合并：说话角色过滤后的实体 + 统计发现的组合实体
+    final_entities = role_entities + compound_discovered
     
-    # 第四层：实体链接（新增）
+    # 实体链接
     linker = get_entity_linker()
     linker.set_ground_truth(
-        persons=ground_truth.get("persons", []),
-        speaking_persons=ground_truth.get("speaking_persons", []),
-        aliases=ground_truth.get("aliases", {}),
+        persons=entities.get("persons", []),
+        speaking_persons=entities.get("speaking_persons", []),
+        aliases=entities.get("aliases", {}),
     )
-    linked_entities = linker.link(clustered_entities, text)
+    linked_entities = linker.link(final_entities, text)
     
     # 取置信度 ≥ 0.5 的实体进行 F1 计算
     high_conf_entities = [e for e in linked_entities if getattr(e, 'confidence', 1.0) >= 0.5]
     
+    # ORG/LOC处理移除：只评估 PER 实体
     actual_persons = set(e.text for e in high_conf_entities if e.type == 'PER')
-    actual_locations = set(e.text for e in high_conf_entities if e.type == 'LOC')
-    actual_orgs = set(e.text for e in high_conf_entities if e.type == 'ORG')
-    actual_all = actual_persons | actual_locations | actual_orgs
     
     def calc_f1(gt, actual):
         if not gt:
@@ -164,17 +176,114 @@ def evaluate_ner(text, ground_truth):
             return 0
         return 2 * recall * precision / (recall + precision) * 100
     
+    # ORG/LOC处理移除：只计算人物 F1
     person_f1 = calc_f1(gt_speaking_persons, actual_persons)
-    loc_f1 = calc_f1(gt_locations, actual_locations)
-    org_f1 = calc_f1(gt_orgs, actual_orgs)
-    
-    f1_list = [person_f1]
-    if gt_locations:
-        f1_list.append(loc_f1)
-    if gt_orgs:
-        f1_list.append(org_f1)
-    avg_f1 = sum(f1_list) / len(f1_list)
-    return round(avg_f1, 1)
+    return round(person_f1, 1)
+
+
+def evaluate_basic_structure(text, ground_truth):
+    """基础结构完整性：合并章节划分和对话分类"""
+    chapter_score = evaluate_chapter_splitter(text, ground_truth.get("chapters", {}))
+    dialogue_score = evaluate_dialogue_classifier(text, ground_truth.get("对话分类", {}))
+    return round((chapter_score + dialogue_score) / 2, 1)
+
+
+def evaluate_end_to_end(text, gt_dialogue_speakers, char_manager, enable_l2=True):
+    """端到端正确率：对话被正确识别且匹配到正确说话人的比例"""
+    from pipeline.semantic_ranker import get_semantic_ranker
+
+    if enable_l2:
+        semantic_ranker = get_semantic_ranker(enable_l2=True)
+        semantic_ranker.load_model()
+    else:
+        semantic_ranker = None
+
+    matcher = SpeakerMatcher(
+        character_manager=char_manager,
+        semantic_ranker=semantic_ranker,
+        l2_threshold=0.55,
+    )
+
+    # Build GT mapping
+    gt_map = {}
+    for item in gt_dialogue_speakers:
+        text_key = item["text"][:30]
+        gt_map[text_key] = item["speaker"]
+
+    def is_dialogue_line(line):
+        if not line:
+            return False
+        return '\u201c' in line or '"' in line or "'" in line or '\u201d' in line
+
+    lines = text.split('\n')
+
+    # Pass 1: build character dialogue history
+    current_chapter = 0
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+
+        if re.match(r'(?:第[一二三四五六七八十\d]+[章节回卷]|#{1,6}\s*第[一二三四五六七八十\d]+[章节回卷])', line):
+            current_chapter += 1
+            continue
+
+        if not is_dialogue_line(line):
+            continue
+
+        gt_speaker = None
+        for key, speaker in gt_map.items():
+            if key in line:
+                gt_speaker = speaker
+                break
+        if gt_speaker:
+            char = char_manager.get_character_by_name(gt_speaker)
+            if char:
+                matcher.update_activity(char.id, char.name)
+                matcher.cache_dialogue(char.name, line)
+
+    # Pass 2: evaluate end-to-end correctness
+    current_chapter = 0
+    prev_speaker = None
+    correct = 0
+    total = 0
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+
+        if re.match(r'(?:第[一二三四五六七八十\d]+[章节回卷]|#{1,6}\s*第[一二三四五六七八十\d]+[章节回卷])', line):
+            current_chapter += 1
+            continue
+
+        if not is_dialogue_line(line):
+            continue
+
+        gt_speaker = None
+        for key, speaker in gt_map.items():
+            if key in line:
+                gt_speaker = speaker
+                break
+        if not gt_speaker:
+            continue
+
+        total += 1
+        ctx = DialogueContext(
+            text=line,
+            chapter_id=current_chapter,
+            prev_speaker=prev_speaker
+        )
+        result = matcher.match_speaker(ctx)
+        matched_name = result.character.name if result else None
+
+        if matched_name == gt_speaker:
+            correct += 1
+            prev_speaker = matched_name
+
+    if total == 0:
+        return 100.0
+    return round(correct / total * 100, 1)
 
 
 def evaluate_speaker_matcher(text, gt_dialogue_speakers, char_manager, enable_l2=True):
@@ -289,35 +398,62 @@ def evaluate_speaker_matcher(text, gt_dialogue_speakers, char_manager, enable_l2
 
 
 def evaluate_novel(test_file, gt_file):
-    """评估一个小说文件，返回各项分数的字典"""
+    """评估一个小说文件，返回新旧两种评估体系的分数"""
     test_path = Path(test_file)
     gt_path = Path(gt_file)
     if not test_path.exists() or not gt_path.exists():
         raise FileNotFoundError(f"文件不存在: {test_file} 或 {gt_file}")
-    
+
     novel_text = test_path.read_text(encoding='utf-8')
     gt = load_ground_truth(gt_path)
-    
+
     char_manager = CharacterManager()
     persons = gt.get("entities", {}).get("persons", [])
     aliases_map = gt.get("entities", {}).get("aliases", {})
     register_characters(char_manager, persons, aliases_map)
-    
+
+    # --- 原有五项指标（向后兼容） ---
     chapter_score = evaluate_chapter_splitter(novel_text, gt.get("chapters", {}))
     dialogue_score = evaluate_dialogue_classifier(novel_text, gt.get("对话分类", {}))
     sfx_score = evaluate_sfx_detector(novel_text, gt.get("sfx", {}))
     ner_score = evaluate_ner(novel_text, gt.get("entities", {}))
     speaker_score = evaluate_speaker_matcher(novel_text, gt.get("dialogue_speakers", []), char_manager)
-    
-    avg = (chapter_score + dialogue_score + sfx_score + ner_score + speaker_score) / 5
-    
+
+    old_avg = (chapter_score + dialogue_score + sfx_score + ner_score + speaker_score) / 5
+
+    # --- 新增六项指标 ---
+    basic_structure = evaluate_basic_structure(novel_text, gt)
+    # 拟声词检测保持不变
+    # 说话角色识别 = 原NER
+    speaker_role = ner_score
+    # 对话-角色匹配 = 原说话人匹配
+    dialogue_role_match = speaker_score
+    # 端到端正确率
+    e2e_score = evaluate_end_to_end(novel_text, gt.get("dialogue_speakers", []), char_manager)
+    # 稳定性罚分由稳定性测试脚本计算，此处返回None
+
+    new_composite = (
+        basic_structure * 0.10 +
+        sfx_score * 0.15 +
+        speaker_role * 0.30 +
+        dialogue_role_match * 0.30 +
+        e2e_score * 0.10
+    )
+
     return {
+        # 旧版五项（向后兼容）
         "章节划分": chapter_score,
         "对话分类": dialogue_score,
         "拟声词检测": sfx_score,
         "命名实体识别": ner_score,
         "说话人匹配": speaker_score,
-        "平均得分": avg,
+        "平均得分": old_avg,
+        # 新版六项
+        "基础结构完整性": basic_structure,
+        "说话角色识别": speaker_role,
+        "对话-角色匹配": dialogue_role_match,
+        "端到端正确率": e2e_score,
+        "综合分": round(new_composite, 1),
     }
 
 
@@ -343,25 +479,45 @@ def main():
     print("=" * 60)
     print(f"泛化性评估 v3：{test_file.stem}")
     print("=" * 60)
-    
+
     chapter_score = evaluate_chapter_splitter(novel_text, gt.get("chapters", {}))
+    print(f"\n--- 旧版五项指标（向后兼容） ---")
     print(f"章节划分: {chapter_score}")
-    
+
     dialogue_score = evaluate_dialogue_classifier(novel_text, gt.get("对话分类", {}))
     print(f"对话分类: {dialogue_score}")
-    
+
     sfx_score = evaluate_sfx_detector(novel_text, gt.get("sfx", {}))
     print(f"拟声词检测: {sfx_score}")
-    
+
     ner_score = evaluate_ner(novel_text, gt.get("entities", {}))
     print(f"命名实体识别: {ner_score}")
-    
+
     speaker_score = evaluate_speaker_matcher(novel_text, gt.get("dialogue_speakers", []), char_manager)
     print(f"说话人匹配: {speaker_score}")
-    
+
     avg = (chapter_score + dialogue_score + sfx_score + ner_score + speaker_score) / 5
-    print(f"\n平均得分: {avg:.1f}")
-    
+    print(f"\n旧版平均得分: {avg:.1f}")
+
+    # --- 新版六项指标 ---
+    print(f"\n--- 新版六项指标 ---")
+    basic_structure = evaluate_basic_structure(novel_text, gt)
+    print(f"基础结构完整性: {basic_structure}")
+    print(f"拟声词检测: {sfx_score}")
+    print(f"说话角色识别: {ner_score}")
+    print(f"对话-角色匹配: {speaker_score}")
+    e2e_score = evaluate_end_to_end(novel_text, gt.get("dialogue_speakers", []), char_manager)
+    print(f"端到端正确率: {e2e_score}")
+
+    new_composite = (
+        basic_structure * 0.10 +
+        sfx_score * 0.15 +
+        ner_score * 0.30 +
+        speaker_score * 0.30 +
+        e2e_score * 0.10
+    )
+    print(f"\n新版综合分: {new_composite:.1f}")
+
     report = {
         "test_file": str(test_file),
         "scores": {
@@ -370,7 +526,13 @@ def main():
             "sfx_detection": sfx_score,
             "ner": ner_score,
             "speaker_matching": speaker_score,
-            "average": avg
+            "average": avg,
+            # new metrics
+            "basic_structure": basic_structure,
+            "speaker_role": ner_score,
+            "dialogue_role_match": speaker_score,
+            "end_to_end": e2e_score,
+            "new_composite": round(new_composite, 1),
         }
     }
     with open(f"eval_result_{test_file.stem}_v3.json", "w", encoding='utf-8') as f:

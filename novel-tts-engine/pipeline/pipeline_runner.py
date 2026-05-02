@@ -3,6 +3,7 @@
 
 import json
 import logging
+import re
 import threading
 from pathlib import Path
 from typing import Optional, Dict, List, Callable
@@ -10,16 +11,17 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from pipeline.chapter_splitter import ChapterSplitter, Chapter
-from pipeline.dialogue_classifier import DialogueClassifier
 from pipeline.sfx_detector import SfxDetector
 from pipeline.nlp_basics import get_nlp, NLPBasics
 from pipeline.context_diversity_validator import get_context_validator, ContextDiversityValidator
 from pipeline.speaker_role_filter import get_speaker_role_filter, SpeakerRoleFilter
 from pipeline.entity_linker import get_entity_linker, EntityLinker
+from pipeline.entity_clusterer import get_entity_clusterer, EntityClusterer
 from pipeline.character_manager import CharacterManager, get_character_manager
 from pipeline.speaker_matcher import SpeakerMatcher
 from pipeline.semantic_ranker import get_semantic_ranker, SemanticRanker
 from pipeline.emotion_tagger import EmotionTagger, get_emotion_tagger
+from utils.text_utils import split_sentences_smart
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +33,8 @@ class PipelineState(Enum):
     DONE = "done"
     ERROR = "error"
 
+
+from utils.config import COLD_START_CHARS_THRESHOLD
 
 @dataclass
 class ProgressInfo:
@@ -79,19 +83,17 @@ class ChapterResult:
 class PipelineRunner:
     """
     流水线调度器：串联所有处理模块。
-    
+
     管道流程：
     1. 章节划分
-    2. NER + 实体链接 + 角色聚类
-    3. 对话分类
-    4. 拟声词检测
-    5. 说话人匹配
-    6. 情绪标注
+    2. NER 分析 + 上下文多样性验证 + 说话角色过滤 + 实体链接
+    3. 拟声词检测
+    4. 说话人匹配
+    5. 情绪标注
     """
     
     def __init__(self):
         self.chapter_splitter = ChapterSplitter()
-        self.dialogue_classifier = DialogueClassifier()
         self.sfx_detector = SfxDetector()
         self.nlp = get_nlp()
         self.char_manager = get_character_manager()
@@ -101,11 +103,15 @@ class PipelineRunner:
         self.context_validator = get_context_validator()
         self.speaker_role_filter = get_speaker_role_filter()
         self.entity_linker = get_entity_linker(self.char_manager)
+        self.entity_clusterer = get_entity_clusterer()
         
         self.progress = ProgressInfo()
         self._pause_event = threading.Event()
         self._pause_event.set()
         self._result_cache: Dict[str, List[ChapterResult]] = {}
+        
+        self._total_processed_chars = 0
+        self._cold_start_done = False
     
     def _set_progress(self, step: str, chapter: int, total: int, step_idx: int, message: str = ""):
         """更新进度信息"""
@@ -162,6 +168,9 @@ class PipelineRunner:
         self._pause_event.set()
         
         results = []
+        self._total_processed_chars = 0
+        self._cold_start_done = False
+        self._full_text = text
         
         try:
             # 第一步：章节划分
@@ -186,6 +195,11 @@ class PipelineRunner:
                 
                 chapter_result = self._process_chapter(chapter, i + start)
                 results.append(chapter_result)
+                
+                # 冷启动检查：累积字数达到阈值时执行批量聚类
+                self._total_processed_chars += len(chapter.content)
+                if not self._cold_start_done and self._total_processed_chars >= COLD_START_CHARS_THRESHOLD:
+                    self._trigger_cold_start()
             
             # 缓存结果
             self._result_cache[cache_key] = results
@@ -215,19 +229,24 @@ class PipelineRunner:
         content = chapter.content
         if not content.strip():
             return result
-        
-        # 第二步：NER + 实体链接
+
+        # 第二步：NER 分析
         self._set_progress("NER", result.chapter_id, result.chapter_id + 1, 2, "正在识别实体...")
         nlp_result = self.nlp.analyze(content)
         entities = list(nlp_result.entities)
-        
-        # 应用实体链接
+
+        # 新增步骤2.1: 上下文多样性验证
+        self._set_progress("实体验证", result.chapter_id, result.chapter_id + 1, 2, "正在验证实体...")
+        entities = self.context_validator.validate(entities, content)
+
+        # 新增步骤2.2: 说话角色过滤
+        self._set_progress("角色过滤", result.chapter_id, result.chapter_id + 1, 2, "正在过滤说话角色...")
+        entities = self.speaker_role_filter.filter(entities, content, self.nlp)
+
+        # 第三步：实体链接
+        self._set_progress("实体链接", result.chapter_id, result.chapter_id + 1, 3, "正在链接实体...")
         linked_entities = self.entity_linker.link(entities, content)
-        
-        # 第三步：对话分类
-        self._set_progress("对话分类", result.chapter_id, result.chapter_id + 1, 3, "正在分类对话...")
-        dialogue_type = self.dialogue_classifier.classify(content)
-        
+
         # 第四步：拟声词检测
         self._set_progress("拟声词检测", result.chapter_id, result.chapter_id + 1, 4, "正在检测拟声词...")
         sfx_words = self.sfx_detector.detect(content)
@@ -244,10 +263,8 @@ class PipelineRunner:
         # 第六步：情绪标注
         self._set_progress("情绪标注", result.chapter_id, result.chapter_id + 1, 6, "正在标注情绪...")
         
-        # 按句号/问号/叹号拆分句子
-        import re
-        sentences = re.split(r'[。！？]', content)
-        sentences = [s.strip() for s in sentences if s.strip()]
+        # 使用智能句子分割（保护引号内内容不被拆分）
+        sentences = split_sentences_smart(content)
         
         sentence_id = 0
         dialogue_count = 0
@@ -281,7 +298,7 @@ class PipelineRunner:
                     sentence_sfx.append(sfx.text)
                     sfx_count += 1
             
-            # 构建实体列表
+            # 构建实体列表（使用 position-based 匹配避免部分匹配问题）
             sentence_entities = []
             for e in linked_entities:
                 e_start = getattr(e, 'start', 0)
@@ -289,12 +306,19 @@ class PipelineRunner:
                 e_text = getattr(e, 'text', '')
                 e_type = getattr(e, 'type', '')
                 e_conf = getattr(e, 'confidence', 1.0)
-                if sentence.find(e_text) >= 0:
-                    sentence_entities.append({
+                e_standard = getattr(e, 'standard_name', '')
+                e_is_linked = getattr(e, 'is_linked', False)
+
+                if self._entity_in_sentence(e_text, e_start, e_end, sentence):
+                    entity_dict = {
                         "text": e_text,
                         "type": e_type,
                         "confidence": e_conf,
-                    })
+                    }
+                    if e_standard:
+                        entity_dict["standard_name"] = e_standard
+                    entity_dict["is_linked"] = e_is_linked
+                    sentence_entities.append(entity_dict)
             
             result.sentences.append(SentenceData(
                 text=sentence,
@@ -316,10 +340,96 @@ class PipelineRunner:
         
         return result
     
+    def _trigger_cold_start(self):
+        """
+        冷启动触发逻辑：当累积字数达到阈值时，执行批量聚类。
+        
+        此方法将当前所有 is_confirmed=0 的实体升级为 is_confirmed=1，
+        并执行一次完整的 EntityClusterer.cluster(write_back=True)。
+        """
+        if self._cold_start_done:
+            return
+        
+        logger.info(f"冷启动触发：已处理 {self._total_processed_chars} 字，达到阈值 {COLD_START_CHARS_THRESHOLD}")
+        
+        try:
+            all_entities = []
+            for result in self._result_cache.get("default", []):
+                for sentence in result.sentences:
+                    for e_dict in sentence.entities:
+                        from pipeline.nlp_basics import Entity
+                        entity = Entity(
+                            text=e_dict.get("text", ""),
+                            type=e_dict.get("type", "PER"),
+                            start=0,
+                            end=len(e_dict.get("text", "")),
+                            confidence=e_dict.get("confidence", 1.0),
+                        )
+                        if entity.type == "PER" and len(entity.text) >= 2:
+                            all_entities.append(entity)
+            
+            if all_entities:
+                self.entity_clusterer.cluster(entities=all_entities, text=self._full_text, write_back=True)
+                self._cold_start_done = True
+                logger.info(f"冷启动批量聚类完成：{len(all_entities)} 个实体参与聚类")
+            else:
+                logger.warning("冷启动触发但无有效实体，跳过聚类")
+                self._cold_start_done = True
+        except Exception as e:
+            logger.error(f"冷启动聚类失败: {e}", exc_info=True)
+    
     def _check_pause(self):
         """检查是否暂停"""
         self._pause_event.wait()
-    
+
+    @staticmethod
+    def _entity_in_sentence(entity_text: str, entity_start: int, entity_end: int, sentence: str) -> bool:
+        """
+        判断实体是否存在于句子中，使用精确边界匹配避免部分匹配问题。
+
+        核心逻辑：
+        - 对于单字实体（如 "林"），检查前后是否有其他中文字符（避免匹配到 "树林"）。
+        - 对于多字实体（如 "苏夜"），只要文本精确出现即可。
+
+        Args:
+            entity_text: 实体文本
+            entity_start: 实体在原文中的起始位置
+            entity_end: 实体在原文中的结束位置
+            sentence: 当前句子文本
+
+        Returns:
+            True 如果实体精确存在于句子中
+        """
+        if not entity_text or not sentence:
+            return False
+
+        # 策略1: 如果实体文本完全等于句子，直接返回 True
+        if entity_text == sentence:
+            return True
+
+        # 策略2: 精确文本匹配
+        # 对于单字实体，需要额外检查边界
+        if len(entity_text) == 1:
+            pattern = re.compile(re.escape(entity_text))
+            for match in pattern.finditer(sentence):
+                # 检查左边界
+                left_ok = (match.start() == 0 or
+                           not _is_chinese_char(sentence[match.start() - 1]))
+                # 检查右边界
+                right_ok = (match.end() == len(sentence) or
+                            not _is_chinese_char(sentence[match.end()]))
+                if left_ok and right_ok:
+                    return True
+            return False
+
+        # 多字实体：只要文本在句子中精确出现即可
+        return entity_text in sentence
+
+
+def _is_chinese_char(char: str) -> bool:
+    """判断字符是否为中文字符"""
+    return '\u4e00' <= char <= '\u9fff'
+
     def _notify_progress(self, callback: Optional[Callable]):
         """通知进度更新"""
         if callback:
@@ -379,11 +489,21 @@ class PipelineRunner:
 
 
 _pipeline_runner: Optional[PipelineRunner] = None
+_pipeline_runner_lock = threading.Lock()
 
 
 def get_pipeline_runner() -> PipelineRunner:
-    """获取或创建全局流水线调度器实例"""
+    """获取或创建全局流水线调度器实例（线程安全，双重检查锁）"""
     global _pipeline_runner
     if _pipeline_runner is None:
-        _pipeline_runner = PipelineRunner()
+        with _pipeline_runner_lock:
+            if _pipeline_runner is None:
+                _pipeline_runner = PipelineRunner()
     return _pipeline_runner
+
+
+def reset_pipeline_runner() -> None:
+    """重置全局流水线调度器实例，用于测试或重新初始化"""
+    global _pipeline_runner
+    with _pipeline_runner_lock:
+        _pipeline_runner = None

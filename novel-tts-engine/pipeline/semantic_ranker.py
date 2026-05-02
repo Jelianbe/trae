@@ -406,3 +406,10 @@ def get_semantic_ranker(enable_l2: bool = True) -> SemanticRanker:
             if _semantic_ranker is None:
                 _semantic_ranker = SemanticRanker(enable_l2=enable_l2)
     return _semantic_ranker
+
+
+def reset_semantic_ranker() -> None:
+    """Reset the global SemanticRanker instance, for testing or reinitialization."""
+    global _semantic_ranker
+    with _singleton_lock:
+        _semantic_ranker = None

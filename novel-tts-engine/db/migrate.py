@@ -3,9 +3,12 @@
 用于将旧版数据库升级到新版schema
 """
 import sqlite3
+import sys
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent.parent / "novel_tts.db"
+# 添加项目根目录到 sys.path，确保能导入 utils.config
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.config import DB_PATH
 
 def migrate():
     conn = sqlite3.connect(DB_PATH)

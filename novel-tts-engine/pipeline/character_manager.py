@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import numpy as np
 
-DB_PATH = Path(__file__).parent.parent / "db" / "novel_tts.db"
+from utils.config import DB_PATH
 logger = logging.getLogger(__name__)
 
 
@@ -432,10 +432,21 @@ class CharacterManager:
 
 
 _character_manager: Optional[CharacterManager] = None
+_character_manager_lock = threading.Lock()
 
 
 def get_character_manager(db_path: str = None) -> CharacterManager:
+    """获取或创建全局角色管理器实例（线程安全，双重检查锁）"""
     global _character_manager
     if _character_manager is None:
-        _character_manager = CharacterManager(db_path)
+        with _character_manager_lock:
+            if _character_manager is None:
+                _character_manager = CharacterManager(db_path)
     return _character_manager
+
+
+def reset_character_manager() -> None:
+    """重置全局角色管理器实例，用于测试或重新初始化"""
+    global _character_manager
+    with _character_manager_lock:
+        _character_manager = None

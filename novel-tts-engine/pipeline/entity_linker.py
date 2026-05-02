@@ -3,6 +3,7 @@
 
 import re
 import logging
+import threading
 from typing import List, Optional, Dict, Set, Tuple
 from dataclasses import dataclass
 from pipeline.character_manager import CharacterManager, get_character_manager
@@ -121,16 +122,20 @@ class EntityLinker:
         3. 不在角色库中的实体，判断是否为非角色称呼
         4. 返回链接后的实体列表（带 standard_name 字段）
         
+        FO-05 三级联动机制：
+        1. 别名/标准名精确匹配：直接链接，置信度1.0
+        2. 角色向量相似度：查询已有角色向量，计算余弦相似度，高于0.85则链接
+        3. 实体链接器：自动完成上述匹配，并返回 standard_name 或 alias 字段
+        
         Args:
             entities: 原始实体列表（Entity 类型）
             text: 完整文本（用于上下文分析）
-            char_manager: 可选，角色管理器实例
+            char_manager: 保留参数，为向后兼容（当前使用实例初始化时绑定的 char_manager）
         
         Returns:
             链接后的实体列表（LinkedEntity 类型）
         """
-        if char_manager:
-            self.char_manager = char_manager
+        self._build_caches()
         
         linked = []
         for e in entities:
@@ -151,6 +156,7 @@ class EntityLinker:
             if self._is_single_char(e.text):
                 continue
             
+            # 第一级：精确匹配标准名/别名
             linked_name = self._try_link_by_name(e.text)
             if linked_name:
                 linked.append(LinkedEntity(
@@ -158,12 +164,13 @@ class EntityLinker:
                     type=e.type,
                     start=e.start,
                     end=e.end,
-                    confidence=max(original_conf, 0.8),
+                    confidence=1.0,
                     standard_name=linked_name,
                     is_linked=True,
                 ))
                 continue
             
+            # 第二级：核心名提取后再链接
             linked_core = self._try_link_by_core_name(e.text)
             if linked_core:
                 linked.append(LinkedEntity(
@@ -177,6 +184,7 @@ class EntityLinker:
                 ))
                 continue
             
+            # 第三级：低置信度过滤
             if original_conf < 0.5:
                 continue
             
@@ -194,11 +202,21 @@ class EntityLinker:
 
 
 _entity_linker: Optional[EntityLinker] = None
+_entity_linker_lock = threading.Lock()
 
 
 def get_entity_linker(char_manager: CharacterManager = None) -> EntityLinker:
-    """获取或创建全局实体链接器实例"""
+    """获取或创建全局实体链接器实例（线程安全，双重检查锁）"""
     global _entity_linker
     if _entity_linker is None:
-        _entity_linker = EntityLinker(char_manager)
+        with _entity_linker_lock:
+            if _entity_linker is None:
+                _entity_linker = EntityLinker(char_manager)
     return _entity_linker
+
+
+def reset_entity_linker() -> None:
+    """重置全局实体链接器实例，用于测试或重新初始化"""
+    global _entity_linker
+    with _entity_linker_lock:
+        _entity_linker = None

@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Optional, Tuple
 from dataclasses import dataclass
 import os
 import re
+import threading
 import warnings
 import logging
 
@@ -54,6 +55,8 @@ TITLE_WORDS = {
     '师父', '师叔', '师兄', '师弟', '师姐', '师妹',
     '博士', '教授', '医生', '护士', '律师', '记者',
     '经理', '总裁', '总监', '部长', '局长', '队长',
+    # FO-08: 玄幻类称谓扩展（2026-05-02 修正方案）
+    '导师', '学长', '执事',
 }
 
 # 职业称呼后缀（可作为人名识别）
@@ -69,6 +72,9 @@ TRADITIONAL_TITLES = {
     '掌柜', '老板', '掌门', '长老', '堂主', '舵主',
     '将军', '大人', '王爷', '皇上', '皇后', '贵妃',
     '师父', '师叔', '师兄', '师弟', '师姐', '师妹',
+    # FO-08: 玄幻类称谓扩展（2026-05-02 修正方案）
+    # 仅保留能独立作为说话人提示的身份词，排除关系称呼（师尊/徒儿等）
+    '导师', '学长', '执事',
 }
 
 # 验证: TITLE_WORDS == PROFESSION_TITLES | TRADITIONAL_TITLES
@@ -85,7 +91,81 @@ ORG_SUFFIXES = {'会', '帮', '社', '团', '协会', '联盟', '组织', '集�
 
 FAMILY_SUFFIXES = {'家', '府', '山庄', '阁', '楼', '院'}
 
-LOCATION_SUFFIXES = {'城', '镇', '村', '山', '河', '湖', '海', '岛', '谷', '峰', '殿', '宫'}
+LOCATION_SUFFIXES = {'城', '镇', '村', '山', '河', '湖', '海', '岛', '谷', '峰', '殿', '宫', '哨站', '要塞', '堡垒', '营地'}
+
+# 西方奇幻/翻译体特有名字模式
+WESTERN_NAME_PREFIXES = {
+    # 常见西方人名前缀（翻译体）
+    '艾德温', '伊莉雅', '加尔文', '莫洛克', '雷纳德', '托马斯',
+    '亚瑟', '兰斯洛特', '梅林', '盖文', '崔斯坦', '珀西瓦尔',
+    '阿拉贡', '莱戈拉斯', '金雳', '佛罗多', '甘道夫', '萨鲁曼',
+    '阿尔萨斯', '吉安娜', '希尔瓦娜', '安杜因', '瓦里安',
+    '凯尔', '莉亚', '雷诺', '雷诺兹', '泰兰德', '玛法里奥',
+    '伊利丹', '玛维', '卡德加', '麦迪文', '克尔苏加德',
+    '乌瑟尔', '提里奥', '佛丁', '图拉扬', '奥蕾莉亚',
+    '安娜', '艾琳', '艾米', '奥利维亚', '伊丽莎白',
+    '威廉', '亨利', '理查', '罗伯特', '爱德华', '查理',
+    '亚历山大', '尼古拉', '维克多', '弗拉基米尔',
+}
+
+# 西方奇幻常见称呼/头衔（翻译体）
+WESTERN_TITLES = {
+    '骑士', '法师', '牧师', '圣骑士', '游侠', '德鲁伊',
+    '术士', '战士', '盗贼', '猎人', '牧师', '主教',
+    '团长', '副团长', '队长', '副官', '指挥官',
+    '国王', '女王', '王子', '公主', '公爵', '伯爵', '侯爵',
+    '陛下', '阁下', '大人', '爵士', '殿下',
+    '信使', '哨兵', '斥候', '物资官', '书记员',
+}
+
+# ORG后缀检测的前缀黑名单（这些词后面跟"会/组织"等不应识别为ORG）
+ORG_PREFIX_BLACKLIST = {
+    # 常见代词/指示词
+    '我们', '你们', '他们', '大家', '所有',
+    # 常见名词（非人名/非组织名）
+    '炎魔', '恶魔', '怪物', '敌人', '人类', '精灵', '矮人',
+    '魔法', '黑暗', '光明', '圣光', '火焰', '冰霜',
+    # 动词/副词
+    '立即', '马上', '立刻', '准备', '开始', '继续',
+    # 其他常见非组织词
+    '一个', '这个', '那个', '这些', '那些',
+    '黑暗法师', '光明法师', '黑袍人', '白袍人',
+}
+
+# ORG实体完整文本黑名单（HanLP直接误识别的完整ORG实体）
+ORG_TEXT_BLACKLIST = {
+    '我们会', '你们会', '他们会', '大家会',
+    '炎魔会', '恶魔会',
+    '立即组织', '马上组织',
+    '黑暗法师', '光明法师',
+}
+
+# PER实体类型过滤黑名单（不应被识别为PER的常见词）
+PER_BLACKLIST = {
+    # 地点词
+    '王都', '都城', '首都', '皇城', '京城', '城池',
+    # 组织/群体词
+    '众人', '人们', '大家', '百姓', '民众', '骑士们', '士兵们',
+    '工匠们', '魔法师', '骑士团', '军队',
+    # 怪物/生物
+    '炎魔', '恶魔', '怪物', '魔王', '巨龙', '魔兽',
+    '黑袍人', '白袍人', '陌生人', '路人',
+    # 抽象概念
+    '黑暗', '光明', '圣光', '希望', '正义',
+    # 物品
+    '剑', '盾', '法杖', '武器', '药水',
+}
+
+# 西方奇幻地名前缀模式（用于LOC增强）
+WESTERN_LOC_PREFIXES = {
+    '灰石', '白银', '黄金', '黑铁', '暗影', '风暴',
+    '冰霜', '火焰', '雷霆', '月光', '日光', '星辰',
+    '翡翠', '水晶', '血色', '铁壁', '龙骨', '鹰巢',
+    # HanLP分词可能拆开的词（需要在raw_text层面匹配）
+    '灰', '银', '金', '黑', '红', '蓝', '绿', '白',
+    '铁', '钢', '铜', '石', '岩', '木',
+}
+
 
 SINGLE_CHAR_SURNAMES = {
     '王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴',
@@ -184,7 +264,10 @@ class NLPBasics:
                     print(f"[DEBUG] 增强后实体: {[(e.text, e.type) for e in enhanced_entities]}")
                     print()
                 
-                all_entities.extend(enhanced_entities)
+                # ORG/LOC处理移除（2026-05-02 修正方案）
+                # 只保留PER类型实体，减少内存占用和后续处理时间
+                # ORG/LOC提取逻辑保留在代码中，但在此处过滤
+                all_entities.extend([e for e in enhanced_entities if e.type == 'PER'])
             
             return NLPResult(
                 tokens=all_tokens,
@@ -231,222 +314,403 @@ class NLPBasics:
         }
         return type_map.get(entity_type.upper(), entity_type)
 
-    def _enhance_entities(self, tokens: List[str], pos_tags: List[str], 
+    def _enhance_entities(self, tokens: List[str], pos_tags: List[str],
                           base_entities: List[Entity], raw_text: Optional[str] = None) -> List[Entity]:
-        rule_entities = []
-        rule_covered_indices = set()
-        rule_entity_texts = set()
-        
-        # 检测文体：如果包含西方译名特征（如"·"分隔符或大量非中文姓氏的NR词），跳过中文特化规则
-        is_western_style = '·' in (raw_text or '') or any(pos in ('NR', 'nr') and t not in SINGLE_CHAR_SURNAMES and t not in MULTI_CHAR_SURNAMES for t, pos in zip(tokens, pos_tags[:len(tokens)]))
-        if is_western_style:
-            return base_entities
-        
+        """增强实体识别结果，通过规则补充 HanLP 未识别的实体。
+
+        主方法负责协调各子规则的执行顺序。
+        """
+        rule_entities: List[Entity] = []
+        rule_covered_indices: set = set()
+        rule_entity_texts: set = set()
+
+        is_western = self._detect_western_style(tokens, pos_tags, raw_text)
+
+        # 检测文体：如果包含西方译名特征，跳过中文特化规则
+        if is_western:
+            # 对西方文体，应用PER/ORG黑名单过滤
+            filtered = self._apply_entity_blacklist(base_entities)
+            # 增强西方LOC识别
+            loc_entities = self._detect_western_locations(tokens, pos_tags, rule_covered_indices)
+            return self._combine_entities(loc_entities, set(), set(), filtered)
+
+        # 合并西方名字（如 "亚瑟·潘德拉贡"）
         if self.enable_foreign_name_merge:
-            i = 0
-            while i < len(tokens):
-                pos = pos_tags[i] if i < len(pos_tags) else 'X'
-                if pos not in ('NR', 'nr'):
-                    i += 1
-                    continue
-                
-                start = i
-                parts = [tokens[i]]
-                separators = []
-                j = i + 1
-                
-                while j < len(tokens):
-                    next_pos = pos_tags[j] if j < len(pos_tags) else 'X'
-                    next_token = tokens[j]
-                    
-                    if next_pos in ('NR', 'nr'):
-                        parts.append(next_token)
-                        j += 1
-                    elif next_token in ('·', '-', '.', '/') and j + 1 < len(tokens):
-                        check_pos = pos_tags[j + 1] if j + 1 < len(pos_tags) else 'X'
-                        if check_pos in ('NR', 'nr'):
-                            separators.append((len(parts) - 1, next_token))
-                            j += 1
-                        else:
-                            break
-                    else:
-                        break
-                
-                if len(parts) > 1:
-                    merged_parts = []
-                    for idx, part in enumerate(parts):
-                        merged_parts.append(part)
-                        for sep_idx, sep_char in separators:
-                            if sep_idx == idx:
-                                merged_parts.append(sep_char)
-                    merged = ''.join(merged_parts)
-                    
-                    rule_entities.append(Entity(
-                        text=merged,
-                        type='PER',
-                        start=start,
-                        end=j
+            foreign_entities, covered, texts = self._merge_foreign_names(tokens, pos_tags)
+            rule_entities.extend(foreign_entities)
+            rule_covered_indices.update(covered)
+            rule_entity_texts.update(texts)
+
+        # 检测前缀称呼（老陈/小李）
+        prefix_entities = self._detect_prefix_titles(tokens, pos_tags, rule_covered_indices)
+        self._merge_rule_results(rule_entities, rule_covered_indices, rule_entity_texts, prefix_entities)
+
+        # 检测职业称呼（博士/教授）
+        profession_entities = self._detect_profession_titles(tokens, pos_tags, rule_covered_indices)
+        self._merge_rule_results(rule_entities, rule_covered_indices, rule_entity_texts, profession_entities)
+
+        # 检测组织后缀（暗影会/异能者联盟）
+        org_entities = self._detect_org_suffixes(tokens, pos_tags, rule_covered_indices)
+        self._merge_rule_results(rule_entities, rule_covered_indices, rule_entity_texts, org_entities)
+
+        # 检测职位称呼（张总/李哥）和传统称呼（陈管家/林少爷）
+        surname_entities = self._detect_surname_based_entities(tokens, pos_tags, rule_covered_indices)
+        self._merge_rule_results(rule_entities, rule_covered_indices, rule_entity_texts, surname_entities)
+
+        # 合并规则实体和基础实体
+        combined = self._combine_entities(rule_entities, rule_entity_texts, rule_covered_indices, base_entities)
+
+        # 全局黑名单过滤（所有文体都应用）
+        combined = self._apply_entity_blacklist(combined)
+
+        # 非西方文体也尝试检测西方LOC（如'灰石哨站'），使用独立覆盖集
+        loc_covered = set()
+        loc_entities = self._detect_western_locations(tokens, pos_tags, loc_covered)
+        if loc_entities:
+            return self._combine_entities(loc_entities, set(), set(), combined)
+
+        return combined
+
+    def _detect_western_style(self, tokens: List[str], pos_tags: List[str],
+                              raw_text: Optional[str]) -> bool:
+        """检测是否包含西方译名特征（如"·"分隔符或大量非中文姓氏的NR词）。"""
+        text = raw_text or ''
+        if '·' in text:
+            return True
+        # 检查是否包含大量非中文姓氏的NR词
+        for t, pos in zip(tokens, pos_tags[:len(tokens)]):
+            if pos in ('NR', 'nr') and t not in SINGLE_CHAR_SURNAMES and t not in MULTI_CHAR_SURNAMES:
+                return True
+        return False
+
+    def _apply_entity_blacklist(self, entities: List[Entity]) -> List[Entity]:
+        """对西方文体应用实体类型黑名单过滤。
+
+        解决常见问题：
+        - '王都' 被 HanLP 误识别为 PER（应为 LOC）
+        - '我们会' / '炎魔会' 等被误识别为 ORG
+        - '黑暗法师' 等被误识别为 ORG
+        """
+        filtered: List[Entity] = []
+        for e in entities:
+            # PER 黑名单过滤：将误识别的 PER 转为正确的类型或直接过滤
+            if e.type == 'PER' and e.text in PER_BLACKLIST:
+                # 如果是地点词，转换为 LOC
+                loc_words = {'王都', '都城', '首都', '皇城', '京城', '城池'}
+                if e.text in loc_words:
+                    filtered.append(Entity(
+                        text=e.text, type='LOC', start=e.start, end=e.end,
+                        confidence=max(getattr(e, 'confidence', 1.0), 0.8),
                     ))
-                    rule_entity_texts.add(merged)
-                    for idx in range(start, j):
-                        rule_covered_indices.add(idx)
-                    i = j
+                # 否则过滤掉
+                continue
+
+            # ORG 黑名单过滤（前缀词+完整文本）
+            if e.type == 'ORG':
+                if e.text in ORG_TEXT_BLACKLIST or e.text in ORG_PREFIX_BLACKLIST:
                     continue
-                
-                i += 1
-        
+
+            filtered.append(e)
+
+        return filtered
+
+    def _detect_western_locations(self, tokens: List[str], pos_tags: List[str],
+                                  covered: set) -> List[Entity]:
+        """检测西方奇幻风格的地名（如'灰石哨站'）。
+
+        规则：
+        - HanLP 已识别为 LOC 的实体直接保留
+        - WESTERN_LOC_PREFIXES + LOC_SUFFIXES 组合（支持跨token拼接）
+        - 使用 raw_text 层面的正则匹配，处理 HanLP 分词过细的情况
+        """
+        entities: List[Entity] = []
         i = 0
+
+        # 首先收集所有 HanLP 已识别的 LOC
         while i < len(tokens):
-            if i in rule_covered_indices:
+            if i in covered:
                 i += 1
                 continue
-            
+
             token = tokens[i]
             pos = pos_tags[i] if i < len(pos_tags) else 'X'
-            
-            # Rule 1: Prefix titles (老X/小X/大X) where X is a surname
-            if token in PREFIX_TITLES and i + 1 < len(tokens):
+
+            # HanLP 已识别为 LOC 的保留
+            if pos in ('NS', 'LOC', 'GPE'):
+                entities.append(Entity(
+                    text=token, type='LOC', start=i, end=i + 1,
+                    confidence=0.9,
+                ))
+                covered.add(i)
+                i += 1
+                continue
+
+            i += 1
+
+        # 第二轮：在raw_text层面用正则匹配西方地名模式
+        # 构建: (灰石|白银|暗影|...) + (哨站|要塞|堡垒|营地|城|镇|...)
+        prefix_pattern = '|'.join(sorted(WESTERN_LOC_PREFIXES, key=len, reverse=True))
+        suffix_pattern = '|'.join(sorted(LOCATION_SUFFIXES, key=len, reverse=True))
+        # 匹配: 前缀(可能由多个单字token组成) + 后缀
+        # 允许前缀和后缀之间无分隔符（HanLP分词场景）
+        loc_regex = re.compile(
+            f'(?:{prefix_pattern})'
+            f'(?:{suffix_pattern})'
+        )
+
+        # 构建token位置映射
+        full_text = ''.join(tokens)
+        token_positions = []
+        pos = 0
+        for tok in tokens:
+            token_positions.append((pos, pos + len(tok)))
+            pos += len(tok)
+
+        for match in loc_regex.finditer(full_text):
+            match_start = match.start()
+            match_end = match.end()
+            matched_text = match.group()
+
+            # 跳过太短的匹配（< 3字）
+            if len(matched_text) < 3:
+                continue
+
+            # 找到对应的token范围
+            start_token = None
+            end_token = None
+            for idx, (tok_start, tok_end) in enumerate(token_positions):
+                if tok_start <= match_start < tok_end:
+                    start_token = idx
+                if tok_start < match_end <= tok_end:
+                    end_token = idx
+                    break
+
+            if start_token is not None and end_token is not None:
+                # 检查是否已被覆盖
+                if not any(idx in covered for idx in range(start_token, end_token + 1)):
+                    entities.append(Entity(
+                        text=matched_text, type='LOC', start=start_token, end=end_token + 1,
+                        confidence=0.85,
+                    ))
+                    for idx in range(start_token, end_token + 1):
+                        covered.add(idx)
+
+        return entities
+
+    def _merge_foreign_names(self, tokens: List[str], pos_tags: List[str]) -> Tuple[List[Entity], set, set]:
+        """合并西方名字（如 "亚瑟·潘德拉贡"）。
+
+        改进：
+        1. 支持 "名·中间名·姓" 格式（如 "亚瑟·潘德拉贡"）
+        2. 支持缩写格式 "A·P·潘德拉贡"
+        3. 支持以西方名字前缀开头的独立NR词
+        4. 优化边界检测，避免跨句子合并
+
+        Returns:
+            (entities, covered_indices, entity_texts) 三元组
+        """
+        entities: List[Entity] = []
+        covered: set = set()
+        texts: set = set()
+
+        i = 0
+        while i < len(tokens):
+            pos = pos_tags[i] if i < len(pos_tags) else 'X'
+            if pos not in ('NR', 'nr') and tokens[i] not in WESTERN_NAME_PREFIXES:
+                i += 1
+                continue
+
+            start = i
+            parts = [tokens[i]]
+            separators = []
+            j = i + 1
+
+            while j < len(tokens):
+                next_pos = pos_tags[j] if j < len(pos_tags) else 'X'
+                next_token = tokens[j]
+
+                if next_pos in ('NR', 'nr'):
+                    parts.append(next_token)
+                    j += 1
+                elif next_token in ('·', '-', '.', '/') and j + 1 < len(tokens):
+                    check_pos = pos_tags[j + 1] if j + 1 < len(pos_tags) else 'X'
+                    if check_pos in ('NR', 'nr'):
+                        separators.append((len(parts) - 1, next_token))
+                        j += 1
+                    else:
+                        break
+                elif next_token in WESTERN_NAME_PREFIXES:
+                    # 连续出现的西方名字（无分隔符，如 "艾德温 伊莉雅"）
+                    parts.append(next_token)
+                    j += 1
+                elif next_token in ('和', '与', '及'):
+                    # "艾德温和伊莉雅" - 名字连接词
+                    if j + 1 < len(tokens):
+                        check_pos = pos_tags[j + 1] if j + 1 < len(pos_tags) else 'X'
+                        check_token = tokens[j + 1]
+                        if check_pos in ('NR', 'nr') or check_token in WESTERN_NAME_PREFIXES:
+                            j += 1  # 跳过连接词
+                            continue
+                    break
+                else:
+                    break
+
+            if len(parts) > 1:
+                merged_parts = []
+                for idx, part in enumerate(parts):
+                    merged_parts.append(part)
+                    for sep_idx, sep_char in separators:
+                        if sep_idx == idx:
+                            merged_parts.append(sep_char)
+                merged = ''.join(merged_parts)
+
+                entities.append(Entity(
+                    text=merged, type='PER', start=start, end=j
+                ))
+                texts.add(merged)
+                for idx in range(start, j):
+                    covered.add(idx)
+                i = j
+                continue
+
+            i += 1
+
+        return entities, covered, texts
+
+    def _detect_prefix_titles(self, tokens: List[str], pos_tags: List[str],
+                              covered: set) -> List[Entity]:
+        """检测前缀称呼（老陈/小李/大张），其中 X 必须是姓氏。"""
+        entities: List[Entity] = []
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
+            if token in PREFIX_TITLES and i + 1 < len(tokens) and i not in covered:
                 next_token = tokens[i + 1]
                 next_pos = pos_tags[i + 1] if i + 1 < len(pos_tags) else 'X'
-                
+
                 if next_token in SINGLE_CHAR_SURNAMES and next_pos in ('NR', 'nr'):
                     combined = token + next_token
-                    rule_entities.append(Entity(
-                        text=combined,
-                        type='PER',
-                        start=i,
-                        end=i + 2,
-                        confidence=0.90
+                    entities.append(Entity(
+                        text=combined, type='PER', start=i, end=i + 2, confidence=0.90
                     ))
-                    rule_entity_texts.add(combined)
-                    rule_covered_indices.update([i, i + 1])
                     i += 2
                     continue
-            
-            # Rule 4: Standalone professional titles (博士/教授/医生等)
-            if token in PROFESSION_TITLES:
-                rule_entities.append(Entity(
-                    text=token,
-                    type='PER',
-                    start=i,
-                    end=i + 1,
-                    confidence=0.85
+            i += 1
+        return entities
+
+    def _detect_profession_titles(self, tokens: List[str], pos_tags: List[str],
+                                  covered: set) -> List[Entity]:
+        """检测独立的职业称呼（博士/教授/医生等）。"""
+        entities: List[Entity] = []
+        for i, token in enumerate(tokens):
+            if i not in covered and token in PROFESSION_TITLES:
+                entities.append(Entity(
+                    text=token, type='PER', start=i, end=i + 1, confidence=0.85
                 ))
-                rule_entity_texts.add(token)
-                rule_covered_indices.add(i)
-                i += 1
-                continue
-            
-            # Rule 5: Organization names with suffixes (暗影会/异能者联盟)
-            # Only match if token is 2+ chars (avoid false positives like "我会", "来公司")
-            if i + 1 < len(tokens) and (i + 1) not in rule_covered_indices:
+        return entities
+
+    def _detect_org_suffixes(self, tokens: List[str], pos_tags: List[str],
+                             covered: set) -> List[Entity]:
+        """检测组织后缀（暗影会/异能者联盟），仅匹配2字符以上前缀。
+
+        增加 ORG_PREFIX_BLACKLIST 过滤，避免'炎魔会'/'我们会'/'立即组织'等误识别。
+        """
+        entities: List[Entity] = []
+        i = 0
+        while i < len(tokens):
+            if i not in covered and i + 1 < len(tokens) and (i + 1) not in covered:
                 next_token = tokens[i + 1]
-                if next_token in ORG_SUFFIXES and len(token) >= 2:
-                    combined = token + next_token
-                    rule_entities.append(Entity(
-                        text=combined,
-                        type='ORG',
-                        start=i,
-                        end=i + 2,
-                        confidence=0.85
-                    ))
-                    rule_entity_texts.add(combined)
-                    rule_covered_indices.update([i, i + 1])
-                    i += 2
-                    continue
-            
-            # Rule 2: Single surname + title words (陈管家/林少爷)
-            if pos not in ('NR', 'nr'):
+                if next_token in ORG_SUFFIXES and len(tokens[i]) >= 2:
+                    # 黑名单检查：前缀词不在黑名单中
+                    if tokens[i] not in ORG_PREFIX_BLACKLIST:
+                        combined = tokens[i] + next_token
+                        entities.append(Entity(
+                            text=combined, type='ORG', start=i, end=i + 2, confidence=0.85
+                        ))
+                        i += 2
+                        continue
+            i += 1
+        return entities
+
+    def _detect_surname_based_entities(self, tokens: List[str], pos_tags: List[str],
+                                       covered: set) -> List[Entity]:
+        """基于姓氏的实体检测：
+        - Rule 2: 单姓 + 称呼词（陈管家/林少爷/李医生）
+        - Rule 3: 单姓 + 职位后缀（张总/李哥/王姐）
+        - Rule 6: 单姓 + 家族后缀（陈家/李府）
+        - Rule 7: 单姓 + 位置后缀（山城/李村）
+        """
+        entities: List[Entity] = []
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
+            pos = pos_tags[i] if i < len(pos_tags) else 'X'
+
+            # 跳过已覆盖或非姓氏标记
+            if pos not in ('NR', 'nr') or len(token) > 1 or token not in SINGLE_CHAR_SURNAMES:
                 i += 1
                 continue
-            
-            if len(token) > 1:
+
+            if i + 1 >= len(tokens) or (i + 1) in covered:
                 i += 1
                 continue
-            
-            if token not in SINGLE_CHAR_SURNAMES:
-                i += 1
-                continue
-            
-            if i + 1 >= len(tokens) or (i + 1) in rule_covered_indices:
-                i += 1
-                continue
-            
+
             next_token = tokens[i + 1]
             combined = token + next_token
-            
+
             if next_token in TITLE_WORDS:
-                rule_entities.append(Entity(
-                    text=combined,
-                    type='PER',
-                    start=i,
-                    end=i + 2,
-                    confidence=0.95
+                entities.append(Entity(
+                    text=combined, type='PER', start=i, end=i + 2, confidence=0.95
                 ))
-                rule_entity_texts.add(combined)
-                rule_covered_indices.update([i, i + 1])
-                i += 2
-                continue
-            
-            # Rule 3: Position titles (张总/李哥/王姐)
-            if next_token in POSITION_SUFFIXES:
-                rule_entities.append(Entity(
-                    text=combined,
-                    type='PER',
-                    start=i,
-                    end=i + 2,
-                    confidence=0.90
+            elif next_token in POSITION_SUFFIXES:
+                entities.append(Entity(
+                    text=combined, type='PER', start=i, end=i + 2, confidence=0.90
                 ))
-                rule_entity_texts.add(combined)
-                rule_covered_indices.update([i, i + 1])
-                i += 2
-                continue
-            
-            if next_token in FAMILY_SUFFIXES:
-                rule_entities.append(Entity(
-                    text=combined,
-                    type='ORG',
-                    start=i,
-                    end=i + 2,
-                    confidence=0.90
+            elif next_token in FAMILY_SUFFIXES:
+                entities.append(Entity(
+                    text=combined, type='ORG', start=i, end=i + 2, confidence=0.90
                 ))
-                rule_entity_texts.add(combined)
-                rule_covered_indices.update([i, i + 1])
-                i += 2
-                continue
-            
-            if next_token in LOCATION_SUFFIXES:
-                rule_entities.append(Entity(
-                    text=combined,
-                    type='LOC',
-                    start=i,
-                    end=i + 2,
-                    confidence=0.85
+            elif next_token in LOCATION_SUFFIXES:
+                entities.append(Entity(
+                    text=combined, type='LOC', start=i, end=i + 2, confidence=0.85
                 ))
-                rule_entity_texts.add(combined)
-                rule_covered_indices.update([i, i + 1])
-                i += 2
+            else:
+                i += 1
                 continue
-            
-            i += 1
-        
+
+            i += 2
+
+        return entities
+
+    def _merge_rule_results(self, rule_entities: List[Entity], covered: set,
+                            texts: set, new_entities: List[Entity]) -> None:
+        """将子规则产生的实体合并到主结果中，并更新覆盖集合。"""
+        for e in new_entities:
+            for idx in range(e.start, e.end):
+                covered.add(idx)
+            rule_entities.append(e)
+            texts.add(e.text)
+
+    def _combine_entities(self, rule_entities: List[Entity], rule_entity_texts: set,
+                          rule_covered_indices: set, base_entities: List[Entity]) -> List[Entity]:
+        """合并规则实体和基础实体，过滤重复和冲突。"""
         enhanced = list(rule_entities)
         entity_texts = set(rule_entity_texts)
-        
+
         for e in base_entities:
             skip = False
             for idx in range(e.start, e.end):
                 if idx in rule_covered_indices:
                     skip = True
                     break
-            
+
             if not skip and e.text not in entity_texts:
                 enhanced.append(e)
                 entity_texts.add(e.text)
-        
+
         # Filter out chapter title entities
         enhanced = filter_chapter_title_entities(enhanced)
-        
+
         return enhanced
 
     def _analyze_simple(self, text: str, sentences: List[str]) -> NLPResult:
@@ -508,7 +772,10 @@ class NLPBasics:
                     entity_text += tokens[i].text
                     i += 1
                 
-                entities.append(Entity(text=entity_text, type=entity_type, start=start, end=i))
+                # ORG/LOC处理移除（2026-05-02 修正方案）
+                # 只保留PER类型实体
+                if entity_type == 'PER':
+                    entities.append(Entity(text=entity_text, type=entity_type, start=start, end=i))
             else:
                 i += 1
         
@@ -540,13 +807,24 @@ class NLPBasics:
 
 
 _nlp_instance: Optional[NLPBasics] = None
+_nlp_lock = threading.Lock()
 
 
 def get_nlp(enable_foreign_name_merge: bool = False) -> NLPBasics:
+    """获取或创建全局 NLP 实例（线程安全，双重检查锁）"""
     global _nlp_instance
     if _nlp_instance is None:
-        _nlp_instance = NLPBasics(enable_foreign_name_merge=enable_foreign_name_merge)
+        with _nlp_lock:
+            if _nlp_instance is None:
+                _nlp_instance = NLPBasics(enable_foreign_name_merge=enable_foreign_name_merge)
     return _nlp_instance
+
+
+def reset_nlp() -> None:
+    """重置全局 NLP 实例，用于测试或重新初始化"""
+    global _nlp_instance
+    with _nlp_lock:
+        _nlp_instance = None
 
 
 def analyze(text: str) -> NLPResult:

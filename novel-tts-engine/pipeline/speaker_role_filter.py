@@ -6,6 +6,7 @@ SpeakerRoleFilter - 说话角色过滤器
 与 ContextDiversityValidator 正交融合，形成交叉验证。
 """
 import re
+import threading
 from typing import List, Set, Dict, Optional
 from pipeline.nlp_basics import NLPBasics, Entity, get_nlp
 
@@ -101,13 +102,17 @@ class SpeakerRoleFilter:
         - PER实体：只有出现在 dialogue_entities 集合中的才能被保留
         - 对低频但多次出现在不同对话场景中的实体，通过L2提升置信度
         """
-        # 首次调用时提取说话角色集合
-        if not self._dialogue_entities:
-            self._dialogue_entities = self._extract_dialogue_entities(text, nlp)
+        # 每次调用时重置状态，避免跨章节/跨文本的状态污染
+        self._dialogue_entities = set()
+        self._entity_scene_count = {}
+        
+        # 提取说话角色集合
+        self._dialogue_entities = self._extract_dialogue_entities(text, nlp)
         
         filtered = []
         for e in entities:
-            # 非PER实体直接放行（ORG/LOC不受说话角色过滤影响）
+            # ORG/LOC处理已移除（2026-05-02 修正方案）
+            # nlp_basics.analyze() 现在只返回 PER 实体，无需再过滤
             if e.type != 'PER':
                 filtered.append(e)
                 continue
@@ -146,14 +151,28 @@ class SpeakerRoleFilter:
 # 全局单例
 # ============================================================
 
-_filter_instance = None
+_filter_instance: Optional[SpeakerRoleFilter] = None
+_filter_lock = threading.Lock()
+
 
 def get_speaker_role_filter(semantic_ranker=None, l2_threshold=0.7) -> SpeakerRoleFilter:
-    """获取或创建全局说话角色过滤器实例"""
+    """获取或创建全局说话角色过滤器实例（线程安全，双重检查锁）"""
     global _filter_instance
     if _filter_instance is None:
-        _filter_instance = SpeakerRoleFilter(
-            semantic_ranker=semantic_ranker,
-            l2_threshold=l2_threshold,
-        )
+        with _filter_lock:
+            if _filter_instance is None:
+                _filter_instance = SpeakerRoleFilter(
+                    semantic_ranker=semantic_ranker,
+                    l2_threshold=l2_threshold,
+                )
     return _filter_instance
+
+
+def reset_speaker_role_filter() -> None:
+    """重置全局说话角色过滤器实例，用于测试或重新初始化"""
+    global _filter_instance
+    with _filter_lock:
+        if _filter_instance is not None:
+            _filter_instance._dialogue_entities = set()
+            _filter_instance._entity_scene_count = {}
+        _filter_instance = None

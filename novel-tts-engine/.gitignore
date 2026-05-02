@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Database files (keep schema, ignore data)
+*.db
+!db/schema.sql
+
+# Models (large files, keep only configs)
+models/hanlp/
+models/bge-small-zh-v1.5/
+*.bin
+*.safetensors
+*.model
+
+# Logs
+*.log
+logs/
+
+# Test outputs
+eval_result_*.json
+test_results/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Environment variables
+.env
+.env.local

@@ -3,9 +3,14 @@
   "scores": {
     "chapter_splitting": 100,
     "dialogue_classification": 100.0,
-    "sfx_detection": 85.1,
-    "ner": 79.7,
-    "speaker_matching": 77.4,
-    "average": 88.44000000000001
+    "sfx_detection": 90.0,
+    "ner": 100.0,
+    "speaker_matching": 65.6,
+    "average": 91.12,
+    "basic_structure": 100.0,
+    "speaker_role": 100.0,
+    "dialogue_role_match": 65.6,
+    "end_to_end": 65.6,
+    "new_composite": 79.7
   }
 }

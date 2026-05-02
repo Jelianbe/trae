@@ -1,11 +1,11 @@
 import sqlite3
 import json
 import logging
-from pathlib import Path
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
 
-DB_PATH = Path(__file__).parent.parent / "novel_tts.db"
+from utils.config import DB_PATH
+
 logger = logging.getLogger(__name__)
 
 

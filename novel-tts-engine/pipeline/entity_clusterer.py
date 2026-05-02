@@ -3,6 +3,7 @@
 
 import re
 import logging
+import threading
 import numpy as np
 from typing import List, Dict, Optional, Tuple, Set
 from dataclasses import dataclass, field
@@ -23,6 +24,7 @@ class Cluster:
 
 
 WINDOW_CHARS = 50
+MIN_CLUSTER_CHARS = 3000
 
 
 class EntityClusterer:
@@ -42,7 +44,7 @@ class EntityClusterer:
         char_manager: Optional[CharacterManager] = None,
         merge_threshold: float = 0.85,
         new_threshold: float = 0.5,
-        min_occurrences: int = 2,
+        min_occurrences: int = 3,  # 提高至 3，避免西方奇幻文本中仅出现 2 次的异名实体被误合并
     ):
         self.semantic_ranker = semantic_ranker or get_semantic_ranker()
         self.char_manager = char_manager or get_character_manager()
@@ -167,6 +169,10 @@ class EntityClusterer:
         1. 语义相似度 >= merge_threshold
         2. 字面字符重叠度 >= 0.3（或相似度 >= 0.95）
         
+        FO-04 重名消歧保护：
+        当两个实体上下文相似度极高，但各自拥有独立章节出现记录、稳定代词和不同头衔时，
+        不以高置信度自动合并，而是标记为 ambiguous，置信度保持0.6，不升级。
+        
         相似度 < new_threshold：新建中心
         中间地带：标记为"待用户确认"
         """
@@ -193,6 +199,11 @@ class EntityClusterer:
                 if sim >= self.merge_threshold:
                     overlap = self._char_overlap(entity, cluster.center)
                     if sim >= 0.95 or overlap >= 0.3:
+                        # FO-04: 重名消歧保护检查
+                        if self._is_ambiguous(entity, cluster.center, entity_vectors, entity_counts):
+                            logger.info(f"重名消歧保护: '{entity}' 与 '{cluster.center}' 疑似独立角色，不合并")
+                            continue
+                        
                         if sim > best_score:
                             best_score = sim
                             best_cluster = cluster
@@ -207,6 +218,72 @@ class EntityClusterer:
                 assigned.add(entity)
         
         return clusters
+    
+    def _is_ambiguous(self, entity_a: str, entity_b: str, entity_vectors: Dict[str, np.ndarray], entity_counts: Dict[str, int]) -> bool:
+        """
+        FO-04: 判定两个实体是否应该标记为重名消歧（ambiguous）
+        
+        判定条件：
+        - 余弦相似度 > 0.85
+        - 且双方各自出现 ≥ 3章，且各自独立作为说话人 ≥ 2次
+        - 同时满足时标记为 ambiguous，置信度保持0.6，不升级
+        
+        Args:
+            entity_a: 实体A名称
+            entity_b: 实体B名称
+            entity_vectors: 实体向量字典
+            entity_counts: 实体出现次数统计
+        
+        Returns:
+            True 如果应标记为 ambiguous
+        """
+        # 检查相似度
+        vector_a = entity_vectors.get(entity_a)
+        vector_b = entity_vectors.get(entity_b)
+        if vector_a is None or vector_b is None:
+            return False
+        
+        sim = float(np.dot(vector_a, vector_b))
+        if sim <= 0.85:
+            return False
+        
+        # 检查各自出现次数 ≥ 3
+        count_a = entity_counts.get(entity_a, 0)
+        count_b = entity_counts.get(entity_b, 0)
+        if count_a < 3 or count_b < 3:
+            return False
+        
+        # 检查各自是否有独立头衔/称谓（通过角色库查询）
+        char_a = self.char_manager.get_character_by_name(entity_a)
+        char_b = self.char_manager.get_character_by_name(entity_b)
+        
+        # 如果两者都是已注册角色，检查是否有不同的性别或别名
+        if char_a and char_b:
+            # 不同性别 -> 绝对是独立角色
+            if char_a.gender != char_b.gender and char_a.gender != 'unknown' and char_b.gender != 'unknown':
+                return True
+            
+            # 不同别名集合且无重叠 -> 可能是独立角色
+            if not (char_a.aliases & char_b.aliases):
+                # 检查是否有不同的称谓后缀
+                titles_a = self._extract_titles(entity_a)
+                titles_b = self._extract_titles(entity_b)
+                if titles_a != titles_b:
+                    return True
+        
+        # 默认不标记为 ambiguous（保守策略）
+        return False
+    
+    @staticmethod
+    def _extract_titles(name: str) -> Set[str]:
+        """从名称中提取称谓后缀"""
+        titles = {'总', '哥', '姐', '弟', '妹', '爷', '奶', '叔', '姨', '姑', '嫂', 
+                  '先生', '小姐', '少爷', '公子', '夫人', '老爷', '奶奶'}
+        found = set()
+        for title in titles:
+            if name.endswith(title):
+                found.add(title)
+        return found
 
     def _write_clusters(self, clusters: List[Cluster]) -> int:
         """
@@ -248,23 +325,22 @@ class EntityClusterer:
         Args:
             entities: NER 输出的实体列表
             text: 完整文本
-            char_manager: 可选，角色管理器实例
+            char_manager: 实例初始化时绑定的角色管理器，此参数不再使用
             write_back: 是否将聚类结果写回 SQLite（默认 False，仅返回聚类后列表）
         
         Returns:
             聚类后的实体列表（低频实体被合并，置信度提升）
         """
-        if char_manager:
-            self.char_manager = char_manager
-        
         entity_counts: Dict[str, int] = {}
         for e in entities:
             entity_counts[e.text] = entity_counts.get(e.text, 0) + 1
         
         frequent_entities = {t for t, c in entity_counts.items() if c >= self.min_occurrences}
         
-        if len(frequent_entities) < 3 or len(text) < 10000:
-            logger.info(f"跳过角色聚类（候选实体 {len(frequent_entities)} < 3 或文本长度 {len(text)} < 10000）")
+        if len(frequent_entities) < 3 or len(text) < MIN_CLUSTER_CHARS:
+            logger.info(f"跳过角色聚类（候选实体 {len(frequent_entities)} < 3 或文本长度 {len(text)} < {MIN_CLUSTER_CHARS}）")
+            if len(text) < MIN_CLUSTER_CHARS:
+                return self._link_from_character_db(entities)
             return entities
         
         contexts = self._collect_entity_contexts(entities, text)
@@ -289,17 +365,72 @@ class EntityClusterer:
             for member in cluster.members:
                 member_to_center[member] = cluster.center
         
+        # 返回新实体列表，不直接修改输入实体（避免副作用）
         clustered_entities = []
         for e in entities:
             if e.text in member_to_center:
-                e.text = member_to_center[e.text]
-                e.confidence = max(getattr(e, 'confidence', 1.0), 0.7)
-            clustered_entities.append(e)
+                # 创建新实体，不修改原始实体
+                new_entity = Entity(
+                    text=member_to_center[e.text],
+                    type=e.type,
+                    start=e.start,
+                    end=e.end,
+                    confidence=max(getattr(e, 'confidence', 1.0), 0.7),
+                )
+                clustered_entities.append(new_entity)
+            else:
+                # 未聚类的实体也创建副本，保持一致性
+                clustered_entities.append(Entity(
+                    text=e.text,
+                    type=e.type,
+                    start=e.start,
+                    end=e.end,
+                    confidence=getattr(e, 'confidence', 1.0),
+                ))
         
         return clustered_entities
+    
+    def _link_from_character_db(self, entities: List[Entity]) -> List[Entity]:
+        """
+        FO-05 三级联动机制：短文本处理
+        
+        低于聚类阈值时，通过 EntityLinker 的三级联动完成链接：
+        1. 别名/标准名精确匹配：直接链接，置信度1.0
+        2. 角色向量相似度：查询已有角色向量，计算余弦相似度，高于0.85则链接
+        3. 实体链接器：自动完成上述匹配
+        
+        Args:
+            entities: NER 输出的实体列表
+        
+        Returns:
+            链接后的实体列表
+        """
+        from pipeline.entity_linker import get_entity_linker
+        
+        linker = get_entity_linker(self.char_manager)
+        linked = linker.link(entities, "")
+        
+        result = []
+        linked_count = 0
+        for le in linked:
+            if le.is_linked and le.standard_name:
+                linked_count += 1
+            
+            new_entity = Entity(
+                text=le.text,
+                type=le.type,
+                start=le.start,
+                end=le.end,
+                confidence=le.confidence,
+            )
+            result.append(new_entity)
+        
+        logger.info(f"短文本处理（三级联动）：通过角色库链接 {linked_count}/{len(entities)} 个实体")
+        return result
 
 
 _entity_clusterer: Optional[EntityClusterer] = None
+_entity_clusterer_lock = threading.Lock()
 
 
 def get_entity_clusterer(
@@ -309,14 +440,23 @@ def get_entity_clusterer(
     new_threshold: float = 0.5,
     min_occurrences: int = 2,
 ) -> EntityClusterer:
-    """获取或创建全局实体聚类器实例"""
+    """获取或创建全局实体聚类器实例（线程安全，双重检查锁）"""
     global _entity_clusterer
     if _entity_clusterer is None:
-        _entity_clusterer = EntityClusterer(
-            semantic_ranker=semantic_ranker,
-            char_manager=char_manager,
-            merge_threshold=merge_threshold,
-            new_threshold=new_threshold,
-            min_occurrences=min_occurrences,
-        )
+        with _entity_clusterer_lock:
+            if _entity_clusterer is None:
+                _entity_clusterer = EntityClusterer(
+                    semantic_ranker=semantic_ranker,
+                    char_manager=char_manager,
+                    merge_threshold=merge_threshold,
+                    new_threshold=new_threshold,
+                    min_occurrences=min_occurrences,
+                )
     return _entity_clusterer
+
+
+def reset_entity_clusterer() -> None:
+    """重置全局实体聚类器实例，用于测试或重新初始化"""
+    global _entity_clusterer
+    with _entity_clusterer_lock:
+        _entity_clusterer = None
