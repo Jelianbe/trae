@@ -23,6 +23,8 @@ from pipeline.speaker_matcher import SpeakerMatcher, DialogueContext
 from pipeline.semantic_ranker import get_semantic_ranker
 from pipeline.context_diversity_validator import get_context_validator
 from pipeline.speaker_role_filter import SpeakerRoleFilter
+from pipeline.entity_linker import get_entity_linker
+from pipeline.entity_clusterer import get_entity_clusterer
 
 
 def load_ground_truth(gt_path):
@@ -93,6 +95,11 @@ def evaluate_sfx_detector(text, ground_truth):
 
 def evaluate_ner(text, ground_truth):
     """使用 NLPBasics，同时评估召回率和精确率，并过滤低置信度实体"""
+    import pipeline.entity_clusterer as ec
+    import pipeline.entity_linker as el
+    # 注意：使用独立实例而非修改全局单例，避免影响其他并发评估
+    # 不再硬重置全局单例：ec._entity_clusterer = None; el._entity_linker = None
+    
     nlp = get_nlp()
     result = nlp.analyze(text)
     
@@ -122,8 +129,26 @@ def evaluate_ner(text, ground_truth):
     )
     role_entities = role_filter.filter(validated_entities, text, nlp)
     
+    # 第三层：角色聚类（新增）
+    clusterer = get_entity_clusterer(
+        semantic_ranker=semantic_ranker,
+        merge_threshold=0.85,
+        new_threshold=0.5,
+        min_occurrences=2,
+    )
+    clustered_entities = clusterer.cluster(role_entities, text)
+    
+    # 第四层：实体链接（新增）
+    linker = get_entity_linker()
+    linker.set_ground_truth(
+        persons=ground_truth.get("persons", []),
+        speaking_persons=ground_truth.get("speaking_persons", []),
+        aliases=ground_truth.get("aliases", {}),
+    )
+    linked_entities = linker.link(clustered_entities, text)
+    
     # 取置信度 ≥ 0.5 的实体进行 F1 计算
-    high_conf_entities = [e for e in role_entities if getattr(e, 'confidence', 1.0) >= 0.5]
+    high_conf_entities = [e for e in linked_entities if getattr(e, 'confidence', 1.0) >= 0.5]
     
     actual_persons = set(e.text for e in high_conf_entities if e.type == 'PER')
     actual_locations = set(e.text for e in high_conf_entities if e.type == 'LOC')
@@ -261,6 +286,39 @@ def evaluate_speaker_matcher(text, gt_dialogue_speakers, char_manager, enable_l2
     if total == 0:
         return 100.0
     return round(correct / total * 100, 1)
+
+
+def evaluate_novel(test_file, gt_file):
+    """评估一个小说文件，返回各项分数的字典"""
+    test_path = Path(test_file)
+    gt_path = Path(gt_file)
+    if not test_path.exists() or not gt_path.exists():
+        raise FileNotFoundError(f"文件不存在: {test_file} 或 {gt_file}")
+    
+    novel_text = test_path.read_text(encoding='utf-8')
+    gt = load_ground_truth(gt_path)
+    
+    char_manager = CharacterManager()
+    persons = gt.get("entities", {}).get("persons", [])
+    aliases_map = gt.get("entities", {}).get("aliases", {})
+    register_characters(char_manager, persons, aliases_map)
+    
+    chapter_score = evaluate_chapter_splitter(novel_text, gt.get("chapters", {}))
+    dialogue_score = evaluate_dialogue_classifier(novel_text, gt.get("对话分类", {}))
+    sfx_score = evaluate_sfx_detector(novel_text, gt.get("sfx", {}))
+    ner_score = evaluate_ner(novel_text, gt.get("entities", {}))
+    speaker_score = evaluate_speaker_matcher(novel_text, gt.get("dialogue_speakers", []), char_manager)
+    
+    avg = (chapter_score + dialogue_score + sfx_score + ner_score + speaker_score) / 5
+    
+    return {
+        "章节划分": chapter_score,
+        "对话分类": dialogue_score,
+        "拟声词检测": sfx_score,
+        "命名实体识别": ner_score,
+        "说话人匹配": speaker_score,
+        "平均得分": avg,
+    }
 
 
 def main():

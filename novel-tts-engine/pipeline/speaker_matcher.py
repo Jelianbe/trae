@@ -39,6 +39,17 @@ PRONOUNS = {
     'unknown': {'它', '它们', '其'},
 }
 
+GROUP_SPEAKERS = {
+    '三人': 'GROUP:3',
+    '他们三人': 'GROUP:3',
+    '他们三个': 'GROUP:3',
+    '三人异口同声': 'GROUP:3',
+    '众人': 'GROUP:CROWD',
+    '大家': 'GROUP:CROWD',
+    '齐声': 'GROUP:CROWD',
+    '所有人': 'GROUP:CROWD',
+}
+
 SPEAKER_HINTS = {
     '说道', '道', '说', '问道', '答道', '笑道', '喊道', '叫道', '怒道',
     '冷冷道', '淡淡道', '沉声道', '低声道', '高声道', '大声道',
@@ -498,7 +509,7 @@ class SpeakerMatcher:
         return None, None
     
     def analyze_dialogue(self, text: str, chapter_id: int = None) -> List[Tuple[str, Optional[Character]]]:
-        results = []
+        # 第一轮：提取所有对话并建立缓存
         dialogues = []
         seen_positions = set()
         
@@ -509,8 +520,16 @@ class SpeakerMatcher:
                     dialogues.append((start, end, match.group(1)))
                     seen_positions.add(start)
         
-        dialogues.sort(key=lambda x: x[0])
+        # 第一轮：建立对话历史缓存
+        self._build_dialogue_cache(text, chapter_id)
         
+        # 重置追踪状态，避免第一轮缓存建立干扰第二轮说话人匹配
+        self._recent_speakers.clear()
+        self._recent_mentions.clear()
+        
+        # 第二轮：匹配说话人
+        dialogues.sort(key=lambda x: x[0])
+        results = []
         prev_speaker = None
         for i, (start, end, dialogue) in enumerate(dialogues):
             prefix_start = dialogues[i-1][1] if i > 0 else 0
@@ -546,6 +565,37 @@ class SpeakerMatcher:
             results.append((dialogue, speaker))
         
         return results
+    
+    def _build_dialogue_cache(self, text: str, chapter_id: int = None):
+        """
+        第一轮扫描全文，建立角色对话历史缓存。
+        先提取所有有明确说话人的对话，缓存到对应角色名下。
+        这样第二轮语义匹配时可以利用已建立的对话画像。
+        """
+        all_dialogues = []
+        for pattern in DIALOGUE_PATTERNS:
+            for match in pattern.finditer(text):
+                start, end = match.start(), match.end()
+                dialogue = match.group(1)
+                
+                prefix_start = max(0, start - 50)
+                suffix_end = min(len(text), end + 50)
+                prefix = text[prefix_start:start].strip()
+                suffix = text[end:suffix_end].strip()
+                context = prefix + " " + dialogue + " " + suffix
+                
+                all_dialogues.append((start, context, dialogue))
+        
+        all_dialogues.sort(key=lambda x: x[0])
+        
+        for _, context, dialogue in all_dialogues:
+            speaker_hint, _ = self.extract_speaker_hint(context)
+            if speaker_hint and speaker_hint not in ('他', '她'):
+                char = self.char_manager.get_character_by_name(speaker_hint)
+                if not char:
+                    char = self.char_manager.get_character_by_alias(speaker_hint)
+                if char:
+                    self.cache_dialogue(char.name, dialogue)
 
 
 _speaker_matcher: Optional[SpeakerMatcher] = None
