@@ -594,7 +594,7 @@ class SpeakerMatcher:
                 char = self.char_manager.get_character_by_name(speaker_hint)
                 if not char:
                     char = self.char_manager.get_character_by_alias(speaker_hint)
-                if char:
+                if char and getattr(char, 'name', None):
                     self.cache_dialogue(char.name, dialogue)
 
 

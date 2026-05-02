@@ -52,7 +52,12 @@ class EntityLinker:
             for alias in char.aliases:
                 self._title_cache[alias] = char.name
     
-    def set_ground_truth(self, persons: List[str] = None, speaking_persons: List[str] = None, aliases: Dict = None):
+    def set_ground_truth(
+        self,
+        persons: Optional[List[str]] = None,
+        speaking_persons: Optional[List[str]] = None,
+        aliases: Optional[Dict[str, List[str]]] = None,
+    ):
         """设置 GT 参考数据，用于评估时的实体链接"""
         self._gt_cache.clear()
         if speaking_persons:

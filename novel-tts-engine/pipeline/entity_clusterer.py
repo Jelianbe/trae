@@ -38,8 +38,8 @@ class EntityClusterer:
     
     def __init__(
         self,
-        semantic_ranker: SemanticRanker = None,
-        char_manager: CharacterManager = None,
+        semantic_ranker: Optional[SemanticRanker] = None,
+        char_manager: Optional[CharacterManager] = None,
         merge_threshold: float = 0.85,
         new_threshold: float = 0.5,
         min_occurrences: int = 2,
