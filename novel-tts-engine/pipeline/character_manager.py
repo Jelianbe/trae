@@ -193,9 +193,19 @@ class CharacterManager:
                 )
             return None
     
+    def _escape_like_pattern(self, pattern: str) -> str:
+        """
+        转义 LIKE 查询中的特殊字符
+        
+        SQLite LIKE 查询中，% 和 _ 是通配符，需要转义
+        必须先转义反斜杠本身，然后再转义其他特殊字符
+        """
+        return pattern.replace('\\', r'\\').replace('%', r'\%').replace('_', r'\_')
+    
     def get_character_by_alias(self, alias: str) -> Optional[Character]:
         with self._get_connection() as conn:
             cursor = conn.cursor()
+            # 首先尝试精确匹配 name
             cursor.execute(
                 "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE name = ?",
                 (alias,)
@@ -210,10 +220,12 @@ class CharacterManager:
                     first_appearance=row[4]
                 )
             
-            # 使用参数化查询，避免SQL注入
+            # 使用更安全的参数化方式，将通配符与参数完全分离
+            # 对特殊字符进行转义，防止SQL注入
+            escaped_alias = self._escape_like_pattern(alias)
             cursor.execute(
-                "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE aliases LIKE ?",
-                (f'%{alias}%',)
+                "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE aliases LIKE '%' || ? || '%' ESCAPE '\\'",
+                (escaped_alias,)
             )
             row = cursor.fetchone()
             

@@ -3,6 +3,8 @@ L2 Semantic Speaker Ranking Module
 
 Uses BGE-small-zh model to compute sentence embeddings and rank candidate speakers
 by semantic similarity to the current dialogue context.
+
+Supports both ONNX (preferred) and PyTorch backends with automatic fallback.
 """
 import numpy as np
 from typing import List, Tuple, Optional, Dict
@@ -16,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 MODEL_NAME = "BAAI/bge-small-zh-v1.5"
 MODEL_LOCAL_PATH = str(Path(__file__).parent.parent / "models" / "bge-small-zh-v1.5")
+ONNX_MODEL_PATH = str(Path(__file__).parent.parent / "models" / "bge-small-onnx")
 
 
 @dataclass
@@ -49,8 +52,12 @@ class SemanticCache:
 class SemanticRanker:
     """Rank candidate speakers by semantic similarity using BGE model."""
 
-    def __init__(self, model_name: str = MODEL_NAME, cache_size: int = 1000):
+    def __init__(self, model_name: str = MODEL_NAME, cache_size: int = 1000, enable_l2: bool = True):
         self.model_name = model_name
+        self._enable_l2 = enable_l2
+        self._backend = None  # 'onnx' or 'pytorch'
+        self._onnx_session = None
+        self._onnx_tokenizer = None
         self._tokenizer = None
         self._model = None
         self._device = None
@@ -59,49 +66,92 @@ class SemanticRanker:
         self._load_error = None
 
     def is_available(self) -> bool:
-        return self._loaded and self._model is not None
+        return self._enable_l2 and self._loaded and (self._model is not None or self._onnx_session is not None)
 
     def load_model(self):
-        """Lazy load the embedding model."""
+        """Lazy load the embedding model, preferring ONNX backend."""
         if self._loaded:
+            return
+
+        if not self._enable_l2:
+            logger.info("L2 semantic matching disabled")
             return
 
         if self._load_error:
             return
 
+        # Try ONNX first (faster, lighter)
         try:
-            from transformers import AutoTokenizer, AutoModel
-            import torch
-
-            # Use local model path if available, otherwise download from HuggingFace
-            model_path = MODEL_LOCAL_PATH if Path(MODEL_LOCAL_PATH).exists() else self.model_name
-            
-            logger.info(f"Loading L2 semantic model from: {model_path}")
-            start = time.time()
-
-            self._tokenizer = AutoTokenizer.from_pretrained(
-                model_path,
-                use_fast=True,
-                trust_remote_code=True,
-                local_files_only=Path(MODEL_LOCAL_PATH).exists(),
-            )
-            self._model = AutoModel.from_pretrained(
-                model_path,
-                local_files_only=Path(MODEL_LOCAL_PATH).exists(),
-            )
-            self._model.eval()
-
-            self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            self._model.to(self._device)
-
-            elapsed = time.time() - start
-            logger.info(f"L2 semantic model loaded in {elapsed:.1f}s on {self._device}")
+            self._load_onnx()
             self._loaded = True
+            return
+        except Exception as e:
+            logger.info(f"ONNX backend not available: {e}")
 
+        # Fallback to PyTorch
+        try:
+            self._load_pytorch()
+            self._loaded = True
+            return
         except Exception as e:
             self._load_error = str(e)
-            logger.warning(f"L2 semantic model load failed: {e}")
+            logger.warning(f"L2 semantic model load failed (all backends): {e}")
             self._loaded = False
+
+    def _load_onnx(self):
+        """Load ONNX runtime model."""
+        from transformers import AutoTokenizer
+        from optimum.onnxruntime import ORTModelForFeatureExtraction
+        import torch
+
+        onnx_path = ONNX_MODEL_PATH if Path(ONNX_MODEL_PATH).exists() else None
+        if not onnx_path:
+            raise FileNotFoundError(f"ONNX model not found at {ONNX_MODEL_PATH}")
+
+        logger.info(f"Loading L2 semantic model (ONNX) from: {onnx_path}")
+        start = time.time()
+
+        self._onnx_tokenizer = AutoTokenizer.from_pretrained(
+            onnx_path,
+            use_fast=True,
+            local_files_only=True,
+        )
+        self._onnx_session = ORTModelForFeatureExtraction.from_pretrained(onnx_path)
+        self._onnx_session.eval()
+
+        self._device = torch.device("cpu")
+        elapsed = time.time() - start
+        logger.info(f"L2 semantic model (ONNX) loaded in {elapsed:.1f}s")
+        self._backend = 'onnx'
+
+    def _load_pytorch(self):
+        """Load PyTorch model as fallback."""
+        from transformers import AutoTokenizer, AutoModel
+        import torch
+
+        model_path = MODEL_LOCAL_PATH if Path(MODEL_LOCAL_PATH).exists() else self.model_name
+        
+        logger.info(f"Loading L2 semantic model (PyTorch) from: {model_path}")
+        start = time.time()
+
+        self._tokenizer = AutoTokenizer.from_pretrained(
+            model_path,
+            use_fast=True,
+            trust_remote_code=True,
+            local_files_only=Path(MODEL_LOCAL_PATH).exists(),
+        )
+        self._model = AutoModel.from_pretrained(
+            model_path,
+            local_files_only=Path(MODEL_LOCAL_PATH).exists(),
+        )
+        self._model.eval()
+
+        self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self._model.to(self._device)
+
+        elapsed = time.time() - start
+        logger.info(f"L2 semantic model (PyTorch) loaded in {elapsed:.1f}s on {self._device}")
+        self._backend = 'pytorch'
 
     def encode(self, text: str) -> Optional[np.ndarray]:
         """Encode single text to embedding vector."""
@@ -114,7 +164,38 @@ class SemanticRanker:
         if cached is not None:
             return cached
 
+        if self._backend == 'onnx':
+            result = self._encode_onnx(text)
+        else:
+            result = self._encode_pytorch(text)
+
+        if result is not None:
+            self._cache.put(text, result)
+        return result
+
+    def _encode_onnx(self, text: str) -> Optional[np.ndarray]:
+        """Encode using ONNX runtime."""
         import torch
+        
+        inputs = self._onnx_tokenizer(
+            text,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=512,
+        )
+
+        with torch.no_grad():
+            outputs = self._onnx_session(**inputs)
+            embeddings = outputs.last_hidden_state[:, 0]
+            embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+
+        return embeddings.cpu().numpy()[0]
+
+    def _encode_pytorch(self, text: str) -> Optional[np.ndarray]:
+        """Encode using PyTorch."""
+        import torch
+        
         inputs = self._tokenizer(
             text,
             return_tensors="pt",
@@ -129,9 +210,7 @@ class SemanticRanker:
             embeddings = outputs.last_hidden_state[:, 0]
             embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
 
-        result = embeddings.cpu().numpy()[0]
-        self._cache.put(text, result)
-        return result
+        return embeddings.cpu().numpy()[0]
 
     def encode_batch(self, texts: List[str]) -> Optional[np.ndarray]:
         """Encode batch of texts to embedding vectors."""
@@ -157,8 +236,46 @@ class SemanticRanker:
         if not to_encode:
             return np.array([r for r in result if r is not None])
 
+        if self._backend == 'onnx':
+            encoded = self._encode_batch_onnx(to_encode)
+        else:
+            encoded = self._encode_batch_pytorch(to_encode)
+
+        if encoded is not None:
+            for idx, emb in zip(to_encode_indices, encoded):
+                result[idx] = emb
+                self._cache.put(to_encode[to_encode_indices.index(idx)], emb)
+
+        return np.array([r for r in result if r is not None])
+
+    def _encode_batch_onnx(self, texts: List[str]) -> Optional[np.ndarray]:
+        import torch
+        
+        inputs = self._onnx_tokenizer(
+            texts,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
+            max_length=512,
+        )
+
+        batch_size = 32
+        all_embeddings = []
+        for start in range(0, len(texts), batch_size):
+            batch_inputs = {k: v[start:start + batch_size] for k, v in inputs.items()}
+            with torch.no_grad():
+                outputs = self._onnx_session(**batch_inputs)
+                embeddings = outputs.last_hidden_state[:, 0]
+                embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
+                all_embeddings.append(embeddings.cpu().numpy())
+
+        return np.vstack(all_embeddings)
+
+    def _encode_batch_pytorch(self, texts: List[str]) -> Optional[np.ndarray]:
+        import torch
+
         inputs = self._tokenizer(
-            to_encode,
+            texts,
             return_tensors="pt",
             padding=True,
             truncation=True,
@@ -168,7 +285,7 @@ class SemanticRanker:
 
         batch_size = 32
         all_embeddings = []
-        for start in range(0, len(to_encode), batch_size):
+        for start in range(0, len(texts), batch_size):
             batch_inputs = {k: v[start:start + batch_size] for k, v in inputs.items()}
             with torch.no_grad():
                 outputs = self._model(**batch_inputs)
@@ -176,13 +293,7 @@ class SemanticRanker:
                 embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
                 all_embeddings.append(embeddings.cpu().numpy())
 
-        encoded = np.vstack(all_embeddings)
-
-        for idx, emb in zip(to_encode_indices, encoded):
-            result[idx] = emb
-            self._cache.put(to_encode[to_encode_indices.index(idx)], emb)
-
-        return np.array([r for r in result if r is not None])
+        return np.vstack(all_embeddings)
 
     @staticmethod
     def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
@@ -287,11 +398,11 @@ _singleton_lock = Lock()
 _semantic_ranker: Optional[SemanticRanker] = None
 
 
-def get_semantic_ranker() -> SemanticRanker:
+def get_semantic_ranker(enable_l2: bool = True) -> SemanticRanker:
     """Get or create singleton SemanticRanker instance."""
     global _semantic_ranker
     if _semantic_ranker is None:
         with _singleton_lock:
             if _semantic_ranker is None:
-                _semantic_ranker = SemanticRanker()
+                _semantic_ranker = SemanticRanker(enable_l2=enable_l2)
     return _semantic_ranker

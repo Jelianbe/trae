@@ -52,9 +52,38 @@ TITLE_WORDS = {
     '掌柜', '老板', '掌门', '长老', '堂主', '舵主',
     '将军', '大人', '王爷', '皇上', '皇后', '贵妃',
     '师父', '师叔', '师兄', '师弟', '师姐', '师妹',
+    '博士', '教授', '医生', '护士', '律师', '记者',
+    '经理', '总裁', '总监', '部长', '局长', '队长',
 }
 
-FAMILY_SUFFIXES = {'家', '府', '门', '派', '宗', '族', '山庄', '阁', '楼', '院'}
+# 职业称呼后缀（可作为人名识别）
+# PROFESSION_TITLES 是 TITLE_WORDS 的子集，专门用于职业相关的称呼
+PROFESSION_TITLES = {
+    '博士', '教授', '医生', '护士', '律师', '记者',
+    '经理', '总裁', '总监', '部长', '局长', '队长',
+}
+
+# 传统称呼后缀（身份相关的称呼）
+TRADITIONAL_TITLES = {
+    '管家', '老爷', '夫人', '少爷', '小姐', '公子', '姑娘',
+    '掌柜', '老板', '掌门', '长老', '堂主', '舵主',
+    '将军', '大人', '王爷', '皇上', '皇后', '贵妃',
+    '师父', '师叔', '师兄', '师弟', '师姐', '师妹',
+}
+
+# 验证: TITLE_WORDS == PROFESSION_TITLES | TRADITIONAL_TITLES
+assert TITLE_WORDS == (PROFESSION_TITLES | TRADITIONAL_TITLES), "TITLE_WORDS 应该等于 PROFESSION_TITLES 和 TRADITIONAL_TITLES 的并集"
+
+# 职位称呼后缀（X总/X哥/X姐/X叔/X伯）
+POSITION_SUFFIXES = {
+    '总', '哥', '姐', '叔', '伯', '姨', '婶', '爷', '公', '婆',
+}
+
+PREFIX_TITLES = {'老', '小', '大'}
+
+ORG_SUFFIXES = {'会', '帮', '社', '团', '协会', '联盟', '组织', '集团', '公司', '企业', '商会', '公会', '教派', '宗门'}
+
+FAMILY_SUFFIXES = {'家', '府', '山庄', '阁', '楼', '院'}
 
 LOCATION_SUFFIXES = {'城', '镇', '村', '山', '河', '湖', '海', '岛', '谷', '峰', '殿', '宫'}
 
@@ -208,6 +237,11 @@ class NLPBasics:
         rule_covered_indices = set()
         rule_entity_texts = set()
         
+        # 检测文体：如果包含西方译名特征（如"·"分隔符或大量非中文姓氏的NR词），跳过中文特化规则
+        is_western_style = '·' in (raw_text or '') or any(pos in ('NR', 'nr') and t not in SINGLE_CHAR_SURNAMES and t not in MULTI_CHAR_SURNAMES for t, pos in zip(tokens, pos_tags[:len(tokens)]))
+        if is_western_style:
+            return base_entities
+        
         if self.enable_foreign_name_merge:
             i = 0
             while i < len(tokens):
@@ -270,6 +304,58 @@ class NLPBasics:
             token = tokens[i]
             pos = pos_tags[i] if i < len(pos_tags) else 'X'
             
+            # Rule 1: Prefix titles (老X/小X/大X) where X is a surname
+            if token in PREFIX_TITLES and i + 1 < len(tokens):
+                next_token = tokens[i + 1]
+                next_pos = pos_tags[i + 1] if i + 1 < len(pos_tags) else 'X'
+                
+                if next_token in SINGLE_CHAR_SURNAMES and next_pos in ('NR', 'nr'):
+                    combined = token + next_token
+                    rule_entities.append(Entity(
+                        text=combined,
+                        type='PER',
+                        start=i,
+                        end=i + 2,
+                        confidence=0.90
+                    ))
+                    rule_entity_texts.add(combined)
+                    rule_covered_indices.update([i, i + 1])
+                    i += 2
+                    continue
+            
+            # Rule 4: Standalone professional titles (博士/教授/医生等)
+            if token in PROFESSION_TITLES:
+                rule_entities.append(Entity(
+                    text=token,
+                    type='PER',
+                    start=i,
+                    end=i + 1,
+                    confidence=0.85
+                ))
+                rule_entity_texts.add(token)
+                rule_covered_indices.add(i)
+                i += 1
+                continue
+            
+            # Rule 5: Organization names with suffixes (暗影会/异能者联盟)
+            # Only match if token is 2+ chars (avoid false positives like "我会", "来公司")
+            if i + 1 < len(tokens) and (i + 1) not in rule_covered_indices:
+                next_token = tokens[i + 1]
+                if next_token in ORG_SUFFIXES and len(token) >= 2:
+                    combined = token + next_token
+                    rule_entities.append(Entity(
+                        text=combined,
+                        type='ORG',
+                        start=i,
+                        end=i + 2,
+                        confidence=0.85
+                    ))
+                    rule_entity_texts.add(combined)
+                    rule_covered_indices.update([i, i + 1])
+                    i += 2
+                    continue
+            
+            # Rule 2: Single surname + title words (陈管家/林少爷)
             if pos not in ('NR', 'nr'):
                 i += 1
                 continue
@@ -296,6 +382,20 @@ class NLPBasics:
                     start=i,
                     end=i + 2,
                     confidence=0.95
+                ))
+                rule_entity_texts.add(combined)
+                rule_covered_indices.update([i, i + 1])
+                i += 2
+                continue
+            
+            # Rule 3: Position titles (张总/李哥/王姐)
+            if next_token in POSITION_SUFFIXES:
+                rule_entities.append(Entity(
+                    text=combined,
+                    type='PER',
+                    start=i,
+                    end=i + 2,
+                    confidence=0.90
                 ))
                 rule_entity_texts.add(combined)
                 rule_covered_indices.update([i, i + 1])

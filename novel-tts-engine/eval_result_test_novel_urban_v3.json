@@ -1,0 +1,11 @@
+{
+  "test_file": "tests\\test_novel_urban.txt",
+  "scores": {
+    "chapter_splitting": 100,
+    "dialogue_classification": 100.0,
+    "sfx_detection": 67.0,
+    "ner": 26.5,
+    "speaker_matching": 61.9,
+    "average": 71.08
+  }
+}

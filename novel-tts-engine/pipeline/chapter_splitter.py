@@ -39,6 +39,7 @@ class ChapterSplitter:
         re.compile(r'^[一二三四五六七八九十\d]+[、.．].*$', re.MULTILINE),
         re.compile(r'^\d+[\.\s].*$', re.MULTILINE),
         re.compile(r'^【第[一二三四五六七八九十百千万零\d]+[章节回卷]】.*$', re.MULTILINE),
+        re.compile(r'^#{1,6}\s*第[一二三四五六七八九十百千万零\d]+[章节回卷].*$', re.MULTILINE),
     ]
     
     VOLUME_PATTERNS = [

@@ -1,0 +1,13 @@
+{
+  "timestamp": "20260502_001546",
+  "novel": "test_novel_urban",
+  "text_length": 3614,
+  "line_count": 287,
+  "chapter_count": 7,
+  "chapter_splitting": 100.0,
+  "dialogue_classification": 98.5,
+  "sfx_detection": 100.0,
+  "ner": 6.2,
+  "speaker_matching": 12.5,
+  "average": 63.4
+}

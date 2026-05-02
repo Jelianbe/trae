@@ -1,0 +1,11 @@
+{
+  "test_file": "tests\\test_novel_western.txt",
+  "scores": {
+    "chapter_splitting": 100,
+    "dialogue_classification": 100.0,
+    "sfx_detection": 85.1,
+    "ner": 79.7,
+    "speaker_matching": 77.4,
+    "average": 88.44000000000001
+  }
+}

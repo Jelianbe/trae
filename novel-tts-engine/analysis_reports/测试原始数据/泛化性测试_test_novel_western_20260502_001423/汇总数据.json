@@ -1,0 +1,13 @@
+{
+  "timestamp": "20260502_001423",
+  "novel": "test_novel_western",
+  "text_length": 5439,
+  "line_count": 613,
+  "chapter_count": 1,
+  "chapter_splitting": 7.1,
+  "dialogue_classification": 99.3,
+  "sfx_detection": 100.0,
+  "ner": 147.4,
+  "speaker_matching": 45.8,
+  "average": 79.9
+}

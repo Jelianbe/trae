@@ -1,0 +1,163 @@
+基于你将 NER 目标收敛为“只识别说话角色”以及已有的 `ContextDiversityValidator`，这份改进方案将两者正交融合，形成一套可泛化、高精确的实体发现与验证机制，直接服务于说话人匹配与最终有声制作。
+
+---
+
+## 一、核心思想：两条逻辑链交叉验证
+
+```
+文本 ──→ HanLP + 规则增强 ──→ [候选实体 100+]
+                │
+                ├── 逻辑链A (ContextDiversityValidator)
+                │      └─ 按上下文多样性、频率调整置信度
+                │
+                └── 逻辑链B (说话角色过滤器)
+                       └─ 只保留出现在“对话引导词”附近的实体
+                       └─ 对低频但多次出现在不同对话中的实体启用 L2 置信度补偿
+                │
+                ▼
+         最终实体列表（只含说话角色，高精确）
+```
+
+**关键收益**：  
+- 大量只存在于旁白中的词汇（如“暗影会”、“总监”、“组织”）被直接剔除，因为它们从未出现在对话引导词附近。  
+- 西幻低频说话角色（如“莫洛克”）由于在多个不同对话场景中作为说话人出现，被说话角色过滤器“兜底捞回”，不再被误杀。
+
+---
+
+## 二、实施计划
+
+### 2.1 新增模块：`pipeline/speaker_role_filter.py`
+
+该模块负责对实体进行“是否为说话角色”的判定，并利用 L2 语义交互验证增强低频实体的置信度。
+
+**核心类 `SpeakerRoleFilter`**：
+
+```python
+class SpeakerRoleFilter:
+    def __init__(self, semantic_ranker=None, l2_threshold=0.7):
+        self.semantic_ranker = semantic_ranker  # 复用全局 L2 引擎
+        self.l2_threshold = l2_threshold
+        self.dialogue_entities = set()  # 说话角色集合
+
+    def _extract_dialogue_entities(self, text: str, nlp: NLPBasics) -> Set[str]:
+        """
+        扫描全文，提取所有出现在对话引导词（如“说道”、“问”、“喊道”）前
+        5 个字符内的实体，作为说话角色候选集合。
+        """
+        # 1. 按行或按句子分割，找到包含引号的对话行
+        # 2. 提取该行的“引号前文本”（设定窗口大小，如 15 个字符）
+        # 3. 用 nlp.analyze() 分析该窗口，提取其中的 PER 实体
+        # 4. 收集实体文本，去重
+        ...
+        return role_entities
+
+    def filter(self, entities: List[Entity], text: str, 
+               nlp: NLPBasics, char_manager=None) -> List[Entity]:
+        """
+        对实体列表执行说话角色过滤：
+        - 只有出现在 dialogue_entities 集合中的才能被保留
+        - 对低频但多次出现在不同对话场景中的实体，通过 L2 提升置信度
+        """
+        if not self.dialogue_entities:
+            self.dialogue_entities = self._extract_dialogue_entities(text, nlp)
+
+        filtered = []
+        for e in entities:
+            if e.text not in self.dialogue_entities:
+                # 不是说话角色，直接丢弃（或降为极低置信度，由上游决定）
+                continue
+            # 如果是说话角色，且原置信度偏低（<0.5），尝试 L2 补偿
+            if e.confidence < 0.5 and self.semantic_ranker and char_manager:
+                new_conf = self._l2_boost_for_role(e, text, char_manager)
+                if new_conf > e.confidence:
+                    e.confidence = new_conf
+            filtered.append(e)
+        return filtered
+
+    def _l2_boost_for_role(self, entity, full_text, char_manager):
+        """
+        如果该实体在多个不同对话上下文中作为说话人出现，
+        收集这些对话句，用 L2 与角色的标准名进行语义相似度计算，
+        取平均值，高于阈值则提升置信度。
+        """
+        # 简化：统计该实体作为说话人的次数（出现在多少不同的对话行）
+        # 若次数 >= 2，且至少有一句匹配度 > 0.7，则将置信度提升至 0.75
+        ...
+```
+
+### 2.2 修改 `ContextDiversityValidator`，使其可配置“模式”
+
+为 `ContextDiversityValidator` 添加一个 `mode` 参数：
+- `mode='general'`：默认行为，使用原先的阈值（min_occurrences=3, high_conf_threshold=5）。
+- `mode='speaker_role'`：说话角色模式，阈值降低（min_occurrences=2, high_conf_threshold=3），因为说话角色本身信号强，不需要太高频次。
+
+```python
+class ContextDiversityValidator:
+    def __init__(self, mode='general'):
+        if mode == 'speaker_role':
+            self.min_occurrences = 2
+            self.high_conf_threshold = 3
+        else:
+            self.min_occurrences = 3
+            self.high_conf_threshold = 5
+        # ... 其余不变
+```
+
+### 2.3 修改 `evaluate_generalization_v3.py` 中的 `evaluate_ner` 函数
+
+串联调用链：
+
+```python
+def evaluate_ner(text, ground_truth):
+    nlp = get_nlp()
+    raw_entities = nlp.analyze(text).entities  # 含 HanLP + _enhance_entities
+
+    # 第一层：上下文多样性验证（说话角色模式）
+    validator = ContextDiversityValidator(mode='speaker_role')
+    validated = validator.validate(raw_entities, text)
+
+    # 第二层：说话角色过滤器
+    role_filter = SpeakerRoleFilter(semantic_ranker=get_semantic_ranker())
+    role_entities = role_filter.filter(validated, text, nlp, char_manager=None)
+
+    # 取置信度 ≥ 0.5 的实体进行 F1 计算
+    high_conf = [e for e in role_entities if e.confidence >= 0.5]
+    # … 后续 F1 计算不变
+```
+
+### 2.4 预期效果
+
+| 指标 | 当前 (都市) | 本方案预期 | 当前 (西幻) | 本方案预期 |
+|------|------------|------------|------------|------------|
+| NER 精确率 | 73.3% | **80-85%** | 53.0% | **75-80%** |
+| 说话人匹配 (L2) | 76.2% | **80-85%** | 65.6% | **70-75%** |
+| 平均得分 | 87.7 | **90+** | 81.7 | **85+** |
+
+**最关键的是**：西幻文本的 NER 将从 53 回升至 75+，因为“莫洛克”、“托马斯”这类低频说话角色会被说话角色过滤器精准保留并提升置信度。
+
+---
+
+## 三、风险与回退
+
+1. **漏掉从未说话的重要旁白角色**：  
+   - 风险评估：这些角色在最终有声书中没有台词，不需要声线，不属于核心业务目标。  
+   - 回退：若不满意，可将 `SpeakerRoleFilter` 设计为可插拔组件，通过开关控制。
+
+2. **L2 交互验证带来额外性能开销**：  
+   - 缓解：`_extract_dialogue_entities` 只做一次，L2 补偿仅对极低频实体触发（一般少于 5 个），不影响整体性能。
+
+3. **若效果不符预期**：  
+   - 先移除 `SpeakerRoleFilter`，保留 `ContextDiversityValidator` 的说话角色模式调整，逐步迭代。
+
+---
+
+## 四、下一步行动
+
+1. **实现 `SpeakerRoleFilter` 模块**（约 100 行代码），重点是 `_extract_dialogue_entities` 方法。
+2. **修改 `ContextDiversityValidator`**，加入 `mode` 支持。
+3. **修改 `evaluate_generalization_v3.py`**，接入串联流程。
+4. **运行测试**，对比两轮数据。
+
+这份方案不再试图解决“万能 NER”，而是聚焦于一个更具体且可验证的目标：**为有声书生成找到对话的主人**。路径清晰，风险可控，收益显著。
+
+要我现在就给出 `SpeakerRoleFilter` 的完整代码实现吗？

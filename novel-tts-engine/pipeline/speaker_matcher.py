@@ -45,6 +45,8 @@ SPEAKER_HINTS = {
     '开口道', '接口道', '插口道', '回应道', '点头道', '摇头道',
     '冷笑', '微笑', '大笑', '叹气', '叹息', '惊呼', '大喊', '大叫',
     '恭敬地', '恭敬', '轻声', '低声', '高声', '大声',
+    '介绍道', '命令道', '下令', '报告', '推测', '皱眉', '犹豫',
+    '接话', '齐声', '猜测', '暗道', '心想',
 }
 
 DIALOGUE_PATTERNS = [
@@ -57,6 +59,8 @@ SPEAKER_PATTERNS = [
     re.compile(r'^([^\s]+?)(说道|道|问道|答道|笑道|喊道|叫道|怒道|冷冷道|淡淡道|沉声道|低声道|高声道|大声道|开口道|接口道|插口道|回应道|点头道|摇头道)'),
     re.compile(r'^([^\s]+?)(冷笑|微笑|大笑|叹气|叹息|惊呼|大喊|大叫)'),
     re.compile(r'^([^\s]+?)(恭敬地|恭敬|轻声|低声|高声|大声)说道'),
+    # 都市格式：对话后跟动作/描述（"dialogue" 说话人动作）
+    re.compile(r'^([^\s，。！？]{2,10}?)(的声音|介绍道|命令道|下令|报告|推测|皱眉|犹豫|接话|猜测|齐声)'),
 ]
 
 
@@ -72,9 +76,11 @@ class SpeakerMatcher:
         self._character_activity: Dict[int, int] = defaultdict(int)
         self._recent_speakers: List[str] = []
         self._recent_mentions: List[str] = []
+        self._mention_counter = 0
         self._current_chapter_id: Optional[int] = None
         self.semantic_ranker = semantic_ranker or get_semantic_ranker()
         self.l2_threshold = l2_threshold
+        self._character_dialogues: Dict[str, List[str]] = defaultdict(list)
     
     @contextmanager
     def chapter_context(self, chapter_id: int):
@@ -214,7 +220,7 @@ class SpeakerMatcher:
         """L2 语义匹配阶段。
 
         使用句子嵌入模型对候选角色进行语义相似度排序。
-        候选包括所有角色的名称和别名。
+        先用角色名/别名进行初步筛选，然后用对话历史画像进行精细排序。
 
         Args:
             sentence: 输入句子（通常包含对话和上下文）
@@ -226,22 +232,26 @@ class SpeakerMatcher:
         if not all_chars:
             return None
 
-        # 构建候选列表：每个角色的名称和别名
-        candidates = []
-        char_map = {}  # 候选字符串 -> Character
+        # 构建对话画像列表：(角色名, 画像文本)
+        profiles = []
+        char_by_name = {}  # 角色名 -> Character
+        
         for char in all_chars:
-            # 添加角色名称
-            candidates.append(char.name)
-            char_map[char.name] = char
-            # 添加别名
-            for alias in char.aliases:
-                candidates.append(alias)
-                char_map[alias] = char
+            char_by_name[char.name] = char
+            # 获取对话历史作为画像
+            dialogue_context = self.get_dialogue_context(char.name)
+            if dialogue_context:
+                # 使用对话历史作为语义画像
+                profiles.append((char.name, dialogue_context))
+            else:
+                # 没有对话历史，用角色名+别名作为画像
+                profile_text = char.name + " " + " ".join(char.aliases)
+                profiles.append((char.name, profile_text))
 
-        # 使用语义排序器
-        results = self.semantic_ranker.rank(
+        # 使用语义排序器（用对话画像进行匹配）
+        results = self.semantic_ranker.rank_with_profiles(
             sentence=sentence,
-            candidates=candidates,
+            profiles=profiles,
             threshold=self.l2_threshold,
         )
 
@@ -249,8 +259,8 @@ class SpeakerMatcher:
             return None
 
         # 取最高相似度的结果
-        best_candidate, best_score = results[0]
-        matched_char = char_map.get(best_candidate)
+        best_char_name, best_score = results[0]
+        matched_char = char_by_name.get(best_char_name)
 
         if matched_char:
             # 将语义相似度映射到置信度 (0.6-0.8 范围)
@@ -426,13 +436,30 @@ class SpeakerMatcher:
             match_type='address_inference'
         )
     
-    def update_activity(self, char_id: int, char_name: str):
-        self._character_activity[char_id] += 1
-        self._recent_speakers.append(char_name)
-        if len(self._recent_speakers) > 10:
-            self._recent_speakers.pop(0)
+    def update_activity(self, character_id: int, name: str):
+        """记录角色出现，增加活跃度"""
+        self._character_activity[character_id] = self._character_activity.get(character_id, 0) + 1
         
-        self.char_manager.update_activity_weight(char_id, increment=0.15)
+        # 维护最近活跃角色列表（最多10个）
+        if name not in self._recent_speakers:
+            self._recent_speakers.append(name)
+            if len(self._recent_speakers) > 10:
+                self._recent_speakers.pop(0)
+    
+    def cache_dialogue(self, character_name: str, dialogue_text: str):
+        """缓存角色的对话文本，用于L2语义画像"""
+        if character_name not in self._character_dialogues:
+            self._character_dialogues[character_name] = []
+        self._character_dialogues[character_name].append(dialogue_text)
+        # 保持最近20条对话
+        if len(self._character_dialogues[character_name]) > 20:
+            self._character_dialogues[character_name] = self._character_dialogues[character_name][-20:]
+    
+    def get_dialogue_context(self, character_name: str) -> str:
+        """获取角色的对话上下文（用于L2语义匹配）"""
+        if character_name in self._character_dialogues:
+            return " ".join(self._character_dialogues[character_name])
+        return ""
     
     def update_mentions(self, names: List[str]):
         for name in names:
