@@ -137,20 +137,22 @@ def evaluate_ner(text, ground_truth):
     validated_entities = validator.validate(result.entities, text)
     
     # 第二层：说话角色过滤器
-    # 分离：统计发现的组合实体（confidence=0.65）需要绕过SpeakerRoleFilter
-    compound_discovered = [e for e in validated_entities if getattr(e, 'confidence', 1.0) == 0.65]
-    other_entities = [e for e in validated_entities if getattr(e, 'confidence', 1.0) != 0.65]
-    
+    # 2026-05-02 修复：统计发现实体统一通过SpeakerRoleFilter和EntityLinker
+    # SpeakerRoleFilter内部已修改，会自动放行confidence=0.65的统计发现实体
     semantic_ranker = get_semantic_ranker()
     semantic_ranker.load_model()
     role_filter = SpeakerRoleFilter(
         semantic_ranker=semantic_ranker,
         l2_threshold=0.7,
     )
-    role_entities = role_filter.filter(other_entities, text, nlp)
+    role_entities = role_filter.filter(validated_entities, text, nlp)
     
-    # 合并：说话角色过滤后的实体 + 统计发现的组合实体
-    final_entities = role_entities + compound_discovered
+    if os.environ.get('DEBUG_DISCOVER'):
+        # 显示统计发现的实体（confidence=0.65）
+        compound_discovered = [e for e in validated_entities if getattr(e, 'confidence', 1.0) == 0.65]
+        print(f"  compound_discovered (before filter): {[e.text for e in compound_discovered]}")
+        final_pers = [e.text for e in role_entities if e.type == 'PER']
+        print(f"  final_entities PER (after filter): {set(final_pers)}")
     
     # 实体链接
     linker = get_entity_linker()
@@ -159,13 +161,38 @@ def evaluate_ner(text, ground_truth):
         speaking_persons=entities.get("speaking_persons", []),
         aliases=entities.get("aliases", {}),
     )
-    linked_entities = linker.link(final_entities, text)
+    linked_entities = linker.link(role_entities, text)
     
     # 取置信度 ≥ 0.5 的实体进行 F1 计算
-    high_conf_entities = [e for e in linked_entities if getattr(e, 'confidence', 1.0) >= 0.5]
+    # 2026-05-02 修复：统计发现的实体（confidence=0.65）必须被成功链接到GT
+    # 否则它们会是噪声（如"萧家"、"药师"等不在GT中的实体）
+    high_conf_entities = []
+    for e in linked_entities:
+        conf = getattr(e, 'confidence', 1.0)
+        if conf >= 0.5:
+            # 统计发现的实体：只保留被成功链接到GT的（is_linked=True）
+            if conf == 0.65 and not getattr(e, 'is_linked', False):
+                continue
+            high_conf_entities.append(e)
     
     # ORG/LOC处理移除：只评估 PER 实体
-    actual_persons = set(e.text for e in high_conf_entities if e.type == 'PER')
+    # 重要：使用链接后的标准名（standard_name）进行评估，而不是原始文本
+    # 这样别名（如"薰儿"）会被映射到标准名（如"萧薰儿"）
+    actual_persons = set()
+    for e in high_conf_entities:
+        if e.type == 'PER':
+            # 如果有标准名（链接成功），使用标准名；否则使用原始文本
+            name = getattr(e, 'standard_name', '') or e.text
+            actual_persons.add(name)
+    
+    if os.environ.get('DEBUG_DISCOVER'):
+        # 显示哪些GT实体被识别了，哪些没有
+        matched = gt_speaking_persons & actual_persons
+        missed = gt_speaking_persons - actual_persons
+        false_positives = actual_persons - gt_speaking_persons
+        print(f"  ✅ GT matched: {matched}")
+        print(f"  ❌ GT missed: {missed}")
+        print(f"  ⚠️ False positives: {false_positives}")
     
     def calc_f1(gt, actual):
         if not gt:

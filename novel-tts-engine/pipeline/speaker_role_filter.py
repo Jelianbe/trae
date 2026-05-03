@@ -101,6 +101,11 @@ class SpeakerRoleFilter:
         - 非PER实体（ORG/LOC）直接放行
         - PER实体：只有出现在 dialogue_entities 集合中的才能被保留
         - 对低频但多次出现在不同对话场景中的实体，通过L2提升置信度
+        
+        2026-05-02 修复：统计发现的实体（confidence=0.65）直接放行。
+        这些实体是通过discover_compound_entities从全文扫描中发现的，
+        已经经过了严格的统计验证（出现在对话引导词附近≥2次），
+        不需要再经过_dialogue_entities的二次过滤。
         """
         # 每次调用时重置状态，避免跨章节/跨文本的状态污染
         self._dialogue_entities = set()
@@ -114,6 +119,12 @@ class SpeakerRoleFilter:
             # ORG/LOC处理已移除（2026-05-02 修正方案）
             # nlp_basics.analyze() 现在只返回 PER 实体，无需再过滤
             if e.type != 'PER':
+                filtered.append(e)
+                continue
+            
+            # 2026-05-02 修复：统计发现的实体直接放行
+            # 这些实体已经通过discover_compound_entities的严格验证
+            if getattr(e, 'confidence', 1.0) == 0.65:
                 filtered.append(e)
                 continue
             
@@ -134,15 +145,27 @@ class SpeakerRoleFilter:
     def _apply_l2_boost(self, entity: Entity, full_text: str) -> float:
         """
         检查该实体作为说话人的场景次数，提升置信度
+        
+        2026-05-02 修复：L2补偿不应覆盖统计验证的降级结果。
+        统计验证（ContextDiversityValidator）已经将某些实体降级为低置信度（如0.3），
+        这表示该实体在统计意义上不可靠（右邻字单一、共现多样性低等）。
+        L2补偿只能在原始置信度的基础上做小幅增量，不能超过原始值的1.5倍。
+        这确保统计验证的降级结果不会被意外覆盖。
         """
+        original_conf = entity.confidence
         scene_count = self._entity_scene_count.get(entity.text, 0)
         
         if scene_count >= 2 and self.semantic_ranker.is_available():
-            # 根据场景次数提升置信度
+            # 根据场景次数计算L2提升后的置信度
             if scene_count >= 3:
-                return 0.8
+                l2_boosted = 0.8
             else:
-                return 0.65
+                l2_boosted = 0.65
+            
+            # 修复：L2补偿不能超过原始置信度的1.5倍
+            # 防止统计验证已降级的实体（如0.3）被提升到过高值（如0.65）
+            max_allowed = min(0.95, original_conf * 1.5)
+            return min(l2_boosted, max_allowed)
         
         return entity.confidence
 

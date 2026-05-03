@@ -114,7 +114,7 @@ class EntityLinker:
         
         return None
 
-    def link(self, entities: List, text: str, char_manager: CharacterManager = None) -> List[LinkedEntity]:
+    def link(self, entities: List, text: str) -> List[LinkedEntity]:
         """
         对实体列表执行链接：
         1. 过滤单字人名（长度 < 2 的 PER 实体）
@@ -130,7 +130,6 @@ class EntityLinker:
         Args:
             entities: 原始实体列表（Entity 类型）
             text: 完整文本（用于上下文分析）
-            char_manager: 保留参数，为向后兼容（当前使用实例初始化时绑定的 char_manager）
         
         Returns:
             链接后的实体列表（LinkedEntity 类型）

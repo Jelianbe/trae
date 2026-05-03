@@ -15,9 +15,12 @@ ContextDiversityValidator - 上下文多样性实体验证器
 from typing import List, Dict, Set, Optional, Tuple
 import re
 import threading
+import logging
 from collections import defaultdict, Counter
 
 from pipeline.nlp_basics import Entity
+
+logger = logging.getLogger(__name__)
 
 
 class ContextDiversityValidator:
@@ -121,24 +124,108 @@ class ContextDiversityValidator:
         Returns:
             调整置信度后的实体列表
         """
+        # 通用实体统计发现：P0 - 提前发现"字A+字B"组合模式（2026-05-02）
+        # 让发现的候选实体也经过完整的统计验证流程，而不是最后直接追加
+        discovered = self.discover_compound_entities(full_text, entities)
+        all_entities = entities + discovered
+        
         # 步骤1：为每个唯一实体文本收集上下文统计 + 共现统计
-        stats = self._collect_context_stats(entities, full_text, chapters)
+        stats = self._collect_context_stats(all_entities, full_text, chapters)
+        
+        # 步骤1.5：误合并检测（2026-05-03 新增）
+        # 在统计验证后，对长度≥3的实体进行误合并检测
+        # 检测逻辑：如果实体去掉末端1-2字后是一个高频已知角色名，且末端是常见动词后缀
+        # 则将置信度降为极低（0.1）
+        mis_merged_entities = self._detect_mis_merged_entities(all_entities, stats, full_text)
+        for entity_text in mis_merged_entities:
+            if entity_text in stats:
+                # 找到该实体的所有实例并降低置信度
+                for entity in all_entities:
+                    if entity.text == entity_text:
+                        entity.confidence = 0.1
+                        logger.debug(f"误合并检测: {entity_text} → confidence=0.1")
         
         # 步骤2：根据多样性 + 共现统计调整置信度
         validated = []
-        for entity in entities:
+        for entity in all_entities:
             key = entity.text
             if key in stats:
+                # 如果已经被误合并检测标记为低置信度，保持0.1
+                if entity.confidence <= 0.1:
+                    continue  # 过滤掉误合并实体
                 new_conf = self._calculate_confidence(entity, stats[key])
                 entity.confidence = new_conf
             validated.append(entity)
         
-        # 通用实体统计发现：P0 - 从全文扫描中发现"字A+字B"组合模式（2026-05-02）
-        # 这是统计发现层，不依赖词表，从文本自身学习组合模式
-        discovered = self.discover_compound_entities(full_text, validated)
-        validated.extend(discovered)
-        
         return validated
+    
+    def _detect_mis_merged_entities(
+        self,
+        entities: List[Entity],
+        stats: Dict[str, Dict],
+        full_text: str,
+    ) -> set:
+        """
+        误合并检测（2026-05-03 新增）
+        
+        检测HanLP将"人名+动词"误合并为更长的"人名"的情况。
+        例如："萧炎冷笑道" → "萧炎冷"(PERSON)
+        
+        检测逻辑：
+        1. 实体长度≥3
+        2. 末端1-2字是常见表情/动作词
+        3. 去除末端后，剩余部分是一个出现≥5次的高频角色名
+        
+        如果满足以上条件，标记为误合并。
+        """
+        # 常见单字表情/动作词（这些字在人名末尾极不常见）
+        SINGLE_CHAR_VERBS = {
+            '冷', '笑', '怒', '喜', '愁', '悲', '愤', '急', '惊', '疑',
+            '呆', '愣', '痴', '醉', '困', '累', '饿', '渴', '痛', '痒',
+            '羞', '恼', '恨', '怨', '叹', '泣', '吼', '喊', '叫', '骂',
+        }
+        
+        # 找出出现≥5次的高频角色名（作为已知角色）
+        known_persons = set()
+        for entity_text, stat in stats.items():
+            if stat['occurrences'] >= 5:
+                known_persons.add(entity_text)
+        
+        mis_merged = set()
+        
+        for entity in entities:
+            if entity.type != 'PER' or len(entity.text) < 3:
+                continue
+            
+            # 检查末端1-2字
+            for suffix_len in [1, 2]:
+                if len(entity.text) <= suffix_len:
+                    continue
+                
+                prefix = entity.text[:-suffix_len]
+                suffix = entity.text[-suffix_len:]
+                
+                # 如果前缀是已知高频角色
+                if prefix in known_persons:
+                    # 检查后缀是否是常见动词
+                    is_verb = False
+                    if len(suffix) == 1 and suffix in SINGLE_CHAR_VERBS:
+                        is_verb = True
+                    elif len(suffix) == 2:
+                        # 检查是否是"动词+道"等结构
+                        if suffix.endswith('道') and suffix[0] in SINGLE_CHAR_VERBS:
+                            is_verb = True
+                    
+                    if is_verb:
+                        mis_merged.add(entity.text)
+                        logger.debug(
+                            f"检测到误合并: {entity.text} → "
+                            f"prefix='{prefix}'(出现{stats[prefix]['occurrences']}次) + "
+                            f"suffix='{suffix}'"
+                        )
+                        break
+        
+        return mis_merged
     
     def _collect_context_stats(
         self,
@@ -428,9 +515,14 @@ class ContextDiversityValidator:
         P0级别核心方法。不依赖词表，纯从文本统计中学习组合模式。
         
         策略：
-        1. 扫描全文，提取所有出现在边界词附近的2字符组合
-        2. 对这些组合进行统计，高频出现的说明是有效的实体模式
-        3. 过滤掉已存在的实体，只保留新发现的组合
+        1. 找到所有单字PER实体（如"药"、"萧"、"云"）
+        2. 统计"单字+后继字"组合出现在对话引导词前面的次数
+        3. 如果"药老说道"出现多次，而"药师说道"不出现，说明"药老"才是说话角色
+        
+        方向A增强（2026-05-02）：字符紧密度预筛选
+        借鉴WBA（Word Boundary Attention）思想，真正的复合实体（如"药老"），
+        其构成字符之间有极高的紧密度。对于单字PER"药"，统计其后面紧跟"老"的比例。
+        如果紧密度高（如70%），则"药老"很可能是真正的复合实体。
         
         Args:
             full_text: 完整文本
@@ -439,8 +531,14 @@ class ContextDiversityValidator:
         Returns:
             新发现的组合实体列表
         """
-        # 收集现有实体文本
-        existing_texts = set(e.text for e in existing_entities)
+        # 收集所有单字PER实体
+        single_char_pers = set()
+        for entity in existing_entities:
+            if entity.type == 'PER' and len(entity.text) == 1:
+                single_char_pers.add(entity.text)
+        
+        if not single_char_pers:
+            return []
         
         # 边界词列表
         BOUNDARY_WORDS = [
@@ -451,33 +549,88 @@ class ContextDiversityValidator:
             '赞叹道', '怪笑道', '冷笑道', '喃喃道', '怪声道',
         ]
         
-        # 统计边界词前面的2字符组合
-        combo_counter = Counter()
-        combo_positions = defaultdict(list)
+        # 非姓氏排除列表（高频代词、指示词、常见动词等）
+        NON_SURNAME_CHARS = {
+            '我', '你', '他', '她', '它', '们', '这', '那', '哪', '谁',
+            '什', '么', '怎', '为', '什', '如', '果', '但', '是', '而',
+            '且', '或', '又', '也', '还', '更', '最', '非', '不', '没',
+            '已', '经', '正', '在', '将', '会', '能', '可', '应', '该',
+            '只', '是', '就', '才', '都', '全', '每', '各', '另', '某',
+            '有', '无', '多', '少', '大', '小', '高', '低', '好', '坏',
+            '的', '了', '着', '过', '吗', '呢', '吧', '啊', '呀', '哦',
+            '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+            '百', '千', '万', '亿', '第', '上', '下', '前', '后', '左',
+            '右', '中', '内', '外', '旁', '边', '面', '里', '间',
+        }
         
-        for word in BOUNDARY_WORDS:
+        # 方向A：字符紧密度统计（基于全文）
+        # 对于每个单字PER，统计其在全文中后面紧跟的字符分布
+        # 真正的复合实体（如"药老"），其构成字符之间有极高的紧密度
+        char_following_full = defaultdict(Counter)  # char -> {next_char -> count}
+        char_total_full = Counter()  # char -> total_following_chars_count_in_full_text
+        
+        for char in single_char_pers:
+            if char in NON_SURNAME_CHARS:
+                continue
+            
             start = 0
             while True:
-                pos = full_text.find(word, start)
+                pos = full_text.find(char, start)
                 if pos == -1:
                     break
                 
-                # 提取边界词前面的2个字符
-                if pos >= 2:
-                    combo = full_text[pos-2:pos]
-                    # 跳过包含标点/修饰词的组合
-                    skip_chars = set('，。！？；：""''（）【】《》\n\r\t 的得地着了吧呢啊呀哦嗯')
-                    if any(c in skip_chars for c in combo):
+                # 检查该字符后面是否紧跟一个字
+                if pos + 1 < len(full_text):
+                    next_char = full_text[pos + 1]
+                    # 跳过标点和空白
+                    if next_char not in '，。！？；：""''（）【】《》\n\r\t 、…':
+                        char_following_full[char][next_char] += 1
+                        char_total_full[char] += 1
+                
+                start = pos + 1
+        
+        # 统计"单字+后继字"组合出现在边界词前面的次数
+        combo_counter = Counter()
+        combo_positions = defaultdict(list)
+        
+        for char in single_char_pers:
+            # 跳过明显非姓氏字符
+            if char in NON_SURNAME_CHARS:
+                continue
+            
+            start = 0
+            while True:
+                pos = full_text.find(char, start)
+                if pos == -1:
+                    break
+                
+                # 检查该字符后面是否紧跟一个字
+                if pos + 1 < len(full_text):
+                    next_char = full_text[pos + 1]
+                    # 跳过标点和空白
+                    if next_char in '，。！？；：""''（）【】《》\n\r\t 、…':
                         start = pos + 1
                         continue
                     
-                    combo_counter[combo] += 1
-                    combo_positions[combo].append(pos - 2)
+                    combo = char + next_char
+                    
+                    # 检查该组合后面不远处是否有边界词（50字符内）
+                    context_end = min(len(full_text), pos + 60)
+                    context = full_text[pos:context_end]
+                    has_boundary = any(bw in context for bw in BOUNDARY_WORDS)
+                    
+                    if has_boundary:
+                        combo_counter[combo] += 1
+                        combo_positions[combo].append(pos)
                 
                 start = pos + 1
         
         # 过滤：只保留出现≥2次的组合
+        existing_texts = set(e.text for e in existing_entities)
         new_entities = []
+        
+        from pipeline.nlp_basics import SINGLE_CHAR_SURNAMES
+        
         for combo, count in combo_counter.items():
             if count < 2:
                 continue
@@ -486,18 +639,31 @@ class ContextDiversityValidator:
             if combo in existing_texts:
                 continue
             
-            # 跳过如果已有实体是该组合的子串（避免与已有实体冲突）
-            skip = False
-            for t in existing_texts:
-                # 跳过已有更长实体的子串，但允许新发现的组合替代短实体
-                if len(t) > len(combo) and combo.startswith(t):
-                    skip = True
-                    break
-            if skip:
+            # 增加姓氏检查，只保留第一个字是姓氏的组合
+            first_char = combo[0]
+            if first_char not in SINGLE_CHAR_SURNAMES:
+                continue
+            
+            # 方向A：字符紧密度预筛选（软阈值）
+            # 计算紧密度：全文中first_char后面紧跟second_char的比例
+            # 对于高频姓氏（如"萧"出现500次），"萧炎"占100次 → 紧密度20%
+            # 对于低频姓氏（如"药"出现50次），"药老"占35次 → 紧密度70%
+            # 设置较低阈值（10%）以容纳高频姓氏的多名字情况
+            second_char = combo[1]
+            total_full = char_total_full[first_char]
+            following_full = char_following_full[first_char][second_char]
+            tightness = following_full / total_full if total_full > 0 else 0.0
+            
+            # 紧密度阈值10% - 过滤掉那些几乎不连续出现的组合
+            if tightness < 0.1:
+                logger.debug(f"  REJECT LOW TIGHTNESS: {combo} (count={count}, tightness={tightness:.2f})")
                 continue
             
             # 创建新实体
             first_pos = combo_positions[combo][0]
+            
+            logger.debug(f"  NEW COMPOUND: {combo} (count={count}, tightness={tightness:.2f}, pos={first_pos})")
+            
             new_entity = Entity(
                 text=combo,
                 type='PER',
@@ -507,7 +673,76 @@ class ContextDiversityValidator:
             )
             new_entities.append(new_entity)
         
+        logger.debug(f"[discover_compound_entities] found {len(new_entities)} new entities: {[e.text for e in new_entities]}")
         return new_entities
+
+    def discover_surnames_from_text(
+        self,
+        full_text: str,
+    ) -> Set[str]:
+        """
+        通用实体统计发现：从文本中自动发现虚构姓氏（2026-05-02）
+        
+        策略：扫描全文，统计所有单字在"X+称谓词"（如"X长老"、"X师兄"、"X大人"）
+        或"X+说/道/问"模式中的出现频率。如果一个单字在这些语境中出现超过N次，
+        且不是常见非姓氏字，就自动加入临时姓氏库，对当前小说生效。
+        
+        Returns:
+            发现的姓氏集合
+        """
+        # 称谓词列表
+        TITLE_WORDS = {
+            '长老', '导师', '学长', '执事', '大人', '前辈', '师兄', '师姐',
+            '师弟', '师妹', '老师', '师父', '师叔', '掌门', '宗主', '峰主',
+            '堂主', '舵主', '管家', '少爷', '小姐', '公子', '姑娘', '掌柜',
+            '老板', '将军', '王爷', '皇上', '皇后', '贵妃', '博士', '教授',
+            '医生', '律师', '记者', '经理', '总裁', '总监', '部长', '局长',
+            '队长', '尊者', '圣人', '之主', '大帝', '天尊', '真人',
+            '说道', '问道', '喊道', '笑道', '道', '来到', '走出', '看着',
+        }
+        
+        # 非姓氏排除列表
+        NON_SURNAME_CHARS = {
+            '我', '你', '他', '她', '它', '们', '这', '那', '哪', '谁',
+            '什', '么', '怎', '为', '什', '如', '果', '但', '是', '而',
+            '且', '或', '又', '也', '还', '更', '最', '非', '不', '没',
+            '已', '经', '正', '在', '将', '会', '能', '可', '应', '该',
+            '只', '是', '就', '才', '都', '全', '每', '各', '另', '某',
+            '有', '无', '多', '少', '大', '小', '高', '低', '好', '坏',
+            '的', '了', '着', '过', '吗', '呢', '吧', '啊', '呀', '哦',
+            '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+            '百', '千', '万', '亿', '第', '上', '下', '前', '后', '左',
+            '右', '中', '内', '外', '旁', '边', '面', '里', '间',
+        }
+        
+        # 统计每个单字在称谓词前面出现的次数
+        char_before_title_counter = Counter()
+        
+        for title in TITLE_WORDS:
+            start = 0
+            while True:
+                pos = full_text.find(title, start)
+                if pos == -1:
+                    break
+                
+                # 提取称谓词前面的单字
+                if pos >= 1:
+                    char = full_text[pos - 1]
+                    # 跳过标点和非姓氏字符
+                    if char not in NON_SURNAME_CHARS and char not in '，。！？；：""''（）【】《》\n\r\t 、…':
+                        char_before_title_counter[char] += 1
+                
+                start = pos + 1
+        
+        # 过滤：出现≥3次的单字认为是姓氏候选
+        discovered_surnames = set()
+        for char, count in char_before_title_counter.items():
+            if count >= 3:
+                discovered_surnames.add(char)
+        
+        logger.debug(f"[discover_surnames] found {len(discovered_surnames)} surnames: {discovered_surnames}")
+        
+        return discovered_surnames
 
     def _discover_name_suffixes(
         self,

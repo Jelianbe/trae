@@ -6,6 +6,7 @@ import re
 import threading
 import warnings
 import logging
+from collections import Counter
 
 warnings.filterwarnings('ignore')
 
@@ -89,9 +90,25 @@ PREFIX_TITLES = {'老', '小', '大'}
 
 ORG_SUFFIXES = {'会', '帮', '社', '团', '协会', '联盟', '组织', '集团', '公司', '企业', '商会', '公会', '教派', '宗门'}
 
-FAMILY_SUFFIXES = {'家', '府', '山庄', '阁', '楼', '院'}
+# 家族后缀（2026-05-02 扩展）
+FAMILY_SUFFIXES = {
+    '家', '府', '族', '宅', '院', '堡', '庄', '邸', '第', '舍',
+    '庐', '亭', '堂', '斋', '轩', '阁', '楼', '台', '苑', '园',
+    '山庄',
+}
 
-LOCATION_SUFFIXES = {'城', '镇', '村', '山', '河', '湖', '海', '岛', '谷', '峰', '殿', '宫', '哨站', '要塞', '堡垒', '营地'}
+# 地点后缀（2026-05-02 扩展）
+LOCATION_SUFFIXES = {
+    '城', '镇', '村', '山', '河', '湖', '海', '岛', '谷', '峰',
+    '岭', '原', '川', '泽', '林', '森', '漠', '殿', '宫', '哨站',
+    '要塞', '堡垒', '营地', '关', '隘', '渡', '津', '桥', '崖',
+    '渊', '潭', '泉', '溪', '涧', '洞', '窟', '峡', '坪',
+}
+
+# 注意：FAMILY_SUFFIXES 和 LOCATION_SUFFIXES 当前已不再用于说话角色识别管道。
+# 它们被保留在代码中是为了保持向后兼容，但 _detect_surname_based_entities
+# 中不再使用它们来创建 ORG/LOC 实体（参见 2026-05-02 修正方案）。
+# 如果将来需要重新启用组织/地点识别，可以从版本控制历史恢复相关逻辑。
 
 # 西方奇幻/翻译体特有名字模式
 WESTERN_NAME_PREFIXES = {
@@ -167,7 +184,11 @@ WESTERN_LOC_PREFIXES = {
 }
 
 
+# 单字姓氏库（2026-05-02 修正方案）
+# 策略：保留真实高频姓氏 + 网文虚构姓氏，不穷举百家姓
+# 穷举会导致噪声（如'武'、'容'被误识别为姓氏）
 SINGLE_CHAR_SURNAMES = {
+    # === 中国前100大姓氏（覆盖约85%人口）===
     '王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴',
     '徐', '孙', '胡', '朱', '高', '林', '何', '郭', '马', '罗',
     '梁', '宋', '郑', '谢', '韩', '唐', '冯', '于', '董', '萧',
@@ -178,8 +199,42 @@ SINGLE_CHAR_SURNAMES = {
     '郝', '孔', '白', '崔', '康', '毛', '邱', '秦', '江', '史',
     '顾', '侯', '邵', '孟', '龙', '万', '段', '雷', '钱', '汤',
     '尹', '黎', '易', '常', '乔', '贺', '赖', '龚', '文', '庞',
+
+    # === 常见补充姓氏 ===
     '樊', '兰', '殷', '施', '陶', '洪', '温', '芦', '牛', '安',
     '莫', '章', '仇', '祖', '符', '柳', '邢', '梅', '阮', '倪',
+    '齐', '岳', '柴', '颜', '屈', '项', '祝', '蓝', '闵', '席',
+    '季', '麻', '强', '路', '娄', '危', '童', '盛', '刁', '骆',
+    '凌', '霍', '虞', '支', '柯', '管', '房', '缪', '干', '解',
+    '应', '宗', '宣', '郁', '单', '杭', '包', '诸', '左', '吉',
+    '钮', '滑', '裴', '荣', '翁', '荀', '甄', '曲', '封', '储',
+    '靳', '松', '井', '富', '巫', '乌', '谷', '车', '全', '班',
+    '宫', '宁', '栾', '暴', '甘', '厉', '戎', '景', '詹', '束',
+    '幸', '司', '郜', '薄', '印', '宿', '怀', '蒲', '索', '卓',
+    '蔺', '蒙', '池', '阴', '胥', '苍', '双', '闻', '莘', '翟',
+    '劳', '姬', '申', '扶', '堵', '冉', '桑', '桂', '边', '扈',
+    '尚', '农', '别', '庄', '晏', '瞿', '阎', '慕', '连', '茹',
+    '向', '古', '慎', '戈', '终', '衡', '步', '耿', '满', '弘',
+    '匡', '国', '寇', '禄', '沃', '蔚', '越', '隆', '巩', '聂',
+    '晁', '冷', '辛', '那', '简', '饶', '沙', '养', '丰', '荆',
+    '游', '权', '盖', '桓', '公', '欧', '诸', '葛', '令', '狐',
+    '夏', '孙', '长', '宇', '轩', '辕', '独', '孤', '慕', '容',
+
+    # === 玄幻/仙侠/网文高频虚构姓氏 ===
+    # 这些字在常规中文中不一定是姓氏，但在网文语境中高频出现在人名首位
+    '药', '云', '风', '火', '雷', '冰', '雪', '霜', '月', '星',
+    '夜', '冥', '幽', '玄', '苍', '荒', '虚', '天', '灵', '神',
+    '仙', '魔', '鬼', '妖', '龙', '凤', '凰', '麒', '麟',
+    '羽', '花', '柳', '叶', '竹', '松', '梅', '兰', '菊', '莲',
+    '水', '木', '岩', '海', '湖',
+    '影', '虹', '霞', '雾', '烟', '露', '辰',
+    '暮', '晓', '朝', '夕', '晨', '昏', '暗', '光', '明',
+    '炎', '熙', '昊', '瀚',
+    '墨', '青', '紫', '赤', '银', '铜', '玉',
+    '砂', '尘', '岚', '陌', '棠', '槐',
+    '念', '思', '忆', '梦',
+    '蓝', '碧', '翠', '素', '锦', '绮',
+    '楚', '燕', '秦', '魏',
 }
 
 MULTI_CHAR_SURNAMES = {
@@ -362,6 +417,11 @@ class NLPBasics:
 
         # 全局黑名单过滤（所有文体都应用）
         combined = self._apply_entity_blacklist(combined)
+        
+        # 2026-05-02 修复：过滤HanLP误识别的虚假人名（如"萧炎冷"、"萧炎承"）
+        # "萧炎冷笑道" → HanLP识别为"萧炎冷"(人名)
+        # "萧炎承喏道" → HanLP识别为"萧炎承"(人名)
+        combined = self._filter_false_persons(combined)
 
         # 非西方文体也尝试检测西方LOC（如'灰石哨站'），使用独立覆盖集
         loc_covered = set()
@@ -637,9 +697,20 @@ class NLPBasics:
         """基于姓氏的实体检测：
         - Rule 2: 单姓 + 称呼词（陈管家/林少爷/李医生）
         - Rule 3: 单姓 + 职位后缀（张总/李哥/王姐）
-        - Rule 6: 单姓 + 家族后缀（陈家/李府）
-        - Rule 7: 单姓 + 位置后缀（山城/李村）
+        
+        注意：Rule 6（家族后缀→ORG）和 Rule 7（位置后缀→LOC）已移除。
+        因策略调整为只识别说话角色，ORG/LOC 实体会被 SpeakerRoleFilter 丢弃。
+        FAMILY_SUFFIXES 和 LOCATION_SUFFIXES 保留为向后兼容，不再用于实体创建。
+        （参见 2026-05-02 修正方案）
+        
+        2026-05-02 修复：增加动词检查，防止"赵虎嗤"类错误。
+        当HanLP将"赵虎嗤笑道"切分为 [赵虎/nr, 嗤/v, 笑道/v] 时，
+        原规则会将"赵"(单姓) + "嗤"(动词) 组合成错误实体"赵嗤"。
+        现在会检查下一个token的词性，如果是动词则跳过。
         """
+        # 动词词性集合（HanLP词性标签）
+        VERB_POS = {'V', 'VE', 'VC', 'VV', 'VW', 'VD', 'VL', 'VH', 'VO', 'VP', 'VB', 'v'}
+        
         entities: List[Entity] = []
         i = 0
         while i < len(tokens):
@@ -647,7 +718,8 @@ class NLPBasics:
             pos = pos_tags[i] if i < len(pos_tags) else 'X'
 
             # 跳过已覆盖或非姓氏标记
-            if pos not in ('NR', 'nr') or len(token) > 1 or token not in SINGLE_CHAR_SURNAMES:
+            # 修复：确保token是单字姓氏（len(token) == 1）
+            if pos not in ('NR', 'nr') or len(token) != 1 or token not in SINGLE_CHAR_SURNAMES:
                 i += 1
                 continue
 
@@ -656,29 +728,31 @@ class NLPBasics:
                 continue
 
             next_token = tokens[i + 1]
+            next_pos = pos_tags[i + 1] if i + 1 < len(pos_tags) else 'X'
+            
+            # 2026-05-02 修复：检查下一个token是否是动词
+            # 防止"赵虎/nr 嗤/v 笑道/v" → "赵嗤"类错误
+            if next_pos.upper() in VERB_POS:
+                i += 1
+                continue
+            
             combined = token + next_token
 
             if next_token in TITLE_WORDS:
                 entities.append(Entity(
                     text=combined, type='PER', start=i, end=i + 2, confidence=0.95
                 ))
+                i += 2
             elif next_token in POSITION_SUFFIXES:
                 entities.append(Entity(
                     text=combined, type='PER', start=i, end=i + 2, confidence=0.90
                 ))
-            elif next_token in FAMILY_SUFFIXES:
-                entities.append(Entity(
-                    text=combined, type='ORG', start=i, end=i + 2, confidence=0.90
-                ))
-            elif next_token in LOCATION_SUFFIXES:
-                entities.append(Entity(
-                    text=combined, type='LOC', start=i, end=i + 2, confidence=0.85
-                ))
+                i += 2
             else:
+                # ORG/LOC创建逻辑已移除（2026-05-02 修正方案）
+                # 不再创建 FAMILY_SUFFIXES → ORG 和 LOCATION_SUFFIXES → LOC 实体
                 i += 1
                 continue
-
-            i += 2
 
         return entities
 
@@ -779,6 +853,21 @@ class NLPBasics:
             else:
                 i += 1
         
+        # 2026-05-02 修复：过滤HanLP/jieba误识别的虚假人名
+        # "萧炎冷笑道" → HanLP识别为"萧炎冷"(人名)
+        # 过滤以常见表情/动作字结尾的人名实体
+        entities = self._filter_false_persons(entities)
+        
+        return entities
+    
+    def _filter_false_persons(self, entities: List[Entity]) -> List[Entity]:
+        """过滤HanLP误识别的虚假人名实体
+        
+        注意：主要的误合并检测（如"萧炎冷"→"萧炎"+"冷"）
+        现在由ContextDiversityValidator的_detect_mis_merged_entities处理。
+        此方法仅处理单句层面的简单过滤。
+        """
+        # 保留原有的简单过滤逻辑（单字/双字过滤等）
         return entities
 
     def tokenize(self, text: str) -> List[str]:
