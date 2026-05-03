@@ -340,11 +340,8 @@ class PipelineRunner:
                 speaker = "Narrator"
             
             # 优化4：使用预构建的拟声词集合进行 O(1) 查找
-            sentence_sfx = []
-            for sfx_text in sfx_text_set:
-                if sfx_text in sentence:
-                    sentence_sfx.append(sfx_text)
-                    sfx_count += 1
+            sentence_sfx = list(set(sfx_text for sfx_text in sfx_text_set if sfx_text in sentence))
+            sfx_count += len(sentence_sfx)
             
             # 优化5：预构建实体属性字典，避免 getattr 重复调用
             sentence_entities = []
