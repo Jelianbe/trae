@@ -1,0 +1,105 @@
+{
+  "test_date": "2026-05-03T12:47:11.882Z",
+  "results": [
+    {
+      "id": 1,
+      "text": "苏夜惊讶地看着药老：\"这异火竟如此神奇\"",
+      "gt_emotion": "surprise",
+      "predicted_emotion": "surprise",
+      "is_correct": true,
+      "natural_score": "2",
+      "match_score": "1",
+      "note": "旁边和说话人声音一样，失败"
+    },
+    {
+      "id": 2,
+      "text": "\"放肆！你敢背叛我？\"萧炎怒喝道",
+      "gt_emotion": "anger",
+      "predicted_emotion": "joy",
+      "is_correct": false,
+      "natural_score": "2",
+      "match_score": "1",
+      "note": "没有愤怒的感觉，你纯粹加快了语速而已，没有足够的起伏"
+    },
+    {
+      "id": 3,
+      "text": "萧炎缓缓站起身来，走向门口",
+      "gt_emotion": "neutral",
+      "predicted_emotion": "neutral",
+      "is_correct": true,
+      "natural_score": "3",
+      "match_score": "4",
+      "note": "这也不是对话啊？报告作为旁边勉强合格"
+    },
+    {
+      "id": 4,
+      "text": "萧炎笑道：\"太好了，我终于突破了！\"",
+      "gt_emotion": "joy",
+      "predicted_emotion": "joy",
+      "is_correct": true,
+      "natural_score": "3",
+      "match_score": "4",
+      "note": "还行"
+    },
+    {
+      "id": 5,
+      "text": "\"太可怕了，我们快逃！\"萧炎心中一阵恐慌",
+      "gt_emotion": "fear",
+      "predicted_emotion": "fear",
+      "is_correct": true,
+      "natural_score": "3",
+      "match_score": "1",
+      "note": "完全没有恐惧的感觉"
+    },
+    {
+      "id": 6,
+      "text": "\"走吧，我们该出发了。\"",
+      "gt_emotion": "neutral",
+      "predicted_emotion": "anger",
+      "is_correct": false,
+      "natural_score": "3",
+      "match_score": "2",
+      "note": ""
+    },
+    {
+      "id": 7,
+      "text": "萧炎低声叹息：\"她还是走了。\"",
+      "gt_emotion": "sadness",
+      "predicted_emotion": "sadness",
+      "is_correct": true,
+      "natural_score": "3",
+      "match_score": "3",
+      "note": ""
+    },
+    {
+      "id": 8,
+      "text": "\"这怎么可能？\"萧炎惊讶地看着眼前的一切",
+      "gt_emotion": "surprise",
+      "predicted_emotion": "surprise",
+      "is_correct": true,
+      "natural_score": "3",
+      "match_score": "3",
+      "note": ""
+    },
+    {
+      "id": 9,
+      "text": "萧炎微微一笑：\"多谢前辈指点。\"",
+      "gt_emotion": "joy",
+      "predicted_emotion": "neutral",
+      "is_correct": false,
+      "natural_score": "4",
+      "match_score": "3",
+      "note": ""
+    },
+    {
+      "id": 10,
+      "text": "\"混蛋！我绝不会放过你！\"萧炎气得浑身发抖",
+      "gt_emotion": "anger",
+      "predicted_emotion": "anger",
+      "is_correct": true,
+      "natural_score": "3",
+      "match_score": "4",
+      "note": ""
+    }
+  ]
+}

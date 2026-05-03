@@ -4,10 +4,6 @@ from dataclasses import dataclass, field
 from collections import defaultdict
 from contextlib import contextmanager
 
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from pipeline.character_manager import CharacterManager, Character, get_character_manager
 from pipeline.nlp_basics import get_nlp
 from pipeline.semantic_ranker import SemanticRanker, get_semantic_ranker
@@ -248,6 +244,10 @@ class SpeakerMatcher:
         使用句子嵌入模型对候选角色进行语义相似度排序。
         先用角色名/别名进行初步筛选，然后用对话历史画像进行精细排序。
 
+        冷启动优化：当角色没有对话历史时，构建更丰富的画像：
+        - 包含角色名、别名、性别、头衔模式
+        - 添加上下文模板（如"{name}说道"、"{name}点头"）
+
         Args:
             sentence: 输入句子（通常包含对话和上下文）
 
@@ -270,8 +270,24 @@ class SpeakerMatcher:
                 # 使用对话历史作为语义画像
                 profiles.append((char.name, dialogue_context))
             else:
-                # 没有对话历史，用角色名+别名作为画像
-                profile_text = char.name + " " + " ".join(char.aliases)
+                # 冷启动优化：构建更丰富的画像
+                profile_parts = []
+                # 1. 角色名和别名
+                profile_parts.append(char.name)
+                if char.aliases:
+                    profile_parts.extend(char.aliases)
+                # 2. 性别提示
+                if char.gender != "unknown":
+                    profile_parts.append("他" if char.gender == "male" else "她")
+                # 3. 上下文模板（模拟常见说话场景）
+                profile_parts.append(f"{char.name}说道")
+                profile_parts.append(f"{char.name}点头")
+                profile_parts.append(f"{char.name}看着")
+                # 4. 头衔模式
+                for alias in char.aliases:
+                    profile_parts.append(f"{alias}道")
+                
+                profile_text = " ".join(profile_parts)
                 profiles.append((char.name, profile_text))
 
         # 使用语义排序器（用对话画像进行匹配）
@@ -685,11 +701,13 @@ class SpeakerMatcher:
         # 重置追踪状态，避免第一轮缓存建立干扰第二轮说话人匹配
         self._recent_speakers.clear()
         self._recent_mentions.clear()
+        self._character_activity.clear()
         
         # 第二轮：匹配说话人
         dialogues.sort(key=lambda x: x[0])
         results = []
         prev_speaker = None
+        last_successful_speaker = None  # 记录最近成功匹配的说话人（用于代词消解）
         for i, (start, end, dialogue) in enumerate(dialogues):
             prefix_start = dialogues[i-1][1] if i > 0 else 0
             prefix = text[prefix_start:start].strip()
@@ -703,10 +721,14 @@ class SpeakerMatcher:
             if mentioned:
                 self.update_mentions(mentioned)
             
+            # 代词消解优先使用 last_successful_speaker，而非 prev_speaker
+            # 这样即使中间某句匹配失败，后续的"他/她"仍能解析到正确的角色
+            pronoun_speaker = last_successful_speaker
+            
             context = DialogueContext(
                 text=prefix + " " + dialogue + " " + suffix,
                 speaker_hint=speaker_hint,
-                prev_speaker=prev_speaker,
+                prev_speaker=pronoun_speaker,
                 mentioned_characters=mentioned,
                 chapter_id=chapter_id
             )
@@ -717,9 +739,11 @@ class SpeakerMatcher:
                 speaker = match_result.character
                 self.update_activity(speaker.id, speaker.name)
                 prev_speaker = speaker.name
+                last_successful_speaker = speaker.name  # 更新最近成功匹配的说话人
             else:
                 speaker = None
                 prev_speaker = None
+                # 注意：不更新 last_successful_speaker，保持上一轮的成功值
             
             results.append((dialogue, speaker))
         

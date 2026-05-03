@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS 端到端听感测试</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+        h1 { color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
+        .sample { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .sample-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .sample-id { font-size: 1.2em; font-weight: bold; color: #4CAF50; }
+        .sample-status { padding: 4px 12px; border-radius: 4px; font-size: 0.9em; }
+        .correct { background: #e8f5e9; color: #2e7d32; }
+        .incorrect { background: #ffebee; color: #c62828; }
+        .sample-text { font-size: 1.1em; padding: 10px; background: #f9f9f9; border-radius: 4px; margin: 10px 0; }
+        .emotion-info { display: flex; gap: 20px; margin: 10px 0; }
+        .emotion-tag { padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        .gt { background: #e3f2fd; color: #1565c0; }
+        .predicted { background: #fff3e0; color: #e65100; }
+        .evaluation { margin-top: 15px; padding: 10px; background: #fafafa; border-radius: 4px; }
+        .evaluation label { display: block; margin: 8px 0; }
+        audio { width: 100%; margin: 10px 0; }
+        .summary { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <h1>🎧 TTS 端到端听感测试</h1>
+    <p><strong>测试日期</strong>: 2026-05-03 20:09</p>
+    <p><strong>测试目标</strong>: 验证情绪标注对 TTS 听感的实际影响</p>
+
+    <div class="summary">
+        <h2>测试样本摘要</h2>
+        <table>
+            <tr><th>ID</th><th>状态</th><th>GT 情绪</th><th>预测情绪</th><th>强度</th><th>音频</th></tr>
+<tr>
+            <td>1</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>surprise</td>
+            <td>surprise</td>
+            <td>mild</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>2</td>
+            <td><span class="sample-status incorrect">错误</span></td>
+            <td>anger</td>
+            <td>joy</td>
+            <td>moderate</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>3</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>neutral</td>
+            <td>neutral</td>
+            <td>mild</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>4</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>joy</td>
+            <td>joy</td>
+            <td>moderate</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>5</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>fear</td>
+            <td>fear</td>
+            <td>strong</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>6</td>
+            <td><span class="sample-status incorrect">错误</span></td>
+            <td>neutral</td>
+            <td>anger</td>
+            <td>mild</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>7</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>sadness</td>
+            <td>sadness</td>
+            <td>moderate</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>8</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>surprise</td>
+            <td>surprise</td>
+            <td>moderate</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>9</td>
+            <td><span class="sample-status incorrect">错误</span></td>
+            <td>joy</td>
+            <td>neutral</td>
+            <td>mild</td>
+            <td>✅</td>
+        </tr>
+<tr>
+            <td>10</td>
+            <td><span class="sample-status correct">正确</span></td>
+            <td>anger</td>
+            <td>anger</td>
+            <td>strong</td>
+            <td>✅</td>
+        </tr>
+</table></div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 1</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">苏夜惊讶地看着药老："这异火竟如此神奇"</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: surprise</span>
+            <span class="emotion-tag predicted">预测: surprise</span>
+            <span class="emotion-tag">强度: mild</span>
+        </div>
+        <audio controls>
+            <source src="正确_1.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_1" value="yes"> 自然
+                   <input type="radio" name="natural_1" value="no"> 不自然
+                   <input type="radio" name="natural_1" value="ok"> 一般</label>
+            <label><input type="radio" name="match_1" value="yes"> 情绪匹配
+                   <input type="radio" name="match_1" value="no"> 不匹配
+                   <input type="radio" name="match_1" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 2</span>
+            <span class="sample-status incorrect">错误标注</span>
+        </div>
+        <div class="sample-text">"放肆！你敢背叛我？"萧炎怒喝道</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: anger</span>
+            <span class="emotion-tag predicted">预测: joy</span>
+            <span class="emotion-tag">强度: moderate</span>
+        </div>
+        <audio controls>
+            <source src="错误_2.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_2" value="yes"> 自然
+                   <input type="radio" name="natural_2" value="no"> 不自然
+                   <input type="radio" name="natural_2" value="ok"> 一般</label>
+            <label><input type="radio" name="match_2" value="yes"> 情绪匹配
+                   <input type="radio" name="match_2" value="no"> 不匹配
+                   <input type="radio" name="match_2" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 3</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">萧炎缓缓站起身来，走向门口</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: neutral</span>
+            <span class="emotion-tag predicted">预测: neutral</span>
+            <span class="emotion-tag">强度: mild</span>
+        </div>
+        <audio controls>
+            <source src="正确_3.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_3" value="yes"> 自然
+                   <input type="radio" name="natural_3" value="no"> 不自然
+                   <input type="radio" name="natural_3" value="ok"> 一般</label>
+            <label><input type="radio" name="match_3" value="yes"> 情绪匹配
+                   <input type="radio" name="match_3" value="no"> 不匹配
+                   <input type="radio" name="match_3" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 4</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">萧炎笑道："太好了，我终于突破了！"</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: joy</span>
+            <span class="emotion-tag predicted">预测: joy</span>
+            <span class="emotion-tag">强度: moderate</span>
+        </div>
+        <audio controls>
+            <source src="正确_4.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_4" value="yes"> 自然
+                   <input type="radio" name="natural_4" value="no"> 不自然
+                   <input type="radio" name="natural_4" value="ok"> 一般</label>
+            <label><input type="radio" name="match_4" value="yes"> 情绪匹配
+                   <input type="radio" name="match_4" value="no"> 不匹配
+                   <input type="radio" name="match_4" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 5</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">"太可怕了，我们快逃！"萧炎心中一阵恐慌</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: fear</span>
+            <span class="emotion-tag predicted">预测: fear</span>
+            <span class="emotion-tag">强度: strong</span>
+        </div>
+        <audio controls>
+            <source src="正确_5.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_5" value="yes"> 自然
+                   <input type="radio" name="natural_5" value="no"> 不自然
+                   <input type="radio" name="natural_5" value="ok"> 一般</label>
+            <label><input type="radio" name="match_5" value="yes"> 情绪匹配
+                   <input type="radio" name="match_5" value="no"> 不匹配
+                   <input type="radio" name="match_5" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 6</span>
+            <span class="sample-status incorrect">错误标注</span>
+        </div>
+        <div class="sample-text">"走吧，我们该出发了。"</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: neutral</span>
+            <span class="emotion-tag predicted">预测: anger</span>
+            <span class="emotion-tag">强度: mild</span>
+        </div>
+        <audio controls>
+            <source src="错误_6.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_6" value="yes"> 自然
+                   <input type="radio" name="natural_6" value="no"> 不自然
+                   <input type="radio" name="natural_6" value="ok"> 一般</label>
+            <label><input type="radio" name="match_6" value="yes"> 情绪匹配
+                   <input type="radio" name="match_6" value="no"> 不匹配
+                   <input type="radio" name="match_6" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 7</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">萧炎低声叹息："她还是走了。"</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: sadness</span>
+            <span class="emotion-tag predicted">预测: sadness</span>
+            <span class="emotion-tag">强度: moderate</span>
+        </div>
+        <audio controls>
+            <source src="正确_7.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_7" value="yes"> 自然
+                   <input type="radio" name="natural_7" value="no"> 不自然
+                   <input type="radio" name="natural_7" value="ok"> 一般</label>
+            <label><input type="radio" name="match_7" value="yes"> 情绪匹配
+                   <input type="radio" name="match_7" value="no"> 不匹配
+                   <input type="radio" name="match_7" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 8</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">"这怎么可能？"萧炎惊讶地看着眼前的一切</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: surprise</span>
+            <span class="emotion-tag predicted">预测: surprise</span>
+            <span class="emotion-tag">强度: moderate</span>
+        </div>
+        <audio controls>
+            <source src="正确_8.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_8" value="yes"> 自然
+                   <input type="radio" name="natural_8" value="no"> 不自然
+                   <input type="radio" name="natural_8" value="ok"> 一般</label>
+            <label><input type="radio" name="match_8" value="yes"> 情绪匹配
+                   <input type="radio" name="match_8" value="no"> 不匹配
+                   <input type="radio" name="match_8" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 9</span>
+            <span class="sample-status incorrect">错误标注</span>
+        </div>
+        <div class="sample-text">萧炎微微一笑："多谢前辈指点。"</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: joy</span>
+            <span class="emotion-tag predicted">预测: neutral</span>
+            <span class="emotion-tag">强度: mild</span>
+        </div>
+        <audio controls>
+            <source src="错误_9.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_9" value="yes"> 自然
+                   <input type="radio" name="natural_9" value="no"> 不自然
+                   <input type="radio" name="natural_9" value="ok"> 一般</label>
+            <label><input type="radio" name="match_9" value="yes"> 情绪匹配
+                   <input type="radio" name="match_9" value="no"> 不匹配
+                   <input type="radio" name="match_9" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="sample">
+        <div class="sample-header">
+            <span class="sample-id">样本 10</span>
+            <span class="sample-status correct">正确标注</span>
+        </div>
+        <div class="sample-text">"混蛋！我绝不会放过你！"萧炎气得浑身发抖</div>
+        <div class="emotion-info">
+            <span class="emotion-tag gt">GT: anger</span>
+            <span class="emotion-tag predicted">预测: anger</span>
+            <span class="emotion-tag">强度: strong</span>
+        </div>
+        <audio controls>
+            <source src="正确_10.mp3" type="audio/mpeg">
+            您的浏览器不支持音频播放
+        </audio>
+        <div class="evaluation">
+            <strong>人工评价</strong>:
+            <label><input type="radio" name="natural_10" value="yes"> 自然
+                   <input type="radio" name="natural_10" value="no"> 不自然
+                   <input type="radio" name="natural_10" value="ok"> 一般</label>
+            <label><input type="radio" name="match_10" value="yes"> 情绪匹配
+                   <input type="radio" name="match_10" value="no"> 不匹配
+                   <input type="radio" name="match_10" value="partial"> 部分匹配</label>
+        </div>
+    </div>
+
+    <div class="summary">
+        <h2>评价说明</h2>
+        <p><strong>问题1</strong>: 这段音频听起来自然吗？</p>
+        <ul><li>是 - 语速、音调听起来舒适</li><li>否 - 有明显的不自然感</li><li>一般 - 介于两者之间</li></ul>
+        <p><strong>问题2</strong>: 情绪表达是否与文本内容匹配？</p>
+        <ul><li>是 - 情绪与文本内容一致</li><li>否 - 情绪与文本内容矛盾</li><li>部分匹配 - 部分符合</li></ul>
+    </div>
+</body>
+</html>

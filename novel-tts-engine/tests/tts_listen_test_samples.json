@@ -1,0 +1,12 @@
+[
+  {"id": 1, "emotion": "surprise", "intensity": "mild", "text": "苏夜惊讶地看着药老：\"这异火竟如此神奇\"", "gt_emotion": "surprise"},
+  {"id": 2, "emotion": "anger", "intensity": "moderate", "text": "\"放肆！你敢背叛我？\"萧炎怒喝道", "gt_emotion": "joy"},
+  {"id": 3, "emotion": "neutral", "intensity": "mild", "text": "萧炎缓缓站起身来，走向门口", "gt_emotion": "neutral"},
+  {"id": 4, "emotion": "joy", "intensity": "moderate", "text": "萧炎笑道：\"太好了，我终于突破了！\"", "gt_emotion": "joy"},
+  {"id": 5, "emotion": "fear", "intensity": "strong", "text": "\"太可怕了，我们快逃！\"萧炎心中一阵恐慌", "gt_emotion": "fear"},
+  {"id": 6, "emotion": "neutral", "intensity": "mild", "text": "\"走吧，我们该出发了。\"", "gt_emotion": "anger"},
+  {"id": 7, "emotion": "sadness", "intensity": "moderate", "text": "萧炎低声叹息：\"她还是走了。\"", "gt_emotion": "sadness"},
+  {"id": 8, "emotion": "surprise", "intensity": "moderate", "text": "\"这怎么可能？\"萧炎惊讶地看着眼前的一切", "gt_emotion": "surprise"},
+  {"id": 9, "emotion": "joy", "intensity": "mild", "text": "萧炎微微一笑：\"多谢前辈指点。\"", "gt_emotion": "neutral"},
+  {"id": 10, "emotion": "anger", "intensity": "strong", "text": "\"混蛋！我绝不会放过你！\"萧炎气得浑身发抖", "gt_emotion": "anger"}
+]

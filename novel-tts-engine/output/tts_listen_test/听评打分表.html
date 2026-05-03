@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS 听感测试 - 打分表</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+        h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }
+        .info-box { background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        
+        .sample-card { background: white; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+        .sample-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .sample-header.correct { background: #e8f5e9; }
+        .sample-header.incorrect { background: #ffebee; }
+        .sample-id { font-size: 18px; font-weight: bold; }
+        .sample-status { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-correct { background: #4CAF50; color: white; }
+        .status-incorrect { background: #f44336; color: white; }
+        
+        .sample-text { padding: 15px 20px; font-size: 16px; line-height: 1.6; border-bottom: 1px solid #eee; }
+        
+        .sample-info { padding: 10px 20px; display: flex; gap: 15px; background: #f9f9f9; }
+        .info-item { font-size: 13px; }
+        .info-item span { font-weight: bold; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+        .tag-joy { background: #fff3e0; color: #e65100; }
+        .tag-anger { background: #ffebee; color: #c62828; }
+        .tag-sadness { background: #e8eaf6; color: #283593; }
+        .tag-surprise { background: #fce4ec; color: #ad1457; }
+        .tag-fear { background: #f3e5f5; color: #6a1b9a; }
+        .tag-neutral { background: #f5f5f5; color: #616161; }
+        
+        .sample-audio { padding: 15px 20px; border-bottom: 1px solid #eee; }
+        .sample-audio audio { width: 100%; }
+        
+        .sample-score { padding: 20px; }
+        .score-row { display: flex; align-items: center; margin: 15px 0; gap: 15px; }
+        .score-label { min-width: 100px; font-weight: bold; font-size: 14px; }
+        .score-select { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .score-select:focus { outline: none; border-color: #4CAF50; box-shadow: 0 0 0 2px rgba(76,175,80,0.2); }
+        
+        .sample-note { padding: 0 20px 20px; }
+        .sample-note textarea { width: 100%; min-height: 50px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; resize: vertical; font-family: inherit; }
+        .sample-note textarea:focus { outline: none; border-color: #4CAF50; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin: 5px; }
+        .btn-primary { background: #4CAF50; color: white; }
+        .btn-primary:hover { background: #45a049; }
+        .btn-secondary { background: #2196F3; color: white; }
+        .btn-secondary:hover { background: #1976D2; }
+        
+        .footer { text-align: center; margin-top: 40px; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🎧 TTS 听感测试</h1>
+    
+    <div class="info-box">
+        <strong>测试日期</strong>: <span id="test-date"></span><br>
+        <strong>使用说明</strong>: 依次点击播放音频，然后对每个样本进行打分。
+    </div>
+
+    <div style="margin: 20px 0;">
+        <button class="btn btn-primary" onclick="exportResults()">📥 导出打分结果</button>
+        <button class="btn btn-secondary" onclick="calculateSummary()">📊 查看统计</button>
+    </div>
+
+    <div id="cards-container"></div>
+
+    <div id="summary-section" style="display: none;"></div>
+
+    <div class="footer">
+        <p>Novel-TTS-Engine | 完成打分后点击「导出打分结果」保存</p>
+    </div>
+
+    <script>
+        const SAMPLES = [
+            { id: 1, text: '苏夜惊讶地看着药老："这异火竟如此神奇"', gt: 'surprise', predicted: 'surprise', intensity: 'mild', is_correct: true },
+            { id: 2, text: '"放肆！你敢背叛我？"萧炎怒喝道', gt: 'anger', predicted: 'joy', intensity: 'moderate', is_correct: false },
+            { id: 3, text: '萧炎缓缓站起身来，走向门口', gt: 'neutral', predicted: 'neutral', intensity: 'mild', is_correct: true },
+            { id: 4, text: '萧炎笑道："太好了，我终于突破了！"', gt: 'joy', predicted: 'joy', intensity: 'moderate', is_correct: true },
+            { id: 5, text: '"太可怕了，我们快逃！"萧炎心中一阵恐慌', gt: 'fear', predicted: 'fear', intensity: 'strong', is_correct: true },
+            { id: 6, text: '"走吧，我们该出发了。"', gt: 'neutral', predicted: 'anger', intensity: 'mild', is_correct: false },
+            { id: 7, text: '萧炎低声叹息："她还是走了。"', gt: 'sadness', predicted: 'sadness', intensity: 'moderate', is_correct: true },
+            { id: 8, text: '"这怎么可能？"萧炎惊讶地看着眼前的一切', gt: 'surprise', predicted: 'surprise', intensity: 'moderate', is_correct: true },
+            { id: 9, text: '萧炎微微一笑："多谢前辈指点。"', gt: 'joy', predicted: 'neutral', intensity: 'mild', is_correct: false },
+            { id: 10, text: '"混蛋！我绝不会放过你！"萧炎气得浑身发抖', gt: 'anger', predicted: 'anger', intensity: 'strong', is_correct: true }
+        ];
+
+        const EMOTION_NAMES = { joy: '喜悦', anger: '愤怒', sadness: '悲伤', surprise: '惊讶', fear: '恐惧', neutral: '中性' };
+        const INTENSITY_NAMES = { mild: '弱', moderate: '中', strong: '强' };
+
+        document.getElementById('test-date').textContent = new Date().toLocaleString('zh-CN');
+
+        function renderCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            
+            SAMPLES.forEach(sample => {
+                const statusText = sample.is_correct ? '标注正确' : '标注错误';
+                const statusClass = sample.is_correct ? 'correct' : 'incorrect';
+                const headerClass = sample.is_correct ? 'status-correct' : 'status-incorrect';
+                const file = sample.is_correct ? `正确_${sample.id}.mp3` : `错误_${sample.id}.mp3`;
+                
+                const card = document.createElement('div');
+                card.className = 'sample-card';
+                card.innerHTML = `
+                    <div class="sample-header ${statusClass}">
+                        <span class="sample-id">样本 ${sample.id}</span>
+                        <span class="sample-status ${headerClass}">${statusText}</span>
+                    </div>
+                    
+                    <div class="sample-text">
+                        ${sample.text}
+                    </div>
+                    
+                    <div class="sample-info">
+                        <div class="info-item">GT情绪: <span class="tag tag-${sample.gt}">${EMOTION_NAMES[sample.gt]}</span></div>
+                        <div class="info-item">预测情绪: <span class="tag tag-${sample.predicted}">${EMOTION_NAMES[sample.predicted]}</span></div>
+                        <div class="info-item">强度: ${INTENSITY_NAMES[sample.intensity]}</div>
+                    </div>
+                    
+                    <div class="sample-audio">
+                        <audio controls src="${file}"></audio>
+                    </div>
+                    
+                    <div class="sample-score">
+                        <div style="font-weight: bold; margin-bottom: 10px;">打分</div>
+                        <div class="score-row">
+                            <div class="score-label">自然度</div>
+                            <select class="score-select" id="natural-${sample.id}">
+                                <option value="">-- 请选择 --</option>
+                                <option value="5">⭐⭐⭐⭐⭐ 非常自然</option>
+                                <option value="4">⭐⭐⭐⭐ 自然</option>
+                                <option value="3">⭐⭐⭐ 一般</option>
+                                <option value="2">⭐⭐ 不自然</option>
+                                <option value="1">⭐ 非常不自然</option>
+                            </select>
+                        </div>
+                        <div class="score-row">
+                            <div class="score-label">情绪匹配</div>
+                            <select class="score-select" id="match-${sample.id}">
+                                <option value="">-- 请选择 --</option>
+                                <option value="5">✅ 完全匹配</option>
+                                <option value="4">👍 基本匹配</option>
+                                <option value="3">🤔 部分匹配</option>
+                                <option value="2">❌ 不太匹配</option>
+                                <option value="1">💥 完全不匹配</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="sample-note">
+                        <textarea id="note-${sample.id}" placeholder="备注（可选）..."></textarea>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function exportResults() {
+            const results = [];
+            SAMPLES.forEach(sample => {
+                results.push({
+                    id: sample.id,
+                    text: sample.text,
+                    gt_emotion: sample.gt,
+                    predicted_emotion: sample.predicted,
+                    is_correct: sample.is_correct,
+                    natural_score: document.getElementById(`natural-${sample.id}`).value || null,
+                    match_score: document.getElementById(`match-${sample.id}`).value || null,
+                    note: document.getElementById(`note-${sample.id}`).value
+                });
+            });
+            
+            const uncompleted = results.filter(r => !r.natural_score || !r.match_score).length;
+            if (uncompleted > 0 && !confirm(`还有 ${uncompleted} 个样本未打分，确定导出？`)) return;
+            
+            const data = {
+                test_date: new Date().toISOString(),
+                results: results
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `tts听评结果_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+        }
+
+        function calculateSummary() {
+            let completed = 0, totalNatural = 0, totalMatch = 0;
+            let correctNatural = 0, correctMatch = 0, correctCount = 0;
+            let incorrectNatural = 0, incorrectMatch = 0, incorrectCount = 0;
+            
+            SAMPLES.forEach(sample => {
+                const n = document.getElementById(`natural-${sample.id}`).value;
+                const m = document.getElementById(`match-${sample.id}`).value;
+                if (n && m) {
+                    completed++;
+                    totalNatural += parseInt(n);
+                    totalMatch += parseInt(m);
+                    if (sample.is_correct) {
+                        correctCount++;
+                        correctNatural += parseInt(n);
+                        correctMatch += parseInt(m);
+                    } else {
+                        incorrectCount++;
+                        incorrectNatural += parseInt(n);
+                        incorrectMatch += parseInt(m);
+                    }
+                }
+            });
+            
+            if (completed === 0) { alert('请先完成打分'); return; }
+            
+            let html = `<div class="sample-card"><div class="sample-header correct"><h2>📊 统计结果 (${completed}/${SAMPLES.length})</h2></div>
+                <div style="padding: 20px;">
+                    <p>平均自然度: <strong>${(totalNatural/completed).toFixed(1)}</strong>/5</p>
+                    <p>平均情绪匹配: <strong>${(totalMatch/completed).toFixed(1)}</strong>/5</p>`;
+            
+            if (correctCount > 0) {
+                html += `<hr><p>正确标注样本 - 自然度: <strong style="color:#4CAF50">${(correctNatural/correctCount).toFixed(1)}</strong> | 情绪匹配: <strong style="color:#4CAF50">${(correctMatch/correctCount).toFixed(1)}</strong></p>`;
+            }
+            if (incorrectCount > 0) {
+                html += `<p>错误标注样本 - 自然度: <strong style="color:#f44336">${(incorrectNatural/incorrectCount).toFixed(1)}</strong> | 情绪匹配: <strong style="color:#f44336">${(incorrectMatch/incorrectCount).toFixed(1)}</strong></p>`;
+            }
+            
+            html += '</div></div>';
+            document.getElementById('summary-section').innerHTML = html;
+            document.getElementById('summary-section').style.display = 'block';
+            document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        renderCards();
+    </script>
+</body>
+</html>

@@ -244,7 +244,7 @@ MULTI_CHAR_SURNAMES = {
 
 
 class NLPBasics:
-    def __init__(self, use_offline: bool = True, enable_foreign_name_merge: bool = False):
+    def __init__(self, use_offline: bool = True, enable_foreign_name_merge: bool = True):
         self.pipeline = None
         self._initialized = False
         self.enable_foreign_name_merge = enable_foreign_name_merge
@@ -861,14 +861,71 @@ class NLPBasics:
         return entities
     
     def _filter_false_persons(self, entities: List[Entity]) -> List[Entity]:
-        """过滤HanLP误识别的虚假人名实体
-        
+        """过滤HanLP误识别的虚假人名实体。
+
+        过滤规则：
+        1. 单字实体不可能是有效人名（排除）
+        2. 包含"家/族/宗/门/派/帮/教/会"等组织词的实体应归类为ORG
+        3. 包含常见非人名词（"天道"、"大道"、"世界"、"空间"等）的应排除
+        4. 长度>=4且包含"之/的/与/和"的短语不是人名
+
         注意：主要的误合并检测（如"萧炎冷"→"萧炎"+"冷"）
         现在由ContextDiversityValidator的_detect_mis_merged_entities处理。
         此方法仅处理单句层面的简单过滤。
         """
-        # 保留原有的简单过滤逻辑（单字/双字过滤等）
-        return entities
+        # 组织特征词：包含这些词的应归类为 ORG
+        org_patterns = [
+            '家', '族', '宗', '门', '派', '帮', '教', '会', '阁', '殿', '府',
+            '宫', '堡', '寨', '岛', '城', '国', '界', '域', '天'
+        ]
+        # 常见非人名词（网文高频但非人名）
+        false_person_words = [
+            '天道', '大道', '世界', '空间', '时间', '天地', '万物', '虚空',
+            '宇宙', '星辰', '天命', '命运', '轮回', '因果', '境界', '修炼',
+            '灵力', '灵力', '灵气', '真气', '斗气', '魂力', '元力', '法力',
+            '神识', '意识', '灵魂', '魂魄', '肉身', '血脉', '功法', '武技',
+            '剑意', '剑道', '阵法', '丹药', '灵药', '法宝', '神器', '兵器',
+            '飞舟', '马车', '山洞', '树林', '草原', '沙漠', '河流', '瀑布'
+        ]
+        # 长度阈值：过长不是人名
+        max_person_len = 7
+
+        filtered = []
+        for ent in entities:
+            name = ent.text
+            ent_type = ent.type
+            name_len = len(name)
+
+            # 规则1：单字实体不可能是有效人名
+            if name_len < 2:
+                continue
+
+            # 规则2：包含组织特征词的归类为 ORG
+            if ent_type == 'PER' and any(pat in name for pat in org_patterns):
+                ent.type = 'ORG'
+                filtered.append(ent)
+                continue
+
+            # 规则3：常见非人名词直接过滤
+            if name in false_person_words:
+                continue
+
+            # 规则4：长度超限过滤
+            if name_len > max_person_len:
+                # 检查是否包含连接词
+                if any(conn in name for conn in ['之', '的', '与', '和', '而', '但']):
+                    continue
+
+            # 规则5：纯数字或字母+数字不是人名
+            if name.isdigit():
+                continue
+            if name.replace('·', '').isalpha() and '·' not in name and name_len < 3:
+                # 可能是单字英文名，排除
+                continue
+
+            filtered.append(ent)
+
+        return filtered
 
     def tokenize(self, text: str) -> List[str]:
         result = self.analyze(text)
@@ -899,7 +956,7 @@ _nlp_instance: Optional[NLPBasics] = None
 _nlp_lock = threading.Lock()
 
 
-def get_nlp(enable_foreign_name_merge: bool = False) -> NLPBasics:
+def get_nlp(enable_foreign_name_merge: bool = True) -> NLPBasics:
     """获取或创建全局 NLP 实例（线程安全，双重检查锁）"""
     global _nlp_instance
     if _nlp_instance is None:

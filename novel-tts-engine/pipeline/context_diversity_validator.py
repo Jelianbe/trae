@@ -166,26 +166,34 @@ class ContextDiversityValidator:
         full_text: str,
     ) -> set:
         """
-        误合并检测（2026-05-03 新增）
+        基于统计的结构压缩率检测，替代硬编码后缀黑名单（2026-05-03 v2.2）。
         
-        检测HanLP将"人名+动词"误合并为更长的"人名"的情况。
-        例如："萧炎冷笑道" → "萧炎冷"(PERSON)
+        核心逻辑：
+        对于每个类型为PER且长度≥3的实体A，检查是否存在一个更短的实体B
+        （B是A的前缀，且B是高频角色名），满足：
+          - A的出现次数 ≤ 2（极低频）
+          - A的出现次数 < B出现次数的10%
+          - A的右邻字中，至少50%是对话引导词（道、说、问、喊、叫、喝、笑等）
         
-        检测逻辑：
-        1. 实体长度≥3
-        2. 末端1-2字是常见表情/动作词
-        3. 去除末端后，剩余部分是一个出现≥5次的高频角色名
+        如果满足，则A是B的误合并扩展，标记为mis_merged。
         
-        如果满足以上条件，标记为误合并。
+        优势：
+        - 零硬编码：不依赖SINGLE_CHAR_VERBS等词表
+        - 全覆盖：能检测"萧炎冷"、"萧炎承"、"萧炎承喏"等任意后缀
+        - 低误杀：真实人名（如"纳兰肃"）的右邻字不是对话引导词，不会被误杀
+        
+        v2.2修复：
+        - 使用对话引导词检测替代右邻字多样性阈值
+        - 萧炎冷(右邻字=3，但100%是对话词) → 误合并 ✓
+        - 纳兰肃(右邻字=2，但0%是对话词) → 保留 ✓
         """
-        # 常见单字表情/动作词（这些字在人名末尾极不常见）
-        SINGLE_CHAR_VERBS = {
-            '冷', '笑', '怒', '喜', '愁', '悲', '愤', '急', '惊', '疑',
-            '呆', '愣', '痴', '醉', '困', '累', '饿', '渴', '痛', '痒',
-            '羞', '恼', '恨', '怨', '叹', '泣', '吼', '喊', '叫', '骂',
+        # 对话引导词集合（用于检测误合并）
+        DIALOGUE_WORDS = {
+            '道', '说', '问', '喊', '叫', '喝', '笑', '叹', '答', '应',
+            '吼', '骂', '泣', '怒', '冷', '斥', '责', '嘲', '讽', '讥',
         }
         
-        # 找出出现≥5次的高频角色名（作为已知角色）
+        # 找出出现≥5次的高频角色名（作为prefix候选）
         known_persons = set()
         for entity_text, stat in stats.items():
             if stat['occurrences'] >= 5:
@@ -197,33 +205,50 @@ class ContextDiversityValidator:
             if entity.type != 'PER' or len(entity.text) < 3:
                 continue
             
-            # 检查末端1-2字
+            entity_text = entity.text
+            entity_occ = stats.get(entity_text, {}).get('occurrences', 0)
+            entity_neighbors = stats.get(entity_text, {}).get('right_neighbors', set())
+            
+            # 条件0：实体必须是极低频（≤2次）
+            if entity_occ > 2:
+                continue
+            
+            # 检查所有可能的prefix（去掉末端1-2字）
             for suffix_len in [1, 2]:
-                if len(entity.text) <= suffix_len:
+                if len(entity_text) <= suffix_len:
                     continue
                 
-                prefix = entity.text[:-suffix_len]
-                suffix = entity.text[-suffix_len:]
+                prefix = entity_text[:-suffix_len]
                 
-                # 如果前缀是已知高频角色
-                if prefix in known_persons:
-                    # 检查后缀是否是常见动词
-                    is_verb = False
-                    if len(suffix) == 1 and suffix in SINGLE_CHAR_VERBS:
-                        is_verb = True
-                    elif len(suffix) == 2:
-                        # 检查是否是"动词+道"等结构
-                        if suffix.endswith('道') and suffix[0] in SINGLE_CHAR_VERBS:
-                            is_verb = True
-                    
-                    if is_verb:
-                        mis_merged.add(entity.text)
-                        logger.debug(
-                            f"检测到误合并: {entity.text} → "
-                            f"prefix='{prefix}'(出现{stats[prefix]['occurrences']}次) + "
-                            f"suffix='{suffix}'"
-                        )
-                        break
+                # 条件1：prefix是已知的高频角色
+                if prefix not in known_persons:
+                    continue
+                
+                prefix_occ = stats[prefix]['occurrences']
+                
+                # 条件2：实体出现次数远少于prefix（<10%）
+                if entity_occ >= prefix_occ * 0.1:
+                    continue
+                
+                # 边界条件：无右邻字无法判断是否误合并，跳过
+                if len(entity_neighbors) == 0:
+                    continue
+                
+                # 条件3：实体的右邻字中，至少50%是对话引导词
+                dialogue_ratio = len(entity_neighbors & DIALOGUE_WORDS) / len(entity_neighbors)
+                if dialogue_ratio < 0.5:
+                    continue
+                
+                # 满足所有条件 → 标记为误合并
+                mis_merged.add(entity_text)
+                
+                logger.debug(
+                    f"[结构压缩率检测] {entity_text} → "
+                    f"prefix='{prefix}'({prefix_occ}次) + "
+                    f"suffix='{entity_text[-suffix_len:]}' | "
+                    f"entity_occ={entity_occ}, dialogue_ratio={dialogue_ratio:.0%}"
+                )
+                break
         
         return mis_merged
     

@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "text": "\"苏夜，你在这里！\"",
+    "context_before": "苏夜独自坐在天台上",
+    "context_after": "苏夜转头看去，只见林雪快步走来"
+  },
+  {
+    "id": 2,
+    "text": "\"林雪，你怎么上来了？\"",
+    "context_before": "那是他觉醒的异能",
+    "context_after": "苏夜收起手中的电光，轻声问道"
+  },
+  {
+    "id": 3,
+    "text": "\"公司出事了。\"",
+    "context_before": "她是苏夜的同事",
+    "context_after": "林雪脸色凝重"
+  },
+  {
+    "id": 4,
+    "text": "\"他们怎么知道这里有异能者？\"",
+    "context_before": "说是要找什么异能者",
+    "context_after": "苏夜眉头一皱"
+  },
+  {
+    "id": 5,
+    "text": "\"苏夜，你的能力又变强了！\"",
+    "context_before": "形成了一个小小的电场",
+    "context_after": "林雪惊讶地说道"
+  },
+  {
+    "id": 6,
+    "text": "\"苏夜，来会议室一趟。\"",
+    "context_before": "办公桌上的电话突然响起",
+    "context_after": "是部门经理老陈的声音"
+  },
+  {
+    "id": 7,
+    "text": "\"苏先生，我们是暗影会的调查员。\"",
+    "context_before": "会议室里已经坐着三个人",
+    "context_after": "一个黑衣人开口了"
+  },
+  {
+    "id": 8,
+    "text": "\"我不知道你们在说什么。我只是一个普通的程序员。\"",
+    "context_before": "最近我们检测到这个区域有异能波动",
+    "context_after": "苏夜面色平静地回答"
+  },
+  {
+    "id": 9,
+    "text": "\"普通程序员？那我们检测到的电流波动怎么解释？\"",
+    "context_before": "苏夜心中一惊",
+    "context_after": "另一个黑衣人冷笑一声"
+  },
+  {
+    "id": 10,
+    "text": "\"我们会继续调查的。\"",
+    "context_before": "两个黑衣人交换了一个眼神",
+    "context_after": "为首的黑衣人说道"
+  },
+  {
+    "id": 11,
+    "text": "\"苏夜，你到底卷入了什么事？\"",
+    "context_before": "两人便离开了会议室",
+    "context_after": "张总长叹一声"
+  },
+  {
+    "id": 12,
+    "text": "\"张总，我保证我没有做任何违法的事。\"",
+    "context_before": "张总脸色不太好看",
+    "context_after": "苏夜诚恳地说道"
+  },
+  {
+    "id": 13,
+    "text": "\"苏夜，快来老地方！有重要的事情！\"",
+    "context_before": "晚上，苏夜接到了林雪的电话",
+    "context_after": "林雪的声音有些急促"
+  },
+  {
+    "id": 14,
+    "text": "\"苏夜，你好。我是华夏异能者联盟的负责人。\"",
+    "context_before": "那男子约莫四十岁，身材高大",
+    "context_after": "赵天行伸出手"
+  },
+  {
+    "id": 15,
+    "text": "\"华夏异能者联盟？\"",
+    "context_before": "仿佛体内燃烧着一团火焰",
+    "context_after": "苏夜握了握手，惊讶地发现"
+  },
+  {
+    "id": 16,
+    "text": "\"那你能帮我吗？\"",
+    "context_before": "致力于保护觉醒者不受暗影会的迫害",
+    "context_after": "苏夜眼中闪过一丝希望"
+  },
+  {
+    "id": 17,
+    "text": "\"我愿意。\"",
+    "context_before": "但你必须接受我们的训练",
+    "context_after": "苏夜毫不犹豫地说道"
+  },
+  {
+    "id": 18,
+    "text": "\"苏夜，我也加入了联盟。以后我们一起战斗！\"",
+    "context_before": "赵天行满意地笑了",
+    "context_after": "林雪也开口说道"
+  },
+  {
+    "id": 19,
+    "text": "\"很好！你的进步很快，已经达到了初级异能者的水平。\"",
+    "context_before": "在空气中形成一道道电弧",
+    "context_after": "赵天行拍手称赞"
+  },
+  {
+    "id": 20,
+    "text": "\"暗影会的人来了！\"",
+    "context_before": "警报声突然响起",
+    "context_after": "一个联盟成员冲进来大声喊道"
+  },
+  {
+    "id": 21,
+    "text": "\"暗影鼠辈，也敢在我的地盘撒野！\"",
+    "context_before": "火焰瞬间蔓延开来",
+    "context_after": "赵天行怒喝道"
+  },
+  {
+    "id": 22,
+    "text": "\"没想到这里还有别的异能者！\"",
+    "context_after": "黑衣人惊呼道",
+    "context_before": "苏夜趁机释放出一道电弧"
+  },
+  {
+    "id": 23,
+    "text": "\"干得好，苏夜！你的电流攻击非常精准！\"",
+    "context_before": "三个黑衣人迅速消失在夜色中",
+    "context_after": "赵天行转过身，对苏夜竖起大拇指"
+  },
+  {
+    "id": 24,
+    "text": "\"太危险了。\"",
+    "context_before": "苏夜主动请缨",
+    "context_after": "林雪反对道"
+  },
+  {
+    "id": 25,
+    "text": "\"他们在研究如何抽取异能者的能力！\"",
+    "context_before": "墙壁上挂满了异能者的照片",
+    "context_after": "苏夜震惊地暗道"
+  },
+  {
+    "id": 26,
+    "text": "\"这不是科学，这是犯罪！\"",
+    "context_before": "博士冷声喝道",
+    "context_after": "苏夜怒喝道"
+  },
+  {
+    "id": 27,
+    "text": "\"苏夜，你这次立了大功。\"",
+    "context_before": "战斗结束后，联盟取得了全面胜利",
+    "context_after": "赵天行拍着苏夜的肩膀说道"
+  },
+  {
+    "id": 28,
+    "text": "\"苏夜，你太棒了！\"",
+    "context_before": "林雪走过来，眼中满是喜悦",
+    "context_after": ""
+  },
+  {
+    "id": 29,
+    "text": "\"无论前方有什么困难，我们都会一起面对！\"",
+    "context_before": "林雪点头",
+    "context_after": ""
+  },
+  {
+    "id": 30,
+    "text": "\"为了守护这个世界！\"",
+    "context_before": "三只手紧紧握在一起",
+    "context_after": "三人齐声说道"
+  }
+]

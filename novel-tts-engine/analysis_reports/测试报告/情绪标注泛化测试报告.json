@@ -1,0 +1,147 @@
+{
+  "total": 30,
+  "correct": 8,
+  "incorrect": 22,
+  "accuracy": 0.2667,
+  "per_emotion_f1": {
+    "anger": 0,
+    "fear": 0.4,
+    "joy": 0.2,
+    "neutral": 0.3636,
+    "surprise": 0
+  },
+  "errors": [
+    {
+      "id": 1,
+      "text": "\"苏夜，你在这里！\"",
+      "expected": "surprise",
+      "predicted": "neutral"
+    },
+    {
+      "id": 3,
+      "text": "\"公司出事了。\"",
+      "expected": "fear",
+      "predicted": "neutral"
+    },
+    {
+      "id": 4,
+      "text": "\"他们怎么知道这里有异能者？\"",
+      "expected": "surprise",
+      "predicted": "neutral"
+    },
+    {
+      "id": 5,
+      "text": "\"苏夜，你的能力又变强了！\"",
+      "expected": "surprise",
+      "predicted": "neutral"
+    },
+    {
+      "id": 8,
+      "text": "\"我不知道你们在说什么。我只是一个普通的程序员。\"",
+      "expected": "neutral",
+      "predicted": "surprise"
+    },
+    {
+      "id": 9,
+      "text": "\"普通程序员？那我们检测到的电流波动怎么解释？\"",
+      "expected": "anger",
+      "predicted": "neutral"
+    },
+    {
+      "id": 11,
+      "text": "\"苏夜，你到底卷入了什么事？\"",
+      "expected": "neutral",
+      "predicted": "surprise"
+    },
+    {
+      "id": 13,
+      "text": "\"苏夜，快来老地方！有重要的事情！\"",
+      "expected": "fear",
+      "predicted": "neutral"
+    },
+    {
+      "id": 15,
+      "text": "\"华夏异能者联盟？\"",
+      "expected": "surprise",
+      "predicted": "neutral"
+    },
+    {
+      "id": 16,
+      "text": "\"那你能帮我吗？\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    },
+    {
+      "id": 17,
+      "text": "\"我愿意。\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    },
+    {
+      "id": 18,
+      "text": "\"苏夜，我也加入了联盟。以后我们一起战斗！\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    },
+    {
+      "id": 19,
+      "text": "\"很好！你的进步很快，已经达到了初级异能者的水平。\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    },
+    {
+      "id": 20,
+      "text": "\"暗影会的人来了！\"",
+      "expected": "fear",
+      "predicted": "neutral"
+    },
+    {
+      "id": 21,
+      "text": "\"暗影鼠辈，也敢在我的地盘撒野！\"",
+      "expected": "anger",
+      "predicted": "neutral"
+    },
+    {
+      "id": 22,
+      "text": "\"没想到这里还有别的异能者！\"",
+      "expected": "surprise",
+      "predicted": "neutral"
+    },
+    {
+      "id": 23,
+      "text": "\"干得好，苏夜！你的电流攻击非常精准！\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    },
+    {
+      "id": 25,
+      "text": "\"他们在研究如何抽取异能者的能力！\"",
+      "expected": "surprise",
+      "predicted": "neutral"
+    },
+    {
+      "id": 26,
+      "text": "\"这不是科学，这是犯罪！\"",
+      "expected": "anger",
+      "predicted": "neutral"
+    },
+    {
+      "id": 27,
+      "text": "\"苏夜，你这次立了大功。\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    },
+    {
+      "id": 29,
+      "text": "\"无论前方有什么困难，我们都会一起面对！\"",
+      "expected": "joy",
+      "predicted": "surprise"
+    },
+    {
+      "id": 30,
+      "text": "\"为了守护这个世界！\"",
+      "expected": "joy",
+      "predicted": "neutral"
+    }
+  ]
+}

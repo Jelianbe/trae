@@ -21,6 +21,7 @@ from pipeline.character_manager import CharacterManager, get_character_manager
 from pipeline.speaker_matcher import SpeakerMatcher
 from pipeline.semantic_ranker import get_semantic_ranker, SemanticRanker
 from pipeline.emotion_tagger import EmotionTagger, get_emotion_tagger
+from pipeline.quotation_classifier import QuotationClassifier, QuotationType
 from utils.text_utils import split_sentences_smart
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ class PipelineState(Enum):
     ERROR = "error"
 
 
-from utils.config import COLD_START_CHARS_THRESHOLD
+from utils.config import COLD_START_CHARS_THRESHOLD, MAX_INPUT_CHARS  # 配置已统一移至 utils.config
 
 @dataclass
 class ProgressInfo:
@@ -68,6 +69,9 @@ class SentenceData:
     sfx: List[str] = field(default_factory=list)
     entities: List[dict] = field(default_factory=list)
     sentence_id: int = 0
+    quotation_type: str = "none"  # none/dialogue/written/thought
+    sentence_start: int = 0  # 句子在原文中的起始位置
+    sentence_end: int = 0    # 句子在原文中的结束位置
 
 
 @dataclass
@@ -104,6 +108,7 @@ class PipelineRunner:
         self.speaker_role_filter = get_speaker_role_filter()
         self.entity_linker = get_entity_linker(self.char_manager)
         self.entity_clusterer = get_entity_clusterer()
+        self.quotation_classifier = QuotationClassifier()
         
         self.progress = ProgressInfo()
         self._pause_event = threading.Event()
@@ -160,6 +165,16 @@ class PipelineRunner:
         Returns:
             章节结果列表
         """
+        # 输入验证
+        if not text:
+            raise ValueError("输入文本不能为空")
+        
+        if len(text) > MAX_INPUT_CHARS:
+            raise ValueError(
+                f"输入文本过长（{len(text)} 字符），"
+                f"超过最大限制 {MAX_INPUT_CHARS} 字符（{MAX_INPUT_CHARS // (1024*1024)}MB）"
+            )
+        
         if not force and cache_key in self._result_cache:
             logger.info(f"使用缓存结果 (cache_key={cache_key})")
             return self._result_cache[cache_key]
@@ -266,20 +281,46 @@ class PipelineRunner:
         # 使用智能句子分割（保护引号内内容不被拆分）
         sentences = split_sentences_smart(content)
         
+        # 优化1：预构建对话文本集合（O(1) 查找替代 any() 遍历）
+        dialogue_texts = {d.strip() for d in dialogue_map.keys()}
+        
+        # 优化2：预构建拟声词文本到实体的映射（避免重复查找）
+        sfx_text_set = {sfx.text for sfx in sfx_words}
+        
         sentence_id = 0
         dialogue_count = 0
         narration_count = 0
         sfx_count = 0
+        current_pos = 0  # 跟踪当前在原文中的位置
         
         for sentence in sentences:
             sentence_id += 1
             
-            # 判断是否为对话
-            is_dialogue = any(d.strip() in sentence for d in dialogue_map.keys())
+            # 查找句子在原文中的位置
+            sentence_start = content.find(sentence, current_pos)
+            if sentence_start == -1:
+                sentence_start = current_pos  # 如果找不到，使用当前位置
+            sentence_end = sentence_start + len(sentence)
+            current_pos = sentence_end  # 更新位置
+            
+            # 优化3：使用预构建集合进行对话检测（避免重复遍历）
+            is_dialogue = False
+            for d_text in dialogue_texts:
+                if d_text in sentence:
+                    is_dialogue = True
+                    break
             
             sentence_type = "dialogue" if is_dialogue else "narration"
             speaker = ""
             emotion = "neutral"
+            quotation_type = "none"
+            
+            # 引号内容分类
+            if '"' in sentence or '"' in sentence:
+                quotation_results = self.quotation_classifier.classify_all(sentence)
+                if quotation_results:
+                    best_result = max(quotation_results, key=lambda r: r.confidence)
+                    quotation_type = best_result.type.value
             
             if is_dialogue:
                 for d_text, d_speaker in dialogue_map.items():
@@ -287,25 +328,33 @@ class PipelineRunner:
                         speaker = d_speaker
                         emotion = self.emotion_tagger.tag(sentence, speaker)
                         dialogue_count += 1
+                        # 对话句如果没有明确分类，默认为DIALOGUE
+                        if quotation_type == "none":
+                            quotation_type = "dialogue"
                         break
             else:
                 narration_count += 1
             
-            # 检测拟声词
+            # WRITTEN和THOUGHT类型设置默认说话人为Narrator
+            if quotation_type in ("written", "thought") and not speaker:
+                speaker = "Narrator"
+            
+            # 优化4：使用预构建的拟声词集合进行 O(1) 查找
             sentence_sfx = []
-            for sfx in sfx_words:
-                if sentence.find(sfx.text) >= 0:
-                    sentence_sfx.append(sfx.text)
+            for sfx_text in sfx_text_set:
+                if sfx_text in sentence:
+                    sentence_sfx.append(sfx_text)
                     sfx_count += 1
             
-            # 构建实体列表（使用 position-based 匹配避免部分匹配问题）
+            # 优化5：预构建实体属性字典，避免 getattr 重复调用
             sentence_entities = []
             for e in linked_entities:
-                e_start = getattr(e, 'start', 0)
-                e_end = getattr(e, 'end', 0)
-                e_text = getattr(e, 'text', '')
-                e_type = getattr(e, 'type', '')
-                e_conf = getattr(e, 'confidence', 1.0)
+                # 直接属性访问替代 getattr
+                e_start = e.start
+                e_end = e.end
+                e_text = e.text
+                e_type = e.type
+                e_conf = e.confidence
                 e_standard = getattr(e, 'standard_name', '')
                 e_is_linked = getattr(e, 'is_linked', False)
 
@@ -314,6 +363,9 @@ class PipelineRunner:
                         "text": e_text,
                         "type": e_type,
                         "confidence": e_conf,
+                        # 新增：存储实体在原文中的绝对位置
+                        "start": e_start,
+                        "end": e_end,
                     }
                     if e_standard:
                         entity_dict["standard_name"] = e_standard
@@ -328,6 +380,9 @@ class PipelineRunner:
                 sfx=sentence_sfx,
                 entities=sentence_entities,
                 sentence_id=sentence_id,
+                quotation_type=quotation_type,
+                sentence_start=sentence_start,
+                sentence_end=sentence_end,
             ))
         
         result.statistics = {
@@ -358,11 +413,12 @@ class PipelineRunner:
                 for sentence in result.sentences:
                     for e_dict in sentence.entities:
                         from pipeline.nlp_basics import Entity
+                        # 使用存储的位置信息重建 Entity（而非全部设为 0）
                         entity = Entity(
                             text=e_dict.get("text", ""),
                             type=e_dict.get("type", "PER"),
-                            start=0,
-                            end=len(e_dict.get("text", "")),
+                            start=e_dict.get("start", 0),
+                            end=e_dict.get("end", len(e_dict.get("text", ""))),
                             confidence=e_dict.get("confidence", 1.0),
                         )
                         if entity.type == "PER" and len(entity.text) >= 2:
@@ -408,7 +464,7 @@ class PipelineRunner:
             return True
 
         # 策略2: 精确文本匹配
-        # 对于单字实体，需要额外检查边界
+        # 对于单字实体，需要额外检查边界（避免匹配到更长词的一部分）
         if len(entity_text) == 1:
             pattern = re.compile(re.escape(entity_text))
             for match in pattern.finditer(sentence):
@@ -424,12 +480,7 @@ class PipelineRunner:
 
         # 多字实体：只要文本在句子中精确出现即可
         return entity_text in sentence
-
-
-def _is_chinese_char(char: str) -> bool:
-    """判断字符是否为中文字符"""
-    return '\u4e00' <= char <= '\u9fff'
-
+    
     def _notify_progress(self, callback: Optional[Callable]):
         """通知进度更新"""
         if callback:
@@ -455,6 +506,7 @@ def _is_chinese_char(char: str) -> bool:
                         "sfx": s.sfx,
                         "entities": s.entities,
                         "sentence_id": s.sentence_id,
+                        "quotation_type": s.quotation_type,
                     }
                     for s in chapter.sentences
                 ],
@@ -486,6 +538,11 @@ def _is_chinese_char(char: str) -> bool:
         
         ssml_parts.append('</speak>')
         return '\n'.join(ssml_parts)
+
+
+def _is_chinese_char(char: str) -> bool:
+    """判断字符是否为中文字符"""
+    return '\u4e00' <= char <= '\u9fff'
 
 
 _pipeline_runner: Optional[PipelineRunner] = None

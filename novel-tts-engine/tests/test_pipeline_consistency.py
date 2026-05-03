@@ -164,92 +164,233 @@ class TestPipelineConsistency:
     
     def test_mis_merged_entity_detection(self):
         """
-        测试：误合并检测能正确识别"人名+动词"误合并
+        测试：结构压缩率检测能正确识别误合并实体
         
-        场景：
-        1. 创建"萧炎冷"实体（长度>=3，末端是动词）
-        2. 创建"萧炎"实体（高频，出现>=5次）
+        场景（v2方案 - 零硬编码）：
+        1. 创建"萧炎"实体（高频，出现267次，右邻字多样）
+        2. 创建"萧炎冷"实体（低频，只出现1次，右邻字单一）
         3. 运行误合并检测
-        4. 验证"萧炎冷"被标记为误合并
+        4. 验证"萧炎冷"被标记为误合并（1 < 267*0.1=26.7，右邻字=1≤2）
         """
         validator = ContextDiversityValidator(mode='speaker_role', whitelist=set())
         
-        # 创建实体
         entities = [
             Entity(text="萧炎", type="PER", start=0, end=2, confidence=0.9),
             Entity(text="萧炎冷", type="PER", start=0, end=3, confidence=0.9),
         ]
         
-        # 模拟统计信息（"萧炎"出现267次）
         stats = {
             "萧炎": {
                 "occurrences": 267,
                 "right_neighbors": set(['说', '问', '笑', '道']),
-                "boundary_hit_templates": 0,
-                "boundary_hit_total": 0,
-                "co_occurrence_count": 0,
-                "co_occurrence_entities": [],
-                "chapter_count": 10,
-                "chapter_set": set(range(10)),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 10,
+                'chapter_set': set(range(10)),
             },
             "萧炎冷": {
                 "occurrences": 1,
                 "right_neighbors": set(['笑']),
-                "boundary_hit_templates": 0,
-                "boundary_hit_total": 0,
-                "co_occurrence_count": 0,
-                "co_occurrence_entities": [],
-                "chapter_count": 1,
-                "chapter_set": {0},
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 1,
+                'chapter_set': {0},
             },
         }
         
-        # 运行误合并检测
         mis_merged = validator._detect_mis_merged_entities(entities, stats, "测试文本")
         
         # 验证："萧炎冷"应该被标记为误合并
         assert "萧炎冷" in mis_merged, \
             f"误合并检测失败：'萧炎冷'应该被标记"
         
-        # 验证："萧炎"不应该被标记
         assert "萧炎" not in mis_merged, \
             f"误合并检测错误：'萧炎'不应该被标记"
+    
+    def test_mis_merged_detection_catches_arbitrary_suffix(self):
+        """
+        测试：v2方案能检测任意后缀的误合并（不依赖硬编码词表）
+        
+        场景：
+        1. 创建"萧炎承"实体（"承"不在旧SINGLE_CHAR_VERBS中）
+        2. 验证仍能被检测为误合并（通过结构压缩率）
+        """
+        validator = ContextDiversityValidator(mode='speaker_role', whitelist=set())
+        
+        entities = [
+            Entity(text="萧炎", type="PER", start=0, end=2, confidence=0.9),
+            Entity(text="萧炎承", type="PER", start=0, end=3, confidence=0.9),
+        ]
+        
+        stats = {
+            "萧炎": {
+                "occurrences": 267,
+                "right_neighbors": set(['说', '问', '笑', '道']),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 10,
+                'chapter_set': set(range(10)),
+            },
+            "萧炎承": {
+                "occurrences": 1,
+                "right_neighbors": set(['道']),  # '道'是对话引导词
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 1,
+                'chapter_set': {0},
+            },
+        }
+        
+        mis_merged = validator._detect_mis_merged_entities(entities, stats, "测试文本")
+        
+        # 验证："萧炎承"应该被标记为误合并
+        assert "萧炎承" in mis_merged, \
+            f"v2方案应该能检测任意后缀的误合并"
     
     def test_real_name_not_flagged_as_mis_merged(self):
         """
         测试：真实人名不会被误标记为误合并
         
-        场景：
-        1. 创建"陈承喏"实体（真实人名，右邻字多样）
-        2. 运行误合并检测
-        3. 验证不被标记为误合并
+        场景（v2.2方案 - 对话引导词检测）：
+        1. 创建"陈承喏"实体（真实人名，出现15次，右邻字多样）
+        2. 前缀"陈"出现50次
+        3. 右邻字主要是普通词汇（说、道、问、的），不满足50%是对话引导词
+        4. 验证不被标记为误合并
         """
         validator = ContextDiversityValidator(mode='speaker_role', whitelist=set())
         
         entities = [
+            Entity(text="陈", type="PER", start=0, end=1, confidence=0.9),
             Entity(text="陈承喏", type="PER", start=0, end=3, confidence=0.9),
         ]
         
-        # 模拟统计信息（"陈承喏"出现多次，右邻字多样）
         stats = {
+            "陈": {
+                "occurrences": 50,
+                "right_neighbors": set(['说', '道', '的', '是']),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 10,
+                'chapter_set': set(range(10)),
+            },
             "陈承喏": {
-                "occurrences": 10,
-                "right_neighbors": set(['说', '道', '问', '的', '了']),
-                "boundary_hit_templates": 0,
-                "boundary_hit_total": 0,
-                "co_occurrence_count": 0,
-                "co_occurrence_entities": [],
-                "chapter_count": 5,
-                "chapter_set": set(range(5)),
+                "occurrences": 15,
+                "right_neighbors": set(['说', '道', '问', '的']),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 5,
+                'chapter_set': set(range(5)),
             },
         }
         
-        # 运行误合并检测
         mis_merged = validator._detect_mis_merged_entities(entities, stats, "测试文本")
         
         # 验证："陈承喏"不应该被标记为误合并
         assert "陈承喏" not in mis_merged, \
             f"误合并检测错误：'陈承喏'是真实人名，不应该被标记"
+    
+    def test_nalan_su_not_flagged_as_mis_merged(self):
+        """
+        测试：纳兰肃不会被误标记为误合并（v2.2修复）
+        
+        场景：
+        1. "纳兰肃"出现1次，前缀"纳兰"出现81次
+        2. 右邻字={'你', '有'}，都不是对话引导词
+        3. dialogue_ratio=0/2=0% < 50% → 不满足条件
+        4. 验证不被标记为误合并
+        """
+        validator = ContextDiversityValidator(mode='speaker_role', whitelist=set())
+        
+        entities = [
+            Entity(text="纳兰", type="PER", start=0, end=2, confidence=0.9),
+            Entity(text="纳兰肃", type="PER", start=0, end=3, confidence=0.9),
+        ]
+        
+        stats = {
+            "纳兰": {
+                "occurrences": 81,
+                "right_neighbors": set(['家', '的', '肃', '嫣', '然']),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 10,
+                'chapter_set': set(range(10)),
+            },
+            "纳兰肃": {
+                "occurrences": 1,
+                "right_neighbors": set(['你', '有']),  # 都不是对话引导词
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 1,
+                'chapter_set': {0},
+            },
+        }
+        
+        mis_merged = validator._detect_mis_merged_entities(entities, stats, "测试文本")
+        
+        # 验证："纳兰肃"不应该被标记为误合并
+        assert "纳兰肃" not in mis_merged, \
+            f"误合并检测错误：'纳兰肃'是真实人名，不应该被标记"
+    
+    def test_real_name_with_entity_freq_higher_than_prefix(self):
+        """
+        测试：实体出现次数高于前缀时，不应被误判
+        
+        场景：
+        1. "萧薰儿"出现8次
+        2. "萧薰"只出现3次（不是高频角色）
+        3. 实体次数 > 前缀次数，不应标记为误合并
+        """
+        validator = ContextDiversityValidator(mode='speaker_role', whitelist=set())
+        
+        entities = [
+            Entity(text="萧薰", type="PER", start=0, end=2, confidence=0.9),
+            Entity(text="萧薰儿", type="PER", start=0, end=3, confidence=0.9),
+        ]
+        
+        stats = {
+            "萧薰": {
+                "occurrences": 3,  # 低于5次阈值
+                "right_neighbors": set(['儿', '的']),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 3,
+                'chapter_set': set(range(3)),
+            },
+            "萧薰儿": {
+                "occurrences": 8,  # 高于前缀
+                "right_neighbors": set(['说', '道', '问']),
+                'boundary_hit_templates': 0,
+                'boundary_hit_total': 0,
+                'co_occurrence_count': 0,
+                'co_occurrence_entities': [],
+                'chapter_count': 5,
+                'chapter_set': set(range(5)),
+            },
+        }
+        
+        mis_merged = validator._detect_mis_merged_entities(entities, stats, "测试文本")
+        
+        # 验证："萧薰儿"不应该被标记为误合并
+        assert "萧薰儿" not in mis_merged, \
+            f"误合并检测错误：'萧薰儿'不应该被标记（出现次数高于前缀）"
 
 
 if __name__ == "__main__":
