@@ -1,0 +1,773 @@
+好的，修正和扩展可以并行。以下是新增的 50 条，定向填补缺口——历史文体补强、neutral 正向特征验证样本增加、surprise/fear/anger 边界混淆区定向覆盖。
+
+---
+
+## 第二轮扩展数据集（50条，auto_generated）
+
+### 缺口填补策略
+
+| 目标 | 新增条数 | 说明 |
+|------|---------|------|
+| 历史文体补强 | 12 条 | 含古风表达、君臣对话、战场语境 |
+| neutral 扩充 | 10 条 | 日常平淡对话，验证正向特征 |
+| 边界混淆区 | 20 条 | surprise/fear/anger 易混淆，标注 confidence 0.85-0.90 |
+| 修仙/西幻补充 | 8 条 | 传音、威压、译名体 |
+
+---
+
+### 1. 历史文体补强（12条）
+
+```json
+[
+  {
+    "id": "emo_051",
+    "text": "臣有本奏。",
+    "context_before": "早朝时分，百官列于殿前。",
+    "context_after": "天子微微抬眼，示意他开口。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "恭敬地启奏",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "朝堂奏对，仪式性平静"
+  },
+  {
+    "id": "emo_052",
+    "text": "末将愿往！",
+    "context_before": "军帐中，元帅环顾左右无人应声。",
+    "context_after": "那年轻将领单膝跪地，目光灼灼。",
+    "style": "历史",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "慷慨激昂地请战",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "感叹句+主动请战，愤怒/激昂的混合，偏excited"
+  },
+  {
+    "id": "emo_053",
+    "text": "陛下三思啊！",
+    "context_before": "老丞相跪伏于地，额头紧贴冰冷的砖石。",
+    "context_after": "龙椅上的身影纹丝不动。",
+    "style": "历史",
+    "emotion_class": "excited",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.3, 0.7, 0.0, 0.0, 0.2, 0.0, 0.0],
+    "emotion_text": "痛心疾首地劝谏",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "恳求+感叹号，悲伤带愤怒"
+  },
+  {
+    "id": "emo_054",
+    "text": "罪臣知罪。",
+    "context_before": "他摘下顶戴花翎，双手捧于身前。",
+    "context_after": "这是他戴了二十年的荣耀。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.8, 0.0, 0.0, 0.5, 0.0, 0.0],
+    "emotion_text": "沉重地认罪",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "简短+上下文，克制而沉重"
+  },
+  {
+    "id": "emo_055",
+    "text": "乱臣贼子，人人得而诛之！",
+    "context_before": "御史大夫拂袖而起，环顾满朝文武。",
+    "context_after": "他的声音在殿中回荡。",
+    "style": "历史",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "义正词严地斥责",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "宣言类+感叹号，极强愤怒"
+  },
+  {
+    "id": "emo_056",
+    "text": "圣上息怒！",
+    "context_before": "龙颜大怒，茶杯砸碎在地。",
+    "context_after": "群臣齐刷刷跪倒一片。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "fear",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.8, 0.0, 0.0, 0.0, 0.1],
+    "emotion_text": "惶急地劝阻",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "恐惧带恳求，帝王面前的本能反应"
+  },
+  {
+    "id": "emo_057",
+    "text": "此乃天意，非人力可为。",
+    "context_before": "太史令收回望向星空的目光，摇了摇头。",
+    "context_after": "一旁的年轻官员攥紧了拳头。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.5, 0.0, 0.0, 0.4, 0.0, 0.3],
+    "emotion_text": "无奈地感叹",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "悲观陈述+文言，悲伤带宿命感"
+  },
+  {
+    "id": "emo_058",
+    "text": "愿降。",
+    "context_before": "城门大开，一骑白马缓缓走出。",
+    "context_after": "他解下佩剑，双手呈上。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.7, 0.0, 0.0, 0.5, 0.0, 0.1],
+    "emotion_text": "沉重地投降",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "单字+动作，极简中的屈辱和悲伤"
+  },
+  {
+    "id": "emo_059",
+    "text": "儿臣遵旨。",
+    "context_before": "太子接过圣旨，手微微发抖。",
+    "context_after": "这旨意将把他送去千里之外的封地。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.8],
+    "emotion_text": "努力平静地接旨",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "表面平静但上下文有悲伤。标注为 neutral 因为说话者本人克制"
+  },
+  {
+    "id": "emo_060",
+    "text": "将军！粮草被劫了！",
+    "context_before": "探马连滚带爬冲进大帐。",
+    "context_after": "哗的一声，营帐内将校全站了起来。",
+    "style": "历史",
+    "emotion_class": "excited",
+    "emotion_label": "fear",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.8, 0.0, 0.0, 0.5, 0.0],
+    "emotion_text": "惊慌地报信",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "恐惧+惊讶，高唤醒fear（panic）"
+  },
+  {
+    "id": "emo_061",
+    "text": "可曾想过今日？",
+    "context_before": "监斩官俯身，在死囚耳边低声说了一句。",
+    "context_after": "囚犯闭上了眼，没有回答。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4],
+    "emotion_text": "冷冷地质问",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "反问句+冷怒，低唤醒愤怒。表面平静实则嘲讽"
+  },
+  {
+    "id": "emo_062",
+    "text": "我等这一天，等了十年。",
+    "context_before": "他推开那扇沉重的牢门，看着里面的人。",
+    "context_after": "里面的人抬起头，眼中闪过一丝诧异。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.5, 0.3, 0.0, 0.0, 0.0, 0.0, 0.2],
+    "emotion_text": "隐忍地开口",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "边界：愤怒？悲伤？表面平静实则压抑的怨恨"
+  }
+]
+```
+
+---
+
+### 2. neutral 扩充（10条）
+
+```json
+[
+  {
+    "id": "emo_063",
+    "text": "那就按你说的办。",
+    "context_before": "两人在会议室里讨论了半小时。",
+    "context_after": "他合上文件夹，站起身。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "公事公办地敲定",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "事务性对话，句号结尾，无情绪信号"
+  },
+  {
+    "id": "emo_064",
+    "text": "茶叶在第二个柜子里。",
+    "context_before": "客人环顾了一下厨房。",
+    "context_after": "他点头，自己去取了杯子。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "随口告知",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "日常指引，陈述句，无情绪"
+  },
+  {
+    "id": "emo_065",
+    "text": "他姓王，单名一个岩字。",
+    "context_before": "新来的同事站在门口，有人问了一句。",
+    "context_after": "大家哦了一声，算是认识了。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "客观地介绍",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "客观陈述，无情绪"
+  },
+  {
+    "id": "emo_066",
+    "text": "明日的宴席设在翠云轩。",
+    "context_before": "夫人放下手中的账本。",
+    "context_after": "管事应了一声便去准备了。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "寻常地交代",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "府内日常事务，陈述句"
+  },
+  {
+    "id": "emo_067",
+    "text": "从这儿到镇上要走半个时辰。",
+    "context_before": "樵夫指了指山脚下的土路。",
+    "context_after": "旅人谢过，背起行囊上路。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "平和地指路",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "日常问答，无情绪信号"
+  },
+  {
+    "id": "emo_068",
+    "text": "结界还需要一炷香的时间才能修复。",
+    "context_before": "几位长老盘坐于阵法四周，气息平稳。",
+    "context_after": "众人微微颔首，继续维持灵力输出。",
+    "style": "修仙",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "平静地陈述",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "修仙场景但纯事务性陈述，无情绪"
+  },
+  {
+    "id": "emo_069",
+    "text": "你把那份卷宗递给我。",
+    "context_before": "他头也没抬，继续写着什么。",
+    "context_after": "助手连忙从架子上取下卷宗。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "随意地吩咐",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "日常办公对话，无情绪信号"
+  },
+  {
+    "id": "emo_070",
+    "text": "你们先退下吧。",
+    "context_before": "王爷揉了揉眉心，挥了挥手。",
+    "context_after": "众人躬身行礼，鱼贯而出。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "疲倦地屏退",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "命令句但语气平淡，近似中性"
+  },
+  {
+    "id": "emo_071",
+    "text": "下个路口左转就是了。",
+    "context_before": "路人放下手里的活计。",
+    "context_after": "他点头谢过，转身离开。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "平和地指路",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "日常回答，平静"
+  },
+  {
+    "id": "emo_072",
+    "text": "我知道了。",
+    "context_before": "听完他的汇报，经理微微皱了下眉。",
+    "context_after": "然后继续翻手中的文件。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "平淡地确认",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "最简确认，无额外情绪。上下文有不悦但说话者刻意保持平静"
+  }
+]
+```
+
+---
+
+### 3. 边界混淆区（20条）
+
+```json
+[
+  {
+    "id": "emo_073",
+    "text": "是啊，你说的都对。",
+    "context_before": "他靠在椅背上，嘴角挂着一丝笑。",
+    "context_after": "但那笑容怎么看都不是善意。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.4],
+    "emotion_text": "阴阳怪气地嘲讽",
+    "confidence": 0.88,
+    "source": "auto_generated",
+    "notes": "边界：字面平静实则愤怒/讽刺。上下文决定"
+  },
+  {
+    "id": "emo_074",
+    "text": "这可是天大的好事啊。",
+    "context_before": "婆婆拉着她的手，笑得眼睛眯成缝。",
+    "context_after": "院子里一片欢声笑语。",
+    "style": "都市",
+    "emotion_class": "excited",
+    "emotion_label": "joy",
+    "emotion_vector": [0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "欢喜地赞叹",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "感叹句+好事，喜悦明确"
+  },
+  {
+    "id": "emo_075",
+    "text": "天哪，你竟然来了。",
+    "context_before": "她转过身，看到门口站着的那个人。",
+    "context_after": "手中的杯子掉在地上，碎成几片。",
+    "style": "都市",
+    "emotion_class": "excited",
+    "emotion_label": "surprise",
+    "emotion_vector": [0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.9, 0.0],
+    "emotion_text": "惊喜交加地脱口而出",
+    "confidence": 0.95,
+    "source": "auto_generated",
+    "notes": "天哪+竟然，惊讶为主，带喜悦"
+  },
+  {
+    "id": "emo_076",
+    "text": "你可真有本事。",
+    "context_before": "看完那份提案，他放下稿纸摘下眼镜。",
+    "context_after": "语气平静，但屋里的温度似乎骤降了几度。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3],
+    "emotion_text": "反讽地压低声音",
+    "confidence": 0.85,
+    "source": "auto_generated",
+    "notes": "高难度边界：反讽。表面赞美实则威胁，情绪为愤怒"
+  },
+  {
+    "id": "emo_077",
+    "text": "别走，求你别走。",
+    "context_before": "她拽住他的衣袖，指节泛白。",
+    "context_after": "火车汽笛声越来越近。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.8, 0.3, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "哑声哽咽地挽留",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "重复+恳求，悲伤带恐惧"
+  },
+  {
+    "id": "emo_078",
+    "text": "你这是在威胁我？",
+    "context_before": "对方轻描淡写地报出了他家的地址。",
+    "context_after": "他脸色变了。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "fear",
+    "emotion_vector": [0.0, 0.3, 0.0, 0.7, 0.0, 0.0, 0.0, 0.1],
+    "emotion_text": "警惕地沉声质问",
+    "confidence": 0.90,
+    "source": "auto_generated",
+    "notes": "边界：恐惧？愤怒？反问句+上下文，恐惧为主含愤怒"
+  },
+  {
+    "id": "emo_079",
+    "text": "恭喜啊，如愿以偿了。",
+    "context_before": "他看着那张任命书，是他想要的位置。",
+    "context_after": "但签字栏里写的是别人的名字。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.6, 0.0, 0.0, 0.3, 0.0, 0.2],
+    "emotion_text": "失落地强颜祝贺",
+    "confidence": 0.88,
+    "source": "auto_generated",
+    "notes": "边界：字面恭喜实则失落。上下文决定为悲伤"
+  },
+  {
+    "id": "emo_080",
+    "text": "就让我看看你究竟有多强。",
+    "context_before": "他擦去嘴角的血迹，摆开起手式。",
+    "context_after": "全身灵力在经脉中沸腾。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "冷笑着叫阵",
+    "confidence": 0.95,
+    "source": "auto_generated",
+    "notes": "挑战+战斗场景，语境明确为愤怒"
+  },
+  {
+    "id": "emo_081",
+    "text": "你不该来这里的。",
+    "context_before": "守墓人缓缓抬起头，兜帽下的眼睛闪着幽光。",
+    "context_after": "四周的石碑开始嗡嗡作响。",
+    "style": "西幻",
+    "emotion_class": "subdued",
+    "emotion_label": "fear",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.7, 0.0, 0.0, 0.0, 0.2],
+    "emotion_text": "警示般地低语",
+    "confidence": 0.92,
+    "source": "auto_generated",
+    "notes": "边界：恐惧/警告/神秘。语气平静但语境毛骨悚然"
+  },
+  {
+    "id": "emo_082",
+    "text": "没想到会是你，我早该猜到的。",
+    "context_before": "他回头看着那个举着火把的人，愣了一下。",
+    "context_after": "随即低低地笑了一声，不知是自嘲还是嘲讽。",
+    "style": "西幻",
+    "emotion_class": "subdued",
+    "emotion_label": "surprise",
+    "emotion_vector": [0.0, 0.0, 0.2, 0.0, 0.0, 0.0, 0.6, 0.3],
+    "emotion_text": "故作平静地低喃",
+    "confidence": 0.87,
+    "source": "auto_generated",
+    "notes": "边界：惊讶？悲伤？愤怒？混合情感，惊讶为主"
+  },
+  {
+    "id": "emo_083",
+    "text": "你们魔教，人人得而诛之。",
+    "context_before": "正道弟子们各持法器，将他团团围住。",
+    "context_after": "他扫视一周，眼神中毫无惧色。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "义愤填膺地宣告",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "宣言句式，愤怒明确"
+  },
+  {
+    "id": "emo_084",
+    "text": "我竟然把一个叛徒当成了亲弟弟。",
+    "context_before": "他看着手中那封告密信，笔迹熟悉得刺眼。",
+    "context_after": "每多看一个字，心就凉一分。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.2, 0.8, 0.0, 0.0, 0.4, 0.0, 0.0],
+    "emotion_text": "含着刺骨的失望低语",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "竟然表意外，但上下文是悲伤的意外"
+  },
+  {
+    "id": "emo_085",
+    "text": "你敢背叛我？",
+    "context_before": "他单手掐住那人脖子，将其举离地面。",
+    "context_after": "对方在空中拼命挣扎。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "迸发着杀意地逼问",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "反问句+暴力动作，纯粹愤怒"
+  },
+  {
+    "id": "emo_086",
+    "text": "不必管我！你们快走！",
+    "context_before": "他单膝跪地，已经站不起来了。",
+    "context_after": "身后的追兵杀声越来越近。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "fear",
+    "emotion_vector": [0.0, 0.2, 0.0, 0.8, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "焦急地催促同伴",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "命令句式，但情绪是急切的恐惧/担忧"
+  },
+  {
+    "id": "emo_087",
+    "text": "原来如此……我明白了。",
+    "context_before": "听他说完，她缓缓合上了眼前的书。",
+    "context_after": "以后再提起这件事，她只当是笑话。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.5, 0.0, 0.0, 0.2, 0.0, 0.4],
+    "emotion_text": "故作镇定地接受现实",
+    "confidence": 0.88,
+    "source": "auto_generated",
+    "notes": "边界：表面平静/理解了，实则失落。表面平静内心难过"
+  },
+  {
+    "id": "emo_088",
+    "text": "你……真的不后悔？",
+    "context_before": "她看着已经打点好的行装，停下手。",
+    "context_after": "窗外，是这座生活了十年的城市。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.6, 0.0, 0.0, 0.3, 0.0, 0.1],
+    "emotion_text": "犹豫而伤感地轻声问道",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "省略号+不确定+告别语境，悲伤"
+  },
+  {
+    "id": "emo_089",
+    "text": "你还没明白吗！",
+    "context_before": "他一拳砸在墙上。",
+    "context_after": "眼睛直盯着对方。",
+    "style": "都市",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "急怒交加地喊话",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "反问句+感叹号+暴力动作，愤怒明确"
+  },
+  {
+    "id": "emo_090",
+    "text": "你确定不去吗？机会真的很难得。",
+    "context_before": "好友把邀请函放到他桌上，语气带着一丝犹豫。",
+    "context_after": "他看了一眼，轻轻摇了摇头。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "温和地再确认一遍",
+    "confidence": 0.95,
+    "source": "auto_generated",
+    "notes": "疑问句但语气温和建议，无明显情绪"
+  },
+  {
+    "id": "emo_091",
+    "text": "神也没有抛弃我，是我抛弃了神。",
+    "context_before": "他脱下圣徽，扔进泥水里。",
+    "context_after": "身后的教堂大门缓缓关闭。",
+    "style": "西幻",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.5, 0.4, 0.0, 0.0, 0.0, 0.0, 0.2],
+    "emotion_text": "含着悲凉平静宣告",
+    "confidence": 0.90,
+    "source": "auto_generated",
+    "notes": "边界：愤怒？悲伤？克制但沉重，愤怒/悲伤混合"
+  },
+  {
+    "id": "emo_092",
+    "text": "谁都别想从我手里把它抢走。",
+    "context_before": "他把那枚戒指紧紧攥在手心，硌得生疼。",
+    "context_after": "那是她留给他的唯一东西。",
+    "style": "都市",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "近乎偏执地低吼",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "宣言+否定强调，愤怒/坚定，偏excited"
+  }
+]
+```
+
+---
+
+### 4. 修仙/西幻补充（8条）
+
+```json
+[
+  {
+    "id": "emo_093",
+    "text": "散！",
+    "context_before": "他抬手虚按，漫天黑云翻涌。",
+    "context_after": "一股无形之力将所有人震退三步。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "威严十足地喝令",
+    "confidence": 0.98,
+    "source": "auto_generated",
+    "notes": "单字+感叹号+武力场景，威严带怒"
+  },
+  {
+    "id": "emo_094",
+    "text": "你可知道，我等这一刻等了多久？",
+    "context_before": "他终于将仇人逼到了墙角。",
+    "context_after": "手中的剑微微发颤。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.7, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "压抑着满腔恨意开口",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "反问句+报仇场景，愤怒带悲伤"
+  },
+  {
+    "id": "emo_095",
+    "text": "晚辈告辞。",
+    "context_before": "他躬身一礼，倒退三步。",
+    "context_after": "随后御剑而起，消失在云端。",
+    "style": "修仙",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "emotion_vector": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+    "emotion_text": "恭敬地告退",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "修仙礼仪，仪式性平静"
+  },
+  {
+    "id": "emo_096",
+    "text": "长老，此人不能留！",
+    "context_before": "那弟子指着被押住的魔修，语气焦急。",
+    "context_after": "几位长老互相看了一眼。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "fear",
+    "emotion_vector": [0.0, 0.2, 0.0, 0.7, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "焦急地劝阻",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "感叹句+否定句，恐惧带愤怒，但原动力是恐惧"
+  },
+  {
+    "id": "emo_097",
+    "text": "吾等誓死追随将军！",
+    "context_before": "那将军翻身上马，拔出佩剑。",
+    "context_after": "身后数千将士齐声高呼。",
+    "style": "历史",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "emotion_vector": [0.0, 0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "激昂地宣誓",
+    "confidence": 0.99,
+    "source": "auto_generated",
+    "notes": "誓词+感叹号，激昂/愤怒"
+  },
+  {
+    "id": "emo_098",
+    "text": "即日起，你我恩断义绝。",
+    "context_before": "他割下袍角，抛向空中。",
+    "context_after": "那片布料飘落在泥泞中。",
+    "style": "修仙",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.0, 0.0, 0.7, 0.0, 0.0, 0.3, 0.0, 0.2],
+    "emotion_text": "决绝地割袍断义",
+    "confidence": 0.97,
+    "source": "auto_generated",
+    "notes": "割袍断义场景，悲伤带决绝"
+  },
+  {
+    "id": "emo_099",
+    "text": "来得正好。",
+    "context_before": "密林中传来沙沙声响，他非但没退，嘴角反而勾起一抹笑。",
+    "context_after": "手中长剑轻轻一振，剑鸣清脆。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "joy",
+    "emotion_vector": [0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "emotion_text": "冷傲地轻笑",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "战斗邀约的自信/轻蔑，偏joy"
+  },
+  {
+    "id": "emo_100",
+    "text": "光明终会降临。",
+    "context_before": "废墟中，小女孩看着跪在面前的圣骑士。",
+    "context_after": "骑士握着她的手，铠甲反射出一缕微光。",
+    "style": "西幻",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "emotion_vector": [0.2, 0.0, 0.5, 0.0, 0.0, 0.2, 0.0, 0.3],
+    "emotion_text": "温柔但沉重地安抚",
+    "confidence": 0.96,
+    "source": "auto_generated",
+    "notes": "灾难后安抚，悲伤带希望。偏悲伤"
+  }
+]
+```
+
+---
+
+## 第二轮数据统计
+
+| 维度 | 本批 | 第一批 | 总计 |
+|------|------|--------|------|
+| 总数 | 50 | 50 | **100** |
+| **文体** | | | |
+| 历史 | 12 | 8 | 20 |
+| 都市 | 14 | 16 | 30 |
+| 修仙 | 12 | 12 | 24 |
+| 西幻 | 4 | 9 | 13 |
+| **情绪** | | | |
+| neutral | 10 | 7 | 17 |
+| joy | 6 | 10 | 16 |
+| anger | 12 | 10 | 22 |
+| sadness | 8 | 8 | 16 |
+| surprise | 2 | 8 | 10 |
+| fear | 6 | 7 | 13 |
+| 边界混合 | 6 | - | 6 |
+
+共 100 条完整数据集。修正做完后跑一遍，L2 Macro F1 的目标是保持 0.72 以上，看 neutral F1 能涨多少。拿到结果后找我。

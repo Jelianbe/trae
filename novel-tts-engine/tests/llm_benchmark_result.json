@@ -1,0 +1,367 @@
+{
+  "model": "Qwen2.5-1.5B-Instruct",
+  "total_time": 59.8,
+  "avg_time_per_item": 1.2,
+  "macro_f1": 0.722,
+  "accuracy": 0.76,
+  "f1_by_class": {
+    "joy": 0.947,
+    "anger": 0.741,
+    "sadness": 0.824,
+    "surprise": 0.4,
+    "fear": 0.545,
+    "neutral": 0.875
+  },
+  "predictions": [
+    {
+      "id": "emo_001",
+      "text": "你给我滚出去！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_002",
+      "text": "混蛋！你怎么能这样！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_003",
+      "text": "放肆！谁给你的胆子！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_004",
+      "text": "滚开！别烦我！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_005",
+      "text": "以神之名，净化你！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_006",
+      "text": "萧炎，你太放肆了！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_007",
+      "text": "三十年河东，三十年河西！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_008",
+      "text": "这次让你死无葬身之地！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_009",
+      "text": "你背叛了整个帝国！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_010",
+      "text": "你这是自寻死路！",
+      "gt": "anger",
+      "pred": "anger",
+      "correct": true
+    },
+    {
+      "id": "emo_011",
+      "text": "哈哈哈，太好了！",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_012",
+      "text": "太好了，我们赢了！",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_013",
+      "text": "哈哈哈，这就是你的力量？",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_014",
+      "text": "这简直是完美的！",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_015",
+      "text": "这可真是大喜事啊！",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_016",
+      "text": "哼，就这点本事？",
+      "gt": "joy",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_017",
+      "text": "这就是我梦寐以求的天级功法！",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_018",
+      "text": "冠军！我们是冠军！",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_019",
+      "text": "你终于回来了。",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_020",
+      "text": "我们竟然真的做到了。",
+      "gt": "joy",
+      "pred": "joy",
+      "correct": true
+    },
+    {
+      "id": "emo_021",
+      "text": "天哪！龙竟然复活了！",
+      "gt": "surprise",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_022",
+      "text": "怎么可能会有这种事？",
+      "gt": "surprise",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_023",
+      "text": "药老，您还活着！",
+      "gt": "surprise",
+      "pred": "surprise",
+      "correct": true
+    },
+    {
+      "id": "emo_024",
+      "text": "这……这是什幺？",
+      "gt": "surprise",
+      "pred": "surprise",
+      "correct": true
+    },
+    {
+      "id": "emo_025",
+      "text": "难道是你？怎么会！",
+      "gt": "surprise",
+      "pred": "neutral",
+      "correct": false
+    },
+    {
+      "id": "emo_026",
+      "text": "太可怕了！斗皇的气息！",
+      "gt": "surprise",
+      "pred": "fear",
+      "correct": false
+    },
+    {
+      "id": "emo_027",
+      "text": "你竟然还记得我。",
+      "gt": "surprise",
+      "pred": "sadness",
+      "correct": false
+    },
+    {
+      "id": "emo_028",
+      "text": "难道太子殿下真的……",
+      "gt": "surprise",
+      "pred": "sadness",
+      "correct": false
+    },
+    {
+      "id": "emo_029",
+      "text": "唉，这一切都结束了……",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_030",
+      "text": "不……不要离开我……",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_031",
+      "text": "父亲……我对不起你……",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_032",
+      "text": "呜呜呜，我好难过",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_033",
+      "text": "怎会如此……我的儿啊……",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_034",
+      "text": "我连最后一面都没见到……",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_035",
+      "text": "你走吧，趁我还没后悔。",
+      "gt": "sadness",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_036",
+      "text": "我们……回不去了。",
+      "gt": "sadness",
+      "pred": "sadness",
+      "correct": true
+    },
+    {
+      "id": "emo_037",
+      "text": "别过来！求你别过来！",
+      "gt": "fear",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_038",
+      "text": "我害怕……你别伤害我",
+      "gt": "fear",
+      "pred": "fear",
+      "correct": true
+    },
+    {
+      "id": "emo_039",
+      "text": "他浑身发抖，连剑都拿不稳",
+      "gt": "fear",
+      "pred": "fear",
+      "correct": true
+    },
+    {
+      "id": "emo_040",
+      "text": "恐怖的气息，是斗皇！",
+      "gt": "fear",
+      "pred": "fear",
+      "correct": true
+    },
+    {
+      "id": "emo_041",
+      "text": "你……你不要过来！",
+      "gt": "fear",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_042",
+      "text": "饶命……将军饶命……",
+      "gt": "fear",
+      "pred": "anger",
+      "correct": false
+    },
+    {
+      "id": "emo_043",
+      "text": "快跑！它醒了！",
+      "gt": "fear",
+      "pred": "neutral",
+      "correct": false
+    },
+    {
+      "id": "emo_044",
+      "text": "他走进了房间。",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    },
+    {
+      "id": "emo_045",
+      "text": "今天天气不错。",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    },
+    {
+      "id": "emo_046",
+      "text": "你吃饭了吗？",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    },
+    {
+      "id": "emo_047",
+      "text": "我愿意为你效忠。",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    },
+    {
+      "id": "emo_048",
+      "text": "走吧，我们回去。",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    },
+    {
+      "id": "emo_049",
+      "text": "这是清单上要采买的货物。",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    },
+    {
+      "id": "emo_050",
+      "text": "这条河去年还在这里。",
+      "gt": "neutral",
+      "pred": "neutral",
+      "correct": true
+    }
+  ]
+}

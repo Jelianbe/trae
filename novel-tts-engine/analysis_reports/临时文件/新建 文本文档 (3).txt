@@ -1,0 +1,353 @@
+好，直接开始。
+
+---
+
+## 第一步：重构 neutral 正向特征
+
+你当前的 neutral 逻辑是纯负向兜底——所有情绪得分都不够高就扔进 neutral。这导致 neutral 变成了垃圾桶。
+
+正确做法：给 neutral 独立的特征体系，让它和其他六种情绪公平竞争。
+
+### 修改位置
+
+`pipeline/emotion_extractor.py` 的 `classify()` 方法中，在现有各情绪加分逻辑之前，先构建 neutral 的正向特征。
+
+### 具体修改
+
+```python
+# === 新增：neutral 正向特征（在其他情绪加分之前执行） ===
+# 原则：neutral 不是垃圾桶。它有自己的文本特征。
+# 1. 句号结尾 + 无感叹号 → 平静信号
+# 2. 句子长度适中 → 日常对话特征
+# 3. 无情绪词命中 → 缺少情绪表达
+# 4. 日常词汇命中 → 问候/事务/陈述
+
+neutral_score = 0.0
+
+# 信号1：句号结尾，且无感叹号/问号
+if text.endswith('。') or text.endswith('.') or text.endswith('）') or text.endswith(') '):
+    if features.exclamation_count == 0 and features.question_count == 0:
+        neutral_score += 0.35
+
+# 信号2：句子长度在正常范围（6-25字），无情绪标点
+char_count = len(text)
+if 6 <= char_count <= 25 and features.exclamation_count == 0:
+    neutral_score += 0.20
+
+# 信号3：无任何情绪词命中
+has_any_emotion_word = (
+    features.has_dirty_words or 
+    features.has_emotion_verb or 
+    features.has_emotion_adverb or
+    features.is_exclamatory or
+    features.is_rhetorical or
+    features.is_imperative or
+    features.has_repetition
+)
+if not has_any_emotion_word:
+    neutral_score += 0.25
+
+# 信号4：日常词汇命中（问候、事务、陈述类）
+neutral_daily_words = [
+    '吃饭', '天气', '走吧', '回去', '茶叶', '柜子', '卷宗', '路口',
+    '退下', '告辞', '遵旨', '奏', '清单', '采买', '宴席', '路',
+    '知道', '明白', '了解', '确定', '安排', '准备', '按你说的',
+    '姓', '名', '单名', '可曾', '未曾', '可否',
+]
+for word in neutral_daily_words:
+    if word in text:
+        neutral_score += 0.08
+        break  # 命中一个即可，避免堆叠
+
+# 信号5：省略号出现在句末但无恐惧/悲伤语境
+# （"我知道了……" 类模糊中性）
+if features.ellipsis_count >= 1 and features.ellipsis_count <= 2:
+    if not (features.has_emotion_verb or features.has_dirty_words):
+        neutral_score += 0.10
+
+# 归一化 neutral 分数
+neutral_score = min(neutral_score, 0.85)
+
+# 写入 scores（覆盖原有的兜底 0.3）
+scores['neutral'] = neutral_score
+```
+
+### 关键变化
+
+| 维度 | 优化前 | 优化后 |
+|------|--------|--------|
+| neutral 分数来源 | 固定 0.3 兜底 | 动态 0.0-0.85，由特征决定 |
+| 句号结尾 | 无处理 | +0.35（无感叹号/问号时） |
+| 句子长度 | 无处理 | +0.20（6-25字且无感叹号） |
+| 无情绪词 | 无处理 | +0.25 |
+| 日常词汇 | 无处理 | +0.08 |
+| 短省略号 | 无处理 | +0.10 |
+
+### neutral 的决策逻辑变化
+
+```
+修改前：
+  所有情绪得分不足 → 归 neutral（垃圾桶）
+
+修改后：
+  neutral 有自己的得分 → 和其他 6 类公平竞争
+  谁的分数高就是谁
+  neutral 可以"赢"，也可以"输"
+```
+
+---
+
+## 第二步：降低情绪强度阈值
+
+当前 `best_score <= 0.35` 归 neutral。这个阈值在旧逻辑下是合理的（没信号就归 neutral），但在新逻辑下 neutral 已经有了正向得分，需要调整。
+
+```python
+# 修改前
+if best_score <= 0.35:
+    return 'neutral', 0.3
+
+# 修改后
+# neutral 已有正向分数，降低兜底阈值
+# 只有当所有情绪（包含 neutral）都极低时，才强制归 neutral
+if best_score <= 0.25:
+    return 'neutral', 0.3
+```
+
+---
+
+## 第三步：回滚部分精准补洞的关键词
+
+这不是否定你之前的优化——你把 anger 从 0.875 提到了 0.952，把 sadness 从 0.750 提到了 1.000。这些改动在 50 条测试集上有效，但方向是过拟合。
+
+**建议**：保留句式结构类的改动（这是通则），回退单一关键词类的改动（这是补丁），用重构后的 neutral 特征来弥补准确率。
+
+如果你暂时不想回退，至少做一件事：**把这次新增的关键词的功能视为临时补丁，等泛化性验证结果出来后，保留有效的、删除过拟合的。**
+
+---
+
+## 第四步：泛化性验证样本（20条）
+
+以下是 20 条**不在你前 100 条训练集覆盖范围内的泛化性挑战样本**。这些样本特意避开了你词表中已有的高频关键词，用来测试系统是不是真的学会了"通则"，还是只是记住了前 100 条。
+
+每条包含：对话文本、上下文、文体、GT 标注、挑战点说明。
+
+---
+
+### 泛化性验证集（20条，独立于前100条）
+
+```json
+[
+  {
+    "id": "gen_001",
+    "text": "把东西放下，然后出去。",
+    "context_before": "他头也不抬地写着什么。",
+    "context_after": "助手照做了。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "challenge": "祈使句结构但语气平淡。你的anger规则可能误触发（祈使句+感叹号），这里考验句式判断是否考虑有无感叹号"
+  },
+  {
+    "id": "gen_002",
+    "text": "这价格……不能再低了。",
+    "context_before": "摊主为难地搓着手。",
+    "context_after": "买主皱着眉头没说话。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "challenge": "省略号+否定句。fear规则可能误触发（省略号+否定），但这里是讨价还价的日常"
+  },
+  {
+    "id": "gen_003",
+    "text": "你确定能活着回来？",
+    "context_before": "队长抬眼看着主动请缨的新兵。",
+    "context_after": "新兵重重点头。",
+    "style": "都市",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "challenge": "反问句+生死话题。surprise/anger规则可能误触发，但这里是严肃的确认"
+  },
+  {
+    "id": "gen_004",
+    "text": "太阳晒得人睁不开眼。",
+    "context_before": "两人在路边的茶摊歇脚。",
+    "context_after": "远处官道上腾起一阵黄沙。",
+    "style": "历史",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "challenge": "纯描述性对话。无情绪词，考验neutral能否正确识别描述句"
+  },
+  {
+    "id": "gen_005",
+    "text": "也罢。",
+    "context_before": "听完对方的拒绝，他沉默了片刻。",
+    "context_after": "转过身，朝相反的方向去了。",
+    "style": "修仙",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "极短句+语气词。表面平静实则失落。上下文决定是悲伤"
+  },
+  {
+    "id": "gen_006",
+    "text": "你这剑，还差了些火候。",
+    "context_before": "老剑客看完弟子演示的剑招，背过手去。",
+    "context_after": "弟子收剑，表情微微僵住。",
+    "style": "修仙",
+    "emotion_class": "neutral",
+    "emotion_label": "neutral",
+    "challenge": "评价句。字面不温和但无攻击性。考验是否会被误标为anger"
+  },
+  {
+    "id": "gen_007",
+    "text": "你这样做，值得吗。",
+    "context_before": "他按住同伴的肩膀，看着对方手中的引爆器。",
+    "context_after": "同伴缓缓闭上了眼。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "反问句+句号结尾。字面是疑问但情绪是悲伤。考验情绪强度判断"
+  },
+  {
+    "id": "gen_008",
+    "text": "我的事，我自己扛。",
+    "context_before": "他推开好友递来的钱袋。",
+    "context_after": "站起身，头也不回地走了。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "challenge": "短句+句号+拒绝帮助。低唤醒愤怒（冷怒），考验subdued/anger识别"
+  },
+  {
+    "id": "gen_009",
+    "text": "你当真以为我怕你？",
+    "context_before": "他步步逼近，对方步步后退。",
+    "context_after": "一只手已经按在了刀柄上。",
+    "style": "西幻",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "challenge": "反问句+威胁语境。正常应为anger。考验句式+上下文的结合"
+  },
+  {
+    "id": "gen_010",
+    "text": "为什么偏偏是你……",
+    "context_before": "她看着叛徒名单上排在首位的那个名字。",
+    "context_after": "笔从手中滑落。",
+    "style": "修仙",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "省略号+疑问词。字面是疑问但情绪是悲伤/失望"
+  },
+  {
+    "id": "gen_011",
+    "text": "我何尝不想回去。",
+    "context_before": "他看着那封家书，手指轻轻摩挲着信封。",
+    "context_after": "窗外是异乡的月亮。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "反问句+句号。字面无情绪词但语境是深深的思念"
+  },
+  {
+    "id": "gen_012",
+    "text": "再来！",
+    "context_before": "他从地上爬起来，嘴角还挂着血。",
+    "context_after": "摆开架势，眼里反而有了笑。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "joy",
+    "challenge": "极短句+感叹号+战斗场景。可能是愤怒也可能是兴奋。上下文决定是joy"
+  },
+  {
+    "id": "gen_013",
+    "text": "失陪了。",
+    "context_before": "她起身，将椅子轻轻推回原位。",
+    "context_after": "走到门口时，脚步顿了一下。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "社交辞令+短句。表面平静实则难过。上下文有停顿"
+  },
+  {
+    "id": "gen_014",
+    "text": "今晚的月亮真圆啊。",
+    "context_before": "两人并肩坐在屋顶上，谁都没提明天的事。",
+    "context_after": "风轻轻吹过，她的发丝扫过他的手背。",
+    "style": "修仙",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "感叹句+美好事物。表面轻松但语境是离别前夕。上下文决定是悲伤"
+  },
+  {
+    "id": "gen_015",
+    "text": "你不欠我什么。",
+    "context_before": "他把她当年的欠条撕成两半。",
+    "context_after": "碎片飘落在地上。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "sadness",
+    "challenge": "否定句+句号。表面慷慨实则决绝的悲伤"
+  },
+  {
+    "id": "gen_016",
+    "text": "记着，别回头。",
+    "context_before": "他推了年轻人一把，指向密道出口。",
+    "context_after": "身后追兵的声音已经能听得见了。",
+    "style": "历史",
+    "emotion_class": "subdued",
+    "emotion_label": "fear",
+    "challenge": "祈使句+句号。命令句式但情绪是临别的担忧/恐惧"
+  },
+  {
+    "id": "gen_017",
+    "text": "你的刀慢了。",
+    "context_before": "他两指夹住劈来的刀刃。",
+    "context_after": "对方瞳孔骤缩。",
+    "style": "修仙",
+    "emotion_class": "excited",
+    "emotion_label": "joy",
+    "challenge": "评价句+战斗。表面陈述实则轻蔑/得意。joy（嘲讽）"
+  },
+  {
+    "id": "gen_018",
+    "text": "这算什么。",
+    "context_before": "他看着对方展示的战利品。",
+    "context_after": "嘴角微微一撇。",
+    "style": "都市",
+    "emotion_class": "excited",
+    "emotion_label": "joy",
+    "challenge": "反问句+轻视。情绪是轻蔑/不以为然"
+  },
+  {
+    "id": "gen_019",
+    "text": "你要拦我？",
+    "context_before": "他把玩着手中的匕首，抬眼看向挡在门前的人。",
+    "context_after": "匕首在指间转了一圈。",
+    "style": "都市",
+    "emotion_class": "excited",
+    "emotion_label": "anger",
+    "challenge": "反问句+威胁动作。危险但克制"
+  },
+  {
+    "id": "gen_020",
+    "text": "这件事，到此为止。",
+    "context_before": "他把一叠材料放进碎纸机。",
+    "context_after": "机器嗡嗡作响，纸屑飞溅。",
+    "style": "都市",
+    "emotion_class": "subdued",
+    "emotion_label": "anger",
+    "challenge": "短句+动作。"到此为止"表面平淡实则压抑的愤怒"
+  }
+]
+```
+
+---
+
+## 验证步骤
+
+1. 先按第一步修改 `emotion_extractor.py`
+2. 按第二步调整阈值
+3. 用前 100 条跑一遍，确认原有 case 没有大面积回退
+4. 用这 20 条泛化性样本跑一遍，统计准确率
+5. 告诉我结果（100条回归结果 + 20条泛化结果）
+
+如果 100 条 F1 保持在 0.85 以上，20 条泛化准确率在 0.65 以上，说明方向对了。如果 20 条泛化低于 0.5，说明句式特征也需要调整，但至少你是在做泛化而非补洞。

@@ -19,7 +19,10 @@ N_ZEROS = 5000
 # Whether to join sentences in paragraphs 1 and 3
 JOIN_SENTENCES = True
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+try:
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+except Exception:
+    device = 'cpu'
 
 texts = [(
 "[Kokoro](/kˈQkəɹQ/) is an open-weight series of small but powerful TTS models.",

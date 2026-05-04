@@ -21,6 +21,7 @@ from pipeline.character_manager import CharacterManager, get_character_manager
 from pipeline.speaker_matcher import SpeakerMatcher
 from pipeline.semantic_ranker import get_semantic_ranker, SemanticRanker
 from pipeline.emotion_tagger import EmotionTagger, get_emotion_tagger
+from pipeline.emotion_extractor import get_emotion_extractor  # 方案B：独立情绪提取模块
 from pipeline.quotation_classifier import QuotationClassifier, QuotationType
 from utils.text_utils import split_sentences_smart
 
@@ -72,6 +73,11 @@ class SentenceData:
     quotation_type: str = "none"  # none/dialogue/written/thought
     sentence_start: int = 0  # 句子在原文中的起始位置
     sentence_end: int = 0    # 句子在原文中的结束位置
+    # Index-TTS 2 三层标注体系
+    emotion_class: str = "neutral"  # L1: neutral / excited / subdued
+    emotion_vector: Optional[List[float]] = None  # L3: 8维向量
+    emotion_text: str = ""  # 情感软指令描述
+    emotion_intensity: float = 0.5  # 情绪强度 0.0~1.0
 
 
 @dataclass
@@ -292,6 +298,8 @@ class PipelineRunner:
         narration_count = 0
         sfx_count = 0
         current_pos = 0  # 跟踪当前在原文中的位置
+        prev_emotion = None  # 上下文情感传递：上一句的情绪标签
+        prev_confidence = 0.0  # 上下文情感传递：上一句的情绪置信度
         
         for sentence in sentences:
             sentence_id += 1
@@ -322,11 +330,40 @@ class PipelineRunner:
                     best_result = max(quotation_results, key=lambda r: r.confidence)
                     quotation_type = best_result.type.value
             
+            # 管道2（情绪）：从原始文本窗口提取情绪特征（方案B 双管道并行）
+            # 方案B 核心思想：情绪信号存在于原始文本中，不应等角色匹配完再标注
+            # 取句子前后 20 字上下文作为情绪提取窗口
+            emotion_extractor = get_emotion_extractor()
+            emotion_window_start = max(0, sentence_start - 20)
+            emotion_window_end = min(len(content), sentence_end + 20)
+            emotion_context = content[emotion_window_start:emotion_window_end]
+            emotion_result = emotion_extractor.classify(emotion_context, context_hint=prev_emotion, context_confidence=prev_confidence)
+            
+            # 从 EmotionResult 提取各层标注
+            emotion = emotion_result.emotion_label
+            emotion_class = emotion_result.emotion_class
+            emotion_vector = emotion_result.emotion_vector
+            emotion_text = emotion_result.emotion_text
+            emotion_intensity = emotion_result.intensity
+            emotion_conf = emotion_result.confidence
+            
             if is_dialogue:
                 for d_text, d_speaker in dialogue_map.items():
                     if d_text in sentence:
                         speaker = d_speaker
-                        emotion = self.emotion_tagger.tag(sentence, speaker)
+                        # 方案B 合并策略：
+                        # - 优先使用独立情绪提取器的结果（管道2）
+                        # - 如果 confidence >= 0.5，直接使用
+                        # - 否则与 emotion_tagger 的结果取高置信度者
+                        if emotion_conf >= 0.5:
+                            emotion = emotion_result.emotion_label
+                        else:
+                            # 双管道投票
+                            rule_emotion = self.emotion_tagger.tag(sentence, speaker)
+                            if rule_emotion != 'neutral':
+                                emotion = rule_emotion
+                            else:
+                                emotion = emotion_result.emotion_label
                         dialogue_count += 1
                         # 对话句如果没有明确分类，默认为DIALOGUE
                         if quotation_type == "none":
@@ -334,6 +371,9 @@ class PipelineRunner:
                         break
             else:
                 narration_count += 1
+                # 旁白句也使用情绪提取器
+                if emotion_conf >= 0.4:
+                    emotion = emotion_result.emotion_label
             
             # WRITTEN和THOUGHT类型设置默认说话人为Narrator
             if quotation_type in ("written", "thought") and not speaker:
@@ -380,7 +420,16 @@ class PipelineRunner:
                 quotation_type=quotation_type,
                 sentence_start=sentence_start,
                 sentence_end=sentence_end,
+                # Index-TTS 2 三层标注
+                emotion_class=emotion_class,
+                emotion_vector=emotion_vector,
+                emotion_text=emotion_text,
+                emotion_intensity=emotion_intensity,
             ))
+            
+            # 更新上下文情感传递
+            prev_emotion = emotion
+            prev_confidence = emotion_conf
         
         result.statistics = {
             "total_sentences": sentence_id,

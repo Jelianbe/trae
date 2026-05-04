@@ -2,51 +2,41 @@
 """TTS 音频生成器：将处理后的文本转换为音频文件
 
 本模块实现了从文本到音频的完整转换流程，支持：
-1. 多角色声音映射（不同角色使用不同声音）
-2. 情绪驱动的声音调整（语速、音调、音量变化）
-3. 音频文件导出（MP3 格式）
+1. Kokoro 离线 TTS（100+ 中文音色）
+2. 旁白/对话声线分离
+3. 多角色声音映射
+4. 情绪驱动的声音调整（预留接口）
+5. 音频文件导出 + 章节合并
 
-技术选型：Edge-TTS（免费在线 TTS 服务）
-优势：免费、多语言支持、无需本地模型
-劣势：需要网络连接
+技术选型：Kokoro 82M
+优势：离线、高质量、多音色、CPU 可运行
 """
 
 import os
 import asyncio
 import tempfile
+import logging
+import time
 from pathlib import Path
 from typing import Dict, Optional, List
 from dataclasses import dataclass, field
 import threading
 
 from pipeline.pipeline_runner import ChapterResult, SentenceData
+from pipeline.tts_kokoro import (
+    KokoroTTSGenerator,
+    get_kokoro_generator,
+    NARRATOR_VOICE,
+    ROLE_VOICE_MAP,
+    merge_audio_files,
+)
+
+logger = logging.getLogger(__name__)
 
 
-# 角色到 Edge-TTS 声音的映射
-# 声音列表参考：https://github.com/rany2/edge-tts
-VOICE_MAP: Dict[str, str] = {
-    "default": "zh-CN-XiaoxiaoNeural",      # 默认：年轻女性
-    "Narrator": "zh-CN-YunxiNeural",         # 旁白：年轻男性
-    # 角色声音映射（可根据需要扩展）
-    # "萧炎": "zh-CN-YunxiNeural",          # 年轻男性
-    # "药老": "zh-CN-YunjianNeural",        # 老年男性
-    # "女性角色": "zh-CN-XiaoyiNeural",     # 年轻女性（活泼）
-}
-
-# 情绪到声音参数的映射
-# 语速：相对百分比（Edge-TTS 支持 "+10%" 格式）
-# 音调：Hz 单位（Edge-TTS 要求 Hz 格式，如 "+10Hz"）
-# 音量：相对百分比
-EMOTION_VOICE_PARAMS: Dict[str, Dict[str, str]] = {
-    "neutral": {"rate": "+0%", "pitch": "+0Hz", "volume": "+0%"},
-    "joy": {"rate": "+10%", "pitch": "+10Hz", "volume": "+5%"},
-    "anger": {"rate": "+30%", "pitch": "+20Hz", "volume": "+20%"},
-    "sadness": {"rate": "-20%", "pitch": "-10Hz", "volume": "-10%"},
-    "surprise": {"rate": "+40%", "pitch": "+15Hz", "volume": "+10%"},
-    "fear": {"rate": "+20%", "pitch": "+5Hz", "volume": "+5%"},
-    "written": {"rate": "-10%", "pitch": "+0Hz", "volume": "+0%"},  # 书面内容：慢速念读
-    "thought": {"rate": "-15%", "pitch": "-5Hz", "volume": "-5%"},   # 内心独白：小声慢速
-}
+# 旁白固定参数（无情绪）
+NARRATOR_EMOTION = "neutral"
+NARRATOR_INTENSITY = "mild"
 
 
 @dataclass
@@ -56,48 +46,41 @@ class AudioSegment:
     speaker: str
     emotion: str
     audio_file: Path
-    duration_ms: int = 0  # 音频时长（毫秒）
+    duration_ms: int = 0
     quotation_type: str = "none"
+    sentence_type: str = "narration"  # "narration" / "dialogue"
 
 
 class TTSGenerator:
     """TTS 音频生成器
     
-    使用 Edge-TTS 服务将文本转换为音频。
-    支持角色声音映射和情绪驱动的声音调整。
+    使用 Kokoro 离线 TTS 将文本转换为音频。
+    旁白和对话使用不同音色，角色各有专属音色。
     """
     
     def __init__(self, voice_map: Optional[Dict[str, str]] = None):
-        """
-        Args:
-            voice_map: 自定义角色声音映射（可选）
-        """
         self.voice_map = {**VOICE_MAP, **(voice_map or {})}
         self._lock = threading.Lock()
+        self._kokoro: Optional[KokoroTTSGenerator] = None
     
-    def get_voice_for_speaker(self, speaker: str) -> str:
-        """
-        获取角色对应的 TTS 声音
-        
-        Args:
-            speaker: 角色名称
-        
-        Returns:
-            Edge-TTS 声音名称
-        """
-        return self.voice_map.get(speaker, self.voice_map["default"])
+    def _get_kokoro(self) -> KokoroTTSGenerator:
+        """懒加载 Kokoro 实例"""
+        if self._kokoro is None:
+            with self._lock:
+                if self._kokoro is None:
+                    self._kokoro = get_kokoro_generator()
+        return self._kokoro
     
-    def get_voice_params_for_emotion(self, emotion: str) -> Dict[str, str]:
+    def _get_voice_id(self, speaker: str, sentence_type: str) -> str:
         """
-        获取情绪对应的声音参数
+        获取音色ID
         
-        Args:
-            emotion: 情绪标签
-        
-        Returns:
-            声音参数字典（rate, pitch, volume）
+        旁白 -> NARRATOR_VOICE
+        对话 -> 角色映射 -> 默认男声
         """
-        return EMOTION_VOICE_PARAMS.get(emotion, EMOTION_VOICE_PARAMS["neutral"])
+        if sentence_type == "narration":
+            return NARRATOR_VOICE
+        return self._get_kokoro().get_voice_for_speaker(speaker)
     
     async def generate_audio_async(
         self,
@@ -105,39 +88,23 @@ class TTSGenerator:
         speaker: str = "default",
         emotion: str = "neutral",
         output_file: Optional[Path] = None,
+        sentence_type: str = "narration",
     ) -> Path:
-        """
-        异步生成音频（内部方法）
-        
-        Args:
-            text: 文本内容
-            speaker: 角色名称
-            emotion: 情绪标签
-            output_file: 输出文件路径（可选，默认临时文件）
-        
-        Returns:
-            输出音频文件路径
-        """
-        import edge_tts
-        
-        voice = self.get_voice_for_speaker(speaker)
-        params = self.get_voice_params_for_emotion(emotion)
+        """异步生成音频"""
+        kokoro = self._get_kokoro()
+        voice_id = self._get_voice_id(speaker, sentence_type)
         
         if output_file is None:
-            # 创建临时文件
-            fd, output_file = tempfile.mkstemp(suffix=".mp3")
+            fd, output_file = tempfile.mkstemp(suffix=".wav")
             os.close(fd)
             output_file = Path(output_file)
         
-        communicate = edge_tts.Communicate(
+        kokoro.generate_audio_to_file(
             text=text,
-            voice=voice,
-            rate=params["rate"],
-            pitch=params["pitch"],
-            volume=params["volume"],
+            voice_id=voice_id,
+            output_file=output_file,
+            emotion=emotion,
         )
-        
-        await communicate.save(str(output_file))
         
         return output_file
     
@@ -147,19 +114,9 @@ class TTSGenerator:
         speaker: str = "default",
         emotion: str = "neutral",
         output_file: Optional[Path] = None,
+        sentence_type: str = "narration",
     ) -> Path:
-        """
-        生成音频（同步包装器）
-        
-        Args:
-            text: 文本内容
-            speaker: 角色名称
-            emotion: 情绪标签
-            output_file: 输出文件路径（可选）
-        
-        Returns:
-            输出音频文件路径
-        """
+        """同步生成音频（包装器）"""
         if not text or not text.strip():
             raise ValueError("文本内容不能为空")
         
@@ -168,7 +125,7 @@ class TTSGenerator:
             asyncio.set_event_loop(loop)
             try:
                 return loop.run_until_complete(
-                    self.generate_audio_async(text, speaker, emotion, output_file)
+                    self.generate_audio_async(text, speaker, emotion, output_file, sentence_type)
                 )
             finally:
                 loop.close()
@@ -180,84 +137,89 @@ class TTSGenerator:
         sentence: SentenceData,
         output_dir: Path,
     ) -> AudioSegment:
-        """
-        从句子数据生成音频片段
+        """从句子数据生成音频片段"""
+        sentence_type = getattr(sentence, 'sentence_type', 'narration')
         
-        Args:
-            sentence: 句子数据
-            output_dir: 输出目录
-        
-        Returns:
-            音频片段
-        """
-        # 生成文件名：chapter_sentence.mp3
-        filename = f"sentence_{sentence.sentence_id:04d}.mp3"
+        filename = f"sentence_{sentence.sentence_id:04d}.wav"
         output_file = output_dir / filename
+        
+        emotion = sentence.emotion or NARRATOR_EMOTION
+        if sentence_type == "narration":
+            emotion = NARRATOR_EMOTION
         
         audio_file = self.generate_audio(
             text=sentence.text,
             speaker=sentence.speaker or "default",
-            emotion=sentence.emotion or "neutral",
+            emotion=emotion,
             output_file=output_file,
+            sentence_type=sentence_type,
         )
         
         return AudioSegment(
             text=sentence.text,
-            speaker=sentence.speaker or "default",
-            emotion=sentence.emotion or "neutral",
+            speaker=sentence.speaker or "narrator",
+            emotion=emotion,
             audio_file=audio_file,
             quotation_type=sentence.quotation_type,
+            sentence_type=sentence_type,
         )
     
     def generate_from_chapter(
         self,
         chapter_result: ChapterResult,
         output_dir: Optional[Path] = None,
-    ) -> List[AudioSegment]:
+        merge_output: bool = True,
+    ) -> Dict:
         """
         从章节结果生成完整音频
         
         Args:
             chapter_result: 章节处理结果
-            output_dir: 输出目录（可选，默认临时目录）
+            output_dir: 输出目录
+            merge_output: 是否合并为单个 MP3
         
         Returns:
-            音频片段列表
+            {"segments": [AudioSegment], "merged_file": Path 或 None}
         """
         if output_dir is None:
             output_dir = Path(tempfile.mkdtemp())
         
         output_dir.mkdir(parents=True, exist_ok=True)
-        
         audio_segments = []
+        wav_files = []
         
         for sentence in chapter_result.sentences:
             try:
                 segment = self.generate_from_sentence(sentence, output_dir)
                 audio_segments.append(segment)
+                wav_files.append(segment.audio_file)
             except Exception as e:
-                # 记录错误但继续处理其他句子
-                print(f"生成音频失败（句子 {sentence.sentence_id}）：{e}")
+                logger.error(f"生成音频失败（句子 {sentence.sentence_id}）：{e}")
                 continue
         
-        return audio_segments
+        merged_file = None
+        if merge_output and wav_files:
+            chapter_name = chapter_result.chapter_title or "unknown"
+            merged_name = f"{chapter_name.replace(' ', '_')}.mp3"
+            merged_path = output_dir.parent / merged_name
+            try:
+                merged_file = merge_audio_files(wav_files, merged_path)
+                logger.info(f"章节音频已合并: {merged_file}")
+            except Exception as e:
+                logger.error(f"合并音频失败: {e}")
+        
+        return {
+            "segments": audio_segments,
+            "merged_file": merged_file,
+            "wav_files": wav_files,
+        }
 
 
-# 全局实例管理
 _generator: Optional[TTSGenerator] = None
 _generator_lock = threading.Lock()
 
 
 def get_tts_generator(voice_map: Optional[Dict[str, str]] = None) -> TTSGenerator:
-    """
-    获取或创建全局 TTS 生成器实例（线程安全）
-    
-    Args:
-        voice_map: 自定义角色声音映射（可选）
-    
-    Returns:
-        TTS 生成器实例
-    """
     global _generator
     if _generator is None:
         with _generator_lock:
@@ -267,7 +229,6 @@ def get_tts_generator(voice_map: Optional[Dict[str, str]] = None) -> TTSGenerato
 
 
 def reset_tts_generator() -> None:
-    """重置全局 TTS 生成器实例，用于测试或重新初始化"""
     global _generator
     with _generator_lock:
         _generator = None

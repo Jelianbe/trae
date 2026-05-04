@@ -896,7 +896,15 @@ class NLPBasics:
             ent_type = ent.type
             name_len = len(name)
 
-            # 规则1：单字实体不可能是有效人名
+            # 规则1：单字实体处理
+            # - 在姓氏表中（如"苏"、"张"）→ 保留
+            # - 不在姓氏表中（如"哼"）→ 降级为 confidence=0.3
+            if name_len == 1:
+                if name not in SINGLE_CHAR_SURNAMES:
+                    ent.confidence = 0.3
+                filtered.append(ent)
+                continue
+            
             if name_len < 2:
                 continue
 
@@ -916,11 +924,11 @@ class NLPBasics:
                 if any(conn in name for conn in ['之', '的', '与', '和', '而', '但']):
                     continue
 
-            # 规则5：纯数字或字母+数字不是人名
+            # 规则5：纯数字或纯ASCII字母（英文名）过滤
             if name.isdigit():
                 continue
-            if name.replace('·', '').isalpha() and '·' not in name and name_len < 3:
-                # 可能是单字英文名，排除
+            # 只过滤纯ASCII字母的单字/双字实体（英文名如 "Tom", "Jo"）
+            if name.isascii() and name.isalpha() and name_len < 3:
                 continue
 
             filtered.append(ent)

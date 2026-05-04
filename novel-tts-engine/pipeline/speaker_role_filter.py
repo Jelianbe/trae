@@ -12,12 +12,21 @@ from pipeline.nlp_basics import NLPBasics, Entity, get_nlp
 
 
 class SpeakerRoleFilter:
-    """说话角色过滤器：只保留出现在对话引导词附近的实体"""
+    """说话角色过滤器：只保留出现在对话引导词附近的实体
     
-    # 对话引导词模式
-    DIALOGUE_PATTERNS = [
-        r'["\u201c]',  # 左引号
-    ]
+    2026-05-03 修复：
+    1. 支持更多引号类型（「」『』""等）
+    2. 新增高频实体保留机制：出现次数 >= 3 的 PER 实体即使未出现在对话上下文中也放行
+       （解决短文本/单章节场景下主要角色还没来得及说话就被过滤的问题）
+    """
+    
+    # 所有中文小说中常见的引号类型
+    # 标准双引号 ""
+    # 中文全角双引号 ""
+    # 日式/港台引号 「」
+    # 双层引号 『』
+    # 单引号 ''
+    QUOTE_CHARS = r'"\'\u201c\u201d\u2018\u2019\u300c\u300d\u300e\u300f'
     
     def __init__(self, semantic_ranker=None, l2_threshold=0.7):
         self.semantic_ranker = semantic_ranker
@@ -33,38 +42,36 @@ class SpeakerRoleFilter:
         - 模式2：引号后的上下文（如 ""少爷，您醒了。"老陈说道。"）
         - 模式3：引号中间的说话人提示（如 ""少爷，"老陈说道，"您醒了。"）
         - 模式4：引号后的"是XX的声音/话"（如 ""苏夜，来会议室一趟。"是老陈的声音。"）
+        
+        2026-05-03 修复：支持 「」『』 等更多引号类型
         """
         contexts = []
+        q = self.QUOTE_CHARS
+        qrange = f'[{q}]'
         
-        # 模式1：引号前的上下文（已有）
-        # 匹配左引号前的15字符窗口
-        pattern1 = re.compile(r'["\u201c].*?["\u201d]')
+        # 模式1：引号前的上下文（左引号前的15字符窗口）
+        pattern1 = re.compile(qrange + r'.*?' + qrange)
         for match in pattern1.finditer(text):
             start = match.start()
             context_window = text[max(0, start-15):start]
             contexts.append(context_window.strip())
         
-        # 模式2：引号后的上下文（新增）
-        # 匹配 "dialogue" 后面紧跟的 "XX说道"
-        pattern2 = re.compile(r'["\u201d]\s*([^，。！？\n]{2,10}?)(?:说道|问道|喊道|笑道|道|说)')
+        # 模式2：引号后的上下文（引号后紧跟的 "XX说道"）
+        pattern2 = re.compile(qrange + r'\s*([^，。！？\n]{2,10}?)(?:说道|问道|喊道|笑道|道|说)')
         for match in pattern2.finditer(text):
             speaker = match.group(1).strip()
             if speaker:
                 contexts.append(speaker)
         
-        # 模式3：引号中间的说话人提示（新增）
-        # 匹配 "dialogue，" XX说道，"dialogue"
-        pattern3 = re.compile(r'["\u201d]\s*，\s*([^，。！？\n]{2,10}?)(?:说道|问道|喊道|笑道|道|说)\s*[，,]\s*["\u201c]')
+        # 模式3：引号中间的说话人提示
+        pattern3 = re.compile(qrange + r'\s*，\s*([^，。！？\n]{2,10}?)(?:说道|问道|喊道|笑道|道|说)\s*[，,]\s*' + qrange)
         for match in pattern3.finditer(text):
             speaker = match.group(1).strip()
             if speaker:
                 contexts.append(speaker)
         
-        # 模式4：引号后的"是XX的声音/话"（新增）
-        # 匹配 "dialogue" 是 XX 的声音/话
-        # 兼容格式："苏夜，来会议室一趟。"是部门经理老陈的声音。
-        # 策略：提取右引号到"的声音"之间的文本，让NLP从中提取PER实体
-        pattern4 = re.compile(r'["\u201d]([^。！？\n]{1,30}?)的(?:声音|话)')
+        # 模式4：引号后的"是XX的声音/话"
+        pattern4 = re.compile(qrange + r'([^。！？\n]{1,30}?)的(?:声音|话)')
         for match in pattern4.finditer(text):
             context = match.group(1).strip()
             if context and '是' in context:
@@ -103,9 +110,7 @@ class SpeakerRoleFilter:
         - 对低频但多次出现在不同对话场景中的实体，通过L2提升置信度
         
         2026-05-02 修复：统计发现的实体（confidence=0.65）直接放行。
-        这些实体是通过discover_compound_entities从全文扫描中发现的，
-        已经经过了严格的统计验证（出现在对话引导词附近≥2次），
-        不需要再经过_dialogue_entities的二次过滤。
+        2026-05-03 修复：高频实体（出现次数>=3）即使未出现在对话上下文中也放行。
         """
         # 每次调用时重置状态，避免跨章节/跨文本的状态污染
         self._dialogue_entities = set()
@@ -114,17 +119,25 @@ class SpeakerRoleFilter:
         # 提取说话角色集合
         self._dialogue_entities = self._extract_dialogue_entities(text, nlp)
         
+        # 统计每个实体在全文中的出现次数（用于高频实体保留）
+        entity_freq = self._count_entity_frequency(entities, text)
+        
         filtered = []
         for e in entities:
-            # ORG/LOC处理已移除（2026-05-02 修正方案）
-            # nlp_basics.analyze() 现在只返回 PER 实体，无需再过滤
+            # 非PER实体直接放行
             if e.type != 'PER':
                 filtered.append(e)
                 continue
             
             # 2026-05-02 修复：统计发现的实体直接放行
-            # 这些实体已经通过discover_compound_entities的严格验证
             if getattr(e, 'confidence', 1.0) == 0.65:
+                filtered.append(e)
+                continue
+            
+            # 2026-05-03 修复：高频实体保留机制
+            # 出现次数 >= 3 的 PER 实体即使未出现在对话上下文中也放行
+            # （解决短文本/单章节场景下主要角色还没来得及说话就被过滤的问题）
+            if entity_freq.get(e.text, 0) >= 3:
                 filtered.append(e)
                 continue
             
@@ -141,6 +154,19 @@ class SpeakerRoleFilter:
             filtered.append(e)
         
         return filtered
+    
+    def _count_entity_frequency(self, entities: List[Entity], text: str) -> Dict[str, int]:
+        """统计每个实体在文本中的出现次数"""
+        freq = {}
+        for e in entities:
+            if e.type != 'PER':
+                continue
+            # 使用 re.finditer 精确计数
+            import re
+            pattern = re.compile(re.escape(e.text))
+            count = len(pattern.findall(text))
+            freq[e.text] = count
+        return freq
     
     def _apply_l2_boost(self, entity: Entity, full_text: str) -> float:
         """

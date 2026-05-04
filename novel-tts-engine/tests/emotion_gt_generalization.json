@@ -1,0 +1,22 @@
+[
+  {"id": "gen_001", "text": "把东西放下，然后出去。", "emotion_class": "neutral", "emotion_label": "neutral", "style": "都市", "challenge": "祈使句结构但语气平淡"},
+  {"id": "gen_002", "text": "这价格……不能再低了。", "emotion_class": "neutral", "emotion_label": "neutral", "style": "历史", "challenge": "省略号+否定句，讨价还价"},
+  {"id": "gen_003", "text": "你确定能活着回来？", "emotion_class": "neutral", "emotion_label": "neutral", "style": "都市", "challenge": "反问句+生死话题，严肃确认"},
+  {"id": "gen_004", "text": "太阳晒得人睁不开眼。", "emotion_class": "neutral", "emotion_label": "neutral", "style": "历史", "challenge": "纯描述性对话"},
+  {"id": "gen_005", "text": "也罢。", "emotion_class": "subdued", "emotion_label": "sadness", "style": "修仙", "challenge": "极短句+语气词，表面平静实则失落"},
+  {"id": "gen_006", "text": "你这剑，还差了些火候。", "emotion_class": "neutral", "emotion_label": "neutral", "style": "修仙", "challenge": "评价句，无攻击性"},
+  {"id": "gen_007", "text": "你这样做，值得吗。", "emotion_class": "subdued", "emotion_label": "sadness", "style": "都市", "challenge": "反问句+句号结尾，悲伤"},
+  {"id": "gen_008", "text": "我的事，我自己扛。", "emotion_class": "subdued", "emotion_label": "anger", "style": "都市", "challenge": "短句+拒绝帮助，冷怒"},
+  {"id": "gen_009", "text": "你当真以为我怕你？", "emotion_class": "excited", "emotion_label": "anger", "style": "西幻", "challenge": "反问句+威胁语境"},
+  {"id": "gen_010", "text": "为什么偏偏是你……", "emotion_class": "subdued", "emotion_label": "sadness", "style": "修仙", "challenge": "省略号+疑问词，悲伤/失望"},
+  {"id": "gen_011", "text": "我何尝不想回去。", "emotion_class": "subdued", "emotion_label": "sadness", "style": "历史", "challenge": "反问句+句号，思念"},
+  {"id": "gen_012", "text": "再来！", "emotion_class": "excited", "emotion_label": "joy", "style": "修仙", "challenge": "极短句+感叹号+战斗场景，兴奋"},
+  {"id": "gen_013", "text": "失陪了。", "emotion_class": "subdued", "emotion_label": "sadness", "style": "都市", "challenge": "社交辞令+短句，表面平静实则难过"},
+  {"id": "gen_014", "text": "今晚的月亮真圆啊。", "emotion_class": "subdued", "emotion_label": "sadness", "style": "修仙", "challenge": "感叹句+美好事物，离别前夕"},
+  {"id": "gen_015", "text": "你不欠我什么。", "emotion_class": "subdued", "emotion_label": "sadness", "style": "都市", "challenge": "否定句+句号，决绝的悲伤"},
+  {"id": "gen_016", "text": "记着，别回头。", "emotion_class": "subdued", "emotion_label": "fear", "style": "历史", "challenge": "祈使句+句号，临别的担忧/恐惧"},
+  {"id": "gen_017", "text": "你的刀慢了。", "emotion_class": "excited", "emotion_label": "joy", "style": "修仙", "challenge": "评价句+战斗，轻蔑/得意"},
+  {"id": "gen_018", "text": "这算什么。", "emotion_class": "excited", "emotion_label": "joy", "style": "都市", "challenge": "反问句+轻视，轻蔑/不以为然"},
+  {"id": "gen_019", "text": "你要拦我？", "emotion_class": "excited", "emotion_label": "anger", "style": "都市", "challenge": "反问句+威胁动作，危险但克制"},
+  {"id": "gen_020", "text": "这件事，到此为止。", "emotion_class": "subdued", "emotion_label": "anger", "style": "都市", "challenge": "短句+动作，压抑的愤怒"}
+]

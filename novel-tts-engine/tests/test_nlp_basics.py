@@ -160,11 +160,10 @@ class TestEntityExtraction:
         
         entities = nlp._extract_entities_from_pos(tokens)
         
-        assert len(entities) == 2
+        # 只保留 PER 类型实体（ORG/LOC 处理移除）
+        assert len(entities) == 1
         assert entities[0].text == "张三"
         assert entities[0].type == "PER"
-        assert entities[1].text == "北京"
-        assert entities[1].type == "LOC"
 
     def test_extract_entities_single_token(self):
         nlp = NLPBasics()
@@ -177,9 +176,9 @@ class TestEntityExtraction:
         
         entities = nlp._extract_entities_from_pos(tokens)
         
-        assert len(entities) == 2
+        # 只保留 PER 类型实体（ORG/LOC 处理移除）
+        assert len(entities) == 1
         assert entities[0].text == "张三"
-        assert entities[1].text == "北京"
 
 
 if __name__ == '__main__':
