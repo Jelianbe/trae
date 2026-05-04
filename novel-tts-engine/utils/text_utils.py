@@ -46,12 +46,13 @@ def _find_quote_boundaries(text: str) -> List[tuple]:
 
 def split_sentences_smart(text: str) -> List[str]:
     """
-    智能句子分割：避免将引号内的内容错误拆分。
+    智能句子分割：避免将引号内的内容错误拆分，支持换行符分隔。
     
     传统 split('[。！？]') 会把引号内的句子也拆开，
     例如："你好。"他说。 -> 会被拆成 ['"你好', '"他说']
     
     本函数会识别引号对，保护引号内的完整内容。
+    同时支持换行符作为句子分隔符（段落/场景切换）。
     
     Args:
         text: 需要分割的文本。
@@ -65,16 +66,33 @@ def split_sentences_smart(text: str) -> List[str]:
         
         >>> split_sentences_smart('第一章。苏夜醒来。他看了看四周。')
         ['第一章', '苏夜醒来', '他看了看四周']
+        
+        >>> split_sentences_smart('苏夜站在门口。\n「滚出去！」\n林雪愣住了。')
+        ['苏夜站在门口。', '「滚出去！」', '林雪愣住了。']
     """
     if not text or not text.strip():
         return []
     
-    # 找出所有引号边界
-    quote_boundaries = _find_quote_boundaries(text)
+    all_sentences = []
+    
+    lines = text.split('\n')
+    
+    for line in lines:
+        if not line.strip():
+            continue
+        
+        line_sentences = _split_line_smart(line.strip())
+        all_sentences.extend(line_sentences)
+    
+    return all_sentences
+
+
+def _split_line_smart(line: str) -> List[str]:
+    """对单行文本进行智能分割（保护引号内内容）"""
+    quote_boundaries = _find_quote_boundaries(line)
     
     if not quote_boundaries:
-        # 没有引号，使用简单分割
-        sentences = _SENTENCE_END_PATTERN.split(text)
+        sentences = _SENTENCE_END_PATTERN.split(line)
         result = []
         current = ""
         for part in sentences:
@@ -89,19 +107,16 @@ def split_sentences_smart(text: str) -> List[str]:
             result.append(current.strip())
         return result
     
-    # 有引号，需要保护引号内的内容
     sentences = []
     current = ""
     i = 0
-    text_len = len(text)
+    line_len = len(line)
     
-    while i < text_len:
-        char = text[i]
+    while i < line_len:
+        char = line[i]
         current += char
         
-        # 检查当前字符是否是句子结束标点
         if _SENTENCE_END_PATTERN.match(char):
-            # 检查当前位置是否在某个引号对内部
             in_quotes = False
             for q_start, q_end in quote_boundaries:
                 if q_start <= i < q_end:
@@ -109,14 +124,12 @@ def split_sentences_smart(text: str) -> List[str]:
                     break
             
             if not in_quotes:
-                # 不在引号内，可以拆分
                 if current.strip():
                     sentences.append(current.strip())
                 current = ""
         
         i += 1
     
-    # 处理剩余部分
     if current.strip():
         sentences.append(current.strip())
     

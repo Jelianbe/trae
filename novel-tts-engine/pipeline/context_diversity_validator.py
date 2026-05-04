@@ -39,73 +39,61 @@ class ContextDiversityValidator:
     - 共现对象为高置信度实体（白名单/高频实体）→ 额外加分
     """
     
+    BOUNDARY_PATTERNS = [
+        re.compile(r'(?P<name>.{1,4})说道'),
+        re.compile(r'(?P<name>.{1,4})问道'),
+        re.compile(r'(?P<name>.{1,4})喊道'),
+        re.compile(r'(?P<name>.{1,4})笑道'),
+        re.compile(r'(?P<name>.{1,4})淡淡道'),
+        re.compile(r'(?P<name>.{1,4})沉声道'),
+        re.compile(r'(?P<name>.{1,4})冷声道'),
+        re.compile(r'(?P<name>.{1,4})轻声道'),
+        re.compile(r'(?P<name>.{1,4})低声道'),
+        re.compile(r'(?P<name>.{1,4})道'),
+        re.compile(r'(?P<name>.{1,4})来到'),
+        re.compile(r'(?P<name>.{1,4})走出'),
+        re.compile(r'(?P<name>.{1,4})看着'),
+        re.compile(r'(?P<name>.{1,4})点了点头'),
+        re.compile(r'(?P<name>.{1,4})摇头'),
+        re.compile(r'(?P<name>.{1,4})皱眉'),
+        re.compile(r'(?P<name>.{1,4})转身'),
+        re.compile(r'(?P<name>.{1,4})站起'),
+        re.compile(r'(?P<name>.{1,4})坐下'),
+        re.compile(r'(?P<name>.{1,4})的[^\s]'),
+        re.compile(r'(?P<name>.{1,4})师兄'),
+        re.compile(r'(?P<name>.{1,4})师姐'),
+        re.compile(r'(?P<name>.{1,4})前辈'),
+        re.compile(r'(?P<name>.{1,4})大人'),
+        re.compile(r'(?P<name>.{1,4})长老'),
+        re.compile(r'(?P<name>.{1,4})老师'),
+    ]
+    
+    POSTFIX_PATTERNS_CANDIDATES = [
+        '尊', '皇', '帝', '主', '者', '王', '侯', '公', '伯', '将',
+        '尊者', '道人', '圣人', '之主', '大帝', '天尊', '真人',
+        '先生', '女士', '公子', '少爷', '姑娘', '小姐',
+        '前辈', '后辈', '长老', '宗主', '峰主', '岛主',
+    ]
+    
     def __init__(
         self,
         min_occurrences: int = 3,
         high_conf_threshold: int = 5,
         diversity_threshold: int = 2,
         whitelist: Optional[Set[str]] = None,
-        mode: str = 'general',  # 'general' 或 'speaker_role'
+        mode: str = 'general',
     ):
         self.mode = mode
         
-        # 根据模式调整阈值
         if mode == 'speaker_role':
-            # 说话角色模式：阈值降低，因为说话角色信号更强
-            self.min_occurrences = 2        # 说话角色出现2次即可
-            self.high_conf_threshold = 3     # 3次即认为高频
+            self.min_occurrences = 2
+            self.high_conf_threshold = 3
         else:
             self.min_occurrences = min_occurrences
             self.high_conf_threshold = high_conf_threshold
         
         self.diversity_threshold = diversity_threshold
-        self.whitelist = whitelist or set()  # 白名单实体（不受低频降级影响）
-        
-        # 通用实体统计发现：上下文边界词模板（2026-05-02）
-        # 这些模板由高频姓氏和固定语言使用习惯构成，是比具体词汇更通用的统计信号
-        self.BOUNDARY_PATTERNS = [
-            # 引导类：{候选词}说道/问道/喊道/笑道/淡淡道
-            re.compile(r'(?P<name>.{1,4})说道'),
-            re.compile(r'(?P<name>.{1,4})问道'),
-            re.compile(r'(?P<name>.{1,4})喊道'),
-            re.compile(r'(?P<name>.{1,4})笑道'),
-            re.compile(r'(?P<name>.{1,4})淡淡道'),
-            re.compile(r'(?P<name>.{1,4})沉声道'),
-            re.compile(r'(?P<name>.{1,4})冷声道'),
-            re.compile(r'(?P<name>.{1,4})轻声道'),
-            re.compile(r'(?P<name>.{1,4})低声道'),
-            re.compile(r'(?P<name>.{1,4})道'),
-            # 动作类：{候选词}来到/走出/看着/点了点头
-            re.compile(r'(?P<name>.{1,4})来到'),
-            re.compile(r'(?P<name>.{1,4})走出'),
-            re.compile(r'(?P<name>.{1,4})看着'),
-            re.compile(r'(?P<name>.{1,4})点了点头'),
-            re.compile(r'(?P<name>.{1,4})摇头'),
-            re.compile(r'(?P<name>.{1,4})皱眉'),
-            re.compile(r'(?P<name>.{1,4})转身'),
-            re.compile(r'(?P<name>.{1,4})站起'),
-            re.compile(r'(?P<name>.{1,4})坐下'),
-            # 所有格：{候选词}的/之
-            re.compile(r'(?P<name>.{1,4})的[^\s]'),
-            # 称呼类：{候选词}师兄/师姐/前辈/大人
-            re.compile(r'(?P<name>.{1,4})师兄'),
-            re.compile(r'(?P<name>.{1,4})师姐'),
-            re.compile(r'(?P<name>.{1,4})前辈'),
-            re.compile(r'(?P<name>.{1,4})大人'),
-            re.compile(r'(?P<name>.{1,4})长老'),
-            re.compile(r'(?P<name>.{1,4})老师'),
-        ]
-        
-        # 通用实体统计发现：构词法后缀候选集（2026-05-02）
-        # 预设跨体裁通用的高频人名后缀候选，供后缀自动发现时作为先验加速
-        self.POSTFIX_PATTERNS_CANDIDATES = [
-            # 单字后缀
-            '尊', '皇', '帝', '主', '者', '王', '侯', '公', '伯', '将',
-            # 双字后缀
-            '尊者', '道人', '圣人', '之主', '大帝', '天尊', '真人',
-            '先生', '女士', '公子', '少爷', '姑娘', '小姐',
-            '前辈', '后辈', '长老', '宗主', '峰主', '岛主',
-        ]
+        self.whitelist = whitelist or set()
     
     def validate(
         self,

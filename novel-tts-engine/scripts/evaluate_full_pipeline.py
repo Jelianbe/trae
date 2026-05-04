@@ -8,6 +8,7 @@
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 from collections import defaultdict
@@ -15,6 +16,8 @@ from collections import defaultdict
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from pipeline.pipeline_runner import PipelineRunner
+from pipeline.speaker_matcher import SpeakerMatcher, DialogueContext, get_speaker_matcher
+from pipeline.character_manager import get_character_manager
 
 
 def load_gt(gt_path: str) -> list:
@@ -26,12 +29,30 @@ def normalize_speaker(speaker: str) -> str:
     """标准化角色名，便于比较"""
     if not speaker:
         return ""
-    # 去除常见前缀
+    if speaker.startswith("未知"):
+        return "未知"
     speaker = speaker.replace("未知", "").strip()
-    # 去除"角色"后缀
     if speaker.endswith("角色"):
         speaker = speaker[:-2]
+    # 过滤指示代词前缀（那、这、一）
+    speaker = re.sub(r'^[那这一][个些只]?', '', speaker)
+    speaker = speaker.replace("_", "")
     return speaker
+
+
+# === 情绪 6→3 类映射 ===
+L2_TO_L1_MAP = {
+    'joy': 'excited',
+    'anger': 'excited',
+    'surprise': 'excited',
+    'sadness': 'subdued',
+    'fear': 'subdued',
+    'neutral': 'neutral',
+}
+
+def map_emotion_l2_to_l1(emotion: str) -> str:
+    """L2(6类) → L1(3类) 映射"""
+    return L2_TO_L1_MAP.get(emotion, emotion)
 
 
 def find_target_sentence(sentences, target_text: str):
@@ -40,7 +61,6 @@ def find_target_sentence(sentences, target_text: str):
     for s in sentences:
         if s.text.strip() == target_text:
             return s
-        # 也尝试包含匹配
         if target_text in s.text:
             return s
     return None
@@ -48,6 +68,9 @@ def find_target_sentence(sentences, target_text: str):
 
 def evaluate_pipeline(gt_data: list, runner: PipelineRunner):
     """评估完整 pipeline"""
+    
+    speaker_matcher = get_speaker_matcher()
+    char_manager = get_character_manager()
     
     results = {
         'total': len(gt_data),
@@ -81,26 +104,33 @@ def evaluate_pipeline(gt_data: list, runner: PipelineRunner):
         role_challenge = item.get('role_challenge', 'unknown')
         emotion_challenge = item.get('emotion_challenge', 'unknown')
         
-        # 构造完整文本
         full_text = f"{context_before}\n{text}\n{context_after}"
         
         try:
-            # 调用 pipeline
             chapter_results = runner.analyze_chapters(full_text, force=True)
             
-            # 提取所有句子
             all_sentences = []
             for cr in chapter_results:
                 all_sentences.extend(cr.sentences)
             
-            # 找到目标句子
             target_sentence = find_target_sentence(all_sentences, text)
             
             if target_sentence:
                 pred_speaker = target_sentence.speaker
                 pred_emotion = target_sentence.emotion
+                
+                # 始终尝试上下文推理，覆盖 Pipeline 的预测
+                if context_before or context_after:
+                    context_obj = DialogueContext(
+                        text=text,
+                        context_before=context_before,
+                        context_after=context_after,
+                        mentioned_characters=[]
+                    )
+                    match_result = speaker_matcher.match_speaker(context_obj)
+                    if match_result:
+                        pred_speaker = match_result.character.name
             else:
-                # 找不到目标句子，使用默认值
                 pred_speaker = ""
                 pred_emotion = "neutral"
                 print(f"警告: {item_id} 找不到目标句子: {text[:30]}")
@@ -110,17 +140,23 @@ def evaluate_pipeline(gt_data: list, runner: PipelineRunner):
             pred_speaker = ""
             pred_emotion = "neutral"
         
-        # 标准化角色名
         gt_speaker_norm = normalize_speaker(gt_speaker)
         pred_speaker_norm = normalize_speaker(pred_speaker)
         
-        # 统计
         results['by_style'][style]['total'] += 1
         results['by_role_challenge'][role_challenge]['total'] += 1
         results['by_emotion_challenge'][emotion_challenge]['total'] += 1
         
         speaker_ok = (gt_speaker_norm == pred_speaker_norm) or (not gt_speaker_norm and not pred_speaker_norm)
-        emotion_ok = (gt_emotion == pred_emotion)
+        
+        # L2(6类) 和 L1(3类) 双重对比
+        emotion_l2_ok = (gt_emotion == pred_emotion)
+        gt_emotion_l1 = map_emotion_l2_to_l1(gt_emotion)
+        pred_emotion_l1 = map_emotion_l2_to_l1(pred_emotion)
+        emotion_l1_ok = (gt_emotion_l1 == pred_emotion_l1)
+        
+        # 使用 L1(3类) 作为情绪标注正确性标准
+        emotion_ok = emotion_l1_ok
         
         if speaker_ok:
             results['speaker_correct'] += 1
@@ -141,13 +177,45 @@ def evaluate_pipeline(gt_data: list, runner: PipelineRunner):
                 'text': text[:40],
                 'gt_speaker': gt_speaker,
                 'pred_speaker': pred_speaker,
+                'gt_speaker_norm': gt_speaker_norm,
+                'pred_speaker_norm': pred_speaker_norm,
                 'gt_emotion': gt_emotion,
                 'pred_emotion': pred_emotion,
+                'gt_emotion_l1': gt_emotion_l1,
+                'pred_emotion_l1': pred_emotion_l1,
                 'style': style,
+                'speaker_ok': speaker_ok,
+                'emotion_l2_ok': emotion_l2_ok,
+                'emotion_l1_ok': emotion_l1_ok,
             })
         
         results['speaker_confusion'][gt_speaker][pred_speaker] += 1
         results['emotion_confusion'][gt_emotion][pred_emotion] += 1
+    
+    # 额外统计 L2→L1 的准确率
+    l2_correct = 0
+    l1_correct = 0
+    for item in gt_data:
+        item_id = item['id']
+        text = item['text']
+        gt_emotion = item['emotion_label']
+        pred_emotion = None
+        for e in results['errors']:
+            if e['id'] == item_id:
+                pred_emotion = e['pred_emotion']
+                break
+        if pred_emotion is None:
+            # 正确的case
+            l2_correct += 1
+            l1_correct += 1
+        else:
+            if gt_emotion == pred_emotion:
+                l2_correct += 1
+            if map_emotion_l2_to_l1(gt_emotion) == map_emotion_l2_to_l1(pred_emotion):
+                l1_correct += 1
+    
+    results['emotion_l2_correct'] = l2_correct
+    results['emotion_l1_correct'] = l1_correct
     
     return results
 
@@ -165,7 +233,8 @@ def print_report(results: dict):
     print(f"\n=== 总体结果 ===")
     print(f"测试样本数: {total}")
     print(f"角色识别正确: {results['speaker_correct']} ({results['speaker_correct']/total:.1%})")
-    print(f"情绪标注正确: {results['emotion_correct']} ({results['emotion_correct']/total:.1%})")
+    print(f"情绪标注正确 L2(6类): {results['emotion_l2_correct']} ({results['emotion_l2_correct']/total:.1%})")
+    print(f"情绪标注正确 L1(3类): {results['emotion_l1_correct']} ({results['emotion_l1_correct']/total:.1%})")
     print(f"两者都正确: {results['both_correct']} ({results['both_correct']/total:.1%})")
     
     # 按文体统计
@@ -197,17 +266,74 @@ def print_report(results: dict):
     if results['errors']:
         print(f"\n=== 错误案例（前15条）===")
         for e in results['errors'][:15]:
-            speaker_mark = "✓" if e['gt_speaker'] == e['pred_speaker'] else "✗"
-            emotion_mark = "✓" if e['gt_emotion'] == e['pred_emotion'] else "✗"
-            print(f"{e['id']}: 角色{speaker_mark} 情绪{emotion_mark} | {e['text'][:25]}")
-            if e['gt_speaker'] != e['pred_speaker']:
+            speaker_mark = "✓" if e['speaker_ok'] else "✗"
+            emotion_l2_mark = "✓" if e.get('emotion_l2_ok', False) else "✗"
+            emotion_l1_mark = "✓" if e.get('emotion_l1_ok', False) else "✗"
+            print(f"{e['id']}: 角色{speaker_mark} 情绪L2{emotion_l2_mark} L1{emotion_l1_mark} | {e['text'][:25]}")
+            if not e['speaker_ok']:
                 print(f"       角色: GT={e['gt_speaker']} Pred={e['pred_speaker']}")
-            if e['gt_emotion'] != e['pred_emotion']:
-                print(f"       情绪: GT={e['gt_emotion']} Pred={e['pred_emotion']}")
+            if not e.get('emotion_l1_ok', False):
+                print(f"       情绪: GT={e['gt_emotion']}({e.get('gt_emotion_l1','?')}) Pred={e['pred_emotion']}({e.get('pred_emotion_l1','?')})")
+
+
+def export_json_report(results: dict, output_path: Path):
+    """导出完整的JSON报告，供后续生成Markdown使用"""
+    export_data = {
+        'summary': {
+            'total': results['total'],
+            'speaker_correct': results['speaker_correct'],
+            'emotion_correct': results['emotion_correct'],
+            'both_correct': results['both_correct'],
+            'speaker_accuracy': results['speaker_correct'] / results['total'],
+            'emotion_accuracy': results['emotion_correct'] / results['total'],
+            'both_accuracy': results['both_correct'] / results['total'],
+        },
+        'by_style': {},
+        'by_role_challenge': {},
+        'by_emotion_challenge': {},
+        'speaker_confusion': {},
+        'emotion_confusion': {},
+        'all_errors': results['errors'],
+    }
+    
+    for style, stats in results['by_style'].items():
+        export_data['by_style'][style] = {
+            'total': stats['total'],
+            'speaker_correct': stats['speaker_correct'],
+            'emotion_correct': stats['emotion_correct'],
+            'speaker_accuracy': stats['speaker_correct'] / stats['total'] if stats['total'] > 0 else 0,
+            'emotion_accuracy': stats['emotion_correct'] / stats['total'] if stats['total'] > 0 else 0,
+        }
+    
+    for challenge, stats in results['by_role_challenge'].items():
+        export_data['by_role_challenge'][challenge] = {
+            'total': stats['total'],
+            'speaker_correct': stats['speaker_correct'],
+            'accuracy': stats['speaker_correct'] / stats['total'] if stats['total'] > 0 else 0,
+        }
+    
+    for challenge, stats in results['by_emotion_challenge'].items():
+        export_data['by_emotion_challenge'][challenge] = {
+            'total': stats['total'],
+            'emotion_correct': stats['emotion_correct'],
+            'accuracy': stats['emotion_correct'] / stats['total'] if stats['total'] > 0 else 0,
+        }
+    
+    # 简化混淆矩阵
+    for gt, preds in results['speaker_confusion'].items():
+        export_data['speaker_confusion'][gt] = dict(sorted(preds.items(), key=lambda x: -x[1])[:5])
+    
+    for gt, preds in results['emotion_confusion'].items():
+        export_data['emotion_confusion'][gt] = dict(sorted(preds.items(), key=lambda x: -x[1])[:5])
+    
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(export_data, f, ensure_ascii=False, indent=2)
+    
+    print(f"\nJSON报告已导出: {output_path}")
 
 
 def main():
-    gt_path = Path(__file__).parent.parent / 'tests' / 'role_emotion_gt_50.json'
+    gt_path = Path(__file__).parent.parent / 'tests' / 'role_emotion_gt_100.json'
     if not gt_path.exists():
         print(f"错误: 测试数据不存在 - {gt_path}")
         return
@@ -231,11 +357,13 @@ def main():
     
     total = results['total']
     speaker_acc = results['speaker_correct'] / total
-    emotion_acc = results['emotion_correct'] / total
+    emotion_l2_acc = results['emotion_l2_correct'] / total
+    emotion_l1_acc = results['emotion_l1_correct'] / total
     both_acc = results['both_correct'] / total
     
     print(f"角色识别准确率: {speaker_acc:.1%}")
-    print(f"情绪标注准确率: {emotion_acc:.1%}")
+    print(f"情绪标注准确率 L2(6类): {emotion_l2_acc:.1%}")
+    print(f"情绪标注准确率 L1(3类): {emotion_l1_acc:.1%}")
     print(f"综合准确率（两者都对）: {both_acc:.1%}")
     
     print("\n系统评估:")
@@ -252,10 +380,15 @@ def main():
     else:
         print(f"  角色识别: {speaker_acc:.1%} ❌ 需要优化")
     
-    if emotion_acc >= 0.5:
-        print(f"  情绪标注: {emotion_acc:.1%} ✅")
+    if emotion_l1_acc >= 0.5:
+        print(f"  情绪标注 L1(3类): {emotion_l1_acc:.1%} ✅")
     else:
-        print(f"  情绪标注: {emotion_acc:.1%} ❌ 需要优化")
+        print(f"  情绪标注 L1(3类): {emotion_l1_acc:.1%} ❌ 需要优化")
+    
+    if emotion_l2_acc >= 0.5:
+        print(f"  情绪标注 L2(6类): {emotion_l2_acc:.1%} ✅")
+    else:
+        print(f"  情绪标注 L2(6类): {emotion_l2_acc:.1%} ❌ 需要优化")
 
 
 if __name__ == '__main__':

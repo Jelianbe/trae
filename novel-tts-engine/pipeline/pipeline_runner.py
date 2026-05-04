@@ -5,6 +5,7 @@ import json
 import logging
 import re
 import threading
+from collections import OrderedDict
 from pathlib import Path
 from typing import Optional, Dict, List, Callable
 from dataclasses import dataclass, field
@@ -36,7 +37,7 @@ class PipelineState(Enum):
     ERROR = "error"
 
 
-from utils.config import COLD_START_CHARS_THRESHOLD, MAX_INPUT_CHARS  # 配置已统一移至 utils.config
+from utils.config import COLD_START_CHARS_THRESHOLD, MAX_INPUT_CHARS, MAX_RESULT_CACHE_SIZE  # 配置已统一移至 utils.config
 
 @dataclass
 class ProgressInfo:
@@ -119,10 +120,18 @@ class PipelineRunner:
         self.progress = ProgressInfo()
         self._pause_event = threading.Event()
         self._pause_event.set()
-        self._result_cache: Dict[str, List[ChapterResult]] = {}
+        self._result_cache: "OrderedDict[str, List[ChapterResult]]" = OrderedDict()
         
         self._total_processed_chars = 0
         self._cold_start_done = False
+    
+    def _add_to_cache(self, key: str, value: List["ChapterResult"]):
+        """添加结果到缓存，超过容量时淘汰最旧的"""
+        if key in self._result_cache:
+            del self._result_cache[key]
+        self._result_cache[key] = value
+        while len(self._result_cache) > MAX_RESULT_CACHE_SIZE:
+            self._result_cache.popitem(last=False)
     
     def _set_progress(self, step: str, chapter: int, total: int, step_idx: int, message: str = ""):
         """更新进度信息"""
@@ -183,6 +192,7 @@ class PipelineRunner:
         
         if not force and cache_key in self._result_cache:
             logger.info(f"使用缓存结果 (cache_key={cache_key})")
+            self._result_cache.move_to_end(cache_key)
             return self._result_cache[cache_key]
         
         self.progress.state = PipelineState.RUNNING
@@ -223,7 +233,7 @@ class PipelineRunner:
                     self._trigger_cold_start()
             
             # 缓存结果
-            self._result_cache[cache_key] = results
+            self._add_to_cache(cache_key, results)
             
             self.progress.state = PipelineState.DONE
             self._set_progress("完成", total_chapters, total_chapters, 6, "分析完成")
@@ -447,6 +457,8 @@ class PipelineRunner:
         
         此方法将当前所有 is_confirmed=0 的实体升级为 is_confirmed=1，
         并执行一次完整的 EntityClusterer.cluster(write_back=True)。
+        
+        聚类完成后，用全文角色库回填前3000字内的未知说话人。
         """
         if self._cold_start_done:
             return
@@ -472,8 +484,15 @@ class PipelineRunner:
             
             if all_entities:
                 self.entity_clusterer.cluster(entities=all_entities, text=self._full_text, write_back=True)
+                
+                # 冷启动聚类完成后，回填未知说话人
+                backfill_count = 0
+                for result in self._result_cache.get("default", []):
+                    count = self.speaker_matcher.backfill_unknown_speakers(result.sentences)
+                    backfill_count += count
+                
                 self._cold_start_done = True
-                logger.info(f"冷启动批量聚类完成：{len(all_entities)} 个实体参与聚类")
+                logger.info(f"冷启动批量聚类完成：{len(all_entities)} 个实体参与聚类，回填 {backfill_count} 个未知说话人")
             else:
                 logger.warning("冷启动触发但无有效实体，跳过聚类")
                 self._cold_start_done = True

@@ -1,0 +1,2201 @@
+{
+  "summary": {
+    "total": 100,
+    "speaker_correct": 63,
+    "emotion_correct": 30,
+    "both_correct": 19
+  },
+  "by_style": {
+    "都市": {
+      "total": 40,
+      "speaker_correct": 28,
+      "emotion_correct": 12,
+      "speaker_accuracy": 0.7,
+      "emotion_accuracy": 0.3
+    },
+    "历史": {
+      "total": 17,
+      "speaker_correct": 12,
+      "emotion_correct": 7,
+      "speaker_accuracy": 0.7058823529411765,
+      "emotion_accuracy": 0.4117647058823529
+    },
+    "修仙": {
+      "total": 23,
+      "speaker_correct": 13,
+      "emotion_correct": 5,
+      "speaker_accuracy": 0.5652173913043478,
+      "emotion_accuracy": 0.21739130434782608
+    },
+    "西幻": {
+      "total": 20,
+      "speaker_correct": 10,
+      "emotion_correct": 6,
+      "speaker_accuracy": 0.5,
+      "emotion_accuracy": 0.3
+    }
+  },
+  "by_role_challenge": {
+    "显式提示在上文。说话人名字'苏夜'在context_before中，不在当前句。需要角色识别模块将context_before中的PER与当前对话关联": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人是'那人'，需要代词消解系统将'他'关联到上一句的'他'（下属角色）。说话人无名字，需归为未命名角色": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "显式提示在上文。'韩将军'在context_before中，动作'推开牢门'暗示他是说话人。头衔'将军'需要映射到角色'韩将军'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "显式提示在下文。说话人'萧炎'在context_after中，不在当前句。需要角色识别模块将context_after中的PER与当前对话关联": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "别名映射。说话人自称'老臣'，需要别名系统将'老臣'映射到具体角色（如'张丞相'）。头衔类别名": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "显式提示在上文+头衔。'黑甲骑士'在context_before中，是描述性称呼而非人名。需要角色识别模块处理非人名称呼": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人是'他'，需要从context_before中的'他'推断说话人身份。角色名'佣兵团长'完全不在文本中，需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "显式提示在上文。'林轩'在context_before中，通过动作'单膝跪地'暗示他是说话人。属于显式提示的简单case": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "头衔推断+多角色。说话人是'丫鬟'（未命名角色），听者是'大小姐'（头衔），提及'姑爷'（头衔）。需要同时处理三个非人名称呼": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "头衔推断。说话人是'圣骑士'（头衔/职业），不是人名。需要角色识别模块处理宗教头衔": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "显式提示在上文。'苏夜'在context_before中，通过动作'声音发颤'暗示他是说话人。简单显式case": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人是'她'，需要从context_before推断。角色名不在文本中，需角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "称呼触发词。'师兄'是称呼触发词。说话人是'年轻弟子'，需要区分'说话人'和'被提及的师兄'。多角色交织": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人和听者都是代词指代（'两人'→男修、女修），角色名不在文本中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "多角色交织。说话人'林雪'在context_before，听者'苏夜'在context_after。当前句提到'他'（第三方）。需要角色识别模块同时处理三个角色": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "头衔推断。'老人'是描述，'老法师'是角色注册名。需要角色管理模块已有'老法师'和'老人'的映射": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人是'他'，需要从context_before和context_after推断。角色名'赵天行'完全不在文本中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "多角色交织。前文提到'药老'是说话人，当前句提及'萧炎'是听者。需要正确区分：对话中提到'萧炎'不等于萧炎在说话": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人和听者都是代词（'她'、'他'）。需要代词消解系统处理性别（她→女角色）": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "显式提示在上文+头衔+群体听者。说话人'圣骑士团团长'是头衔，听者'骑士们'是群体。需要处理头衔映射和群体说话人": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "别名映射。说话人'部门经理'是头衔，听者'老陈'是别名（需映射到'陈建国'等完整名）": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解。说话人是'他'，角色名'赵天行'不在文本中。需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "别名映射。说话人'老丞相'是头衔（别名），听者'陛下'是头衔。需要同时处理两个头衔角色": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "多角色交织+代词消解。当前句包含三个角色：'他'（被提及者）、说话人（林雪，在context_before）、听者（苏夜，在context_before）。'他说'中的'他'是第三方角色": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "无显式说话人。说话人身份完全不在文本中，仅靠场景推断。需要角色管理模块已有'冒险者'角色注册，或归为默认/未命名角色": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "头衔推断。'老剑客'是头衔/描述，不是人名。听者'弟子'也是头衔。需要角色管理模块处理师徒关系称谓": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人'她'，角色名不在文本中。独白/自言自语场景，无听者": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解。说话人是'他'，角色名完全不在文本中。需要角色管理模块已有'赵天行'注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "别名映射+自称推断。说话人自称'末将'（军事谦称），需要别名系统映射到'年轻将领'。听者'元帅'是头衔": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解。说话人和听者都是描述性称呼（'他'→前辈，'年轻人'）。角色名不在文本中": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "角色提及推断。说话人'老人'是描述，听者是'说书的人'（职业描述）。当前句包含听者的身份描述，需要NER处理非人名的角色指称": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "头衔推断。听者'族长'是头衔。说话人'年轻人'是描述，需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解。说话人'他'，角色名完全不在文本中。需要角色管理模块已有'杀手'注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "描述性称呼。说话人'年轻人'、听者'老铁匠'都是描述/职业称呼，不是人名。需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "多角色交织。说话人'苏夜'在context_before，听者'林雪'在context_after。提及第三方'他'。需要同时关联三个角色": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "多角色+头衔。说话人'圣骑士'是头衔，听者'小女孩'是描述。角色名不在文本中，需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "多角色交织。说话人'药老'在context_before，听者'萧炎'在context_before和context_after。需要区分谁是说话人谁是听者": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人和听者都是代词（'她'、'他'），角色名完全不在文本中": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "头衔推断。'老总管'是头衔/职位，不是人名。需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "描述性称呼+提及第三方。说话人'中年男人'是描述，提及'女儿'（第三方）。需要处理三个角色的关系": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "头衔推断。说话人'斥候'是身份描述，听者'陛下'是头衔。需要处理军事场景的紧急通讯语境": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解+描述性称呼。说话人'她'，听者'失忆少年'是描述。需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "关系角色。说话人'获救者'和听者'救命恩人'都是关系描述，不是人名。需要处理角色间的关系标签": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解。说话人和听者都是代词（'她'、'他'）。需要从前文'两人'推断性别关系": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "描述性称呼。说话人'老兵'、听者'年轻士兵'都是描述。角色名不在文本中，需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "关系角色。说话人'讨债人'和听者'欠债人'都是关系描述。需要角色管理模块已有注册": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解。说话人和听者都是代词（'她'、'他'）。角色名完全不在文本中": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "别名映射。说话人'黑衣男子'是描述，听者'苏先生'是别名（需映射到'苏夜'）。当前句提及'苏先生'，容易误将苏先生识别为说话人": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "显式提示在上文。'魔尊'在context_before中，通过暴力动作'掐在脖子上'暗示他是说话人。头衔映射": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "显式提示在上文+群体听者+头衔。说话人'老将军'在context_before中，听者'将士们'是群体。提及'兄弟们'（逝者）": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。上下文只有'一只手'和'那人'，没有任何角色名。系统应返回'未知_角色'而非猜测": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'桌对面的身影'不是角色名。系统应诚实返回未知": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'耳边的声音'不是角色名，系统不应猜测": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'披着斗篷的人影'是视觉描述，不是角色名": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'黑袍探子'是描述性角色，不在CharacterManager中。系统应返回'未知_角色'或临时角色。提及'将军'可能误导系统将说话人误判为将军": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知+自称推断。'传令'暗示说话人是将领，角色名不在上下文中。系统应返回'未知_武将'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知+身份类型推断。'山门'暗示说话人是守门修士，角色名不在上下文中。系统应返回'未知_修士'": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "显式提示在上文。'巡逻队长'在context_before中，系统应映射到该描述性角色": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'苍老的声音'是声音描述，不是角色名。系统应返回'未知_角色'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'那人'是代词，不是角色名。系统应返回'未知_角色'而非猜测身份": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知+关系角色。说话人是'他'，角色名不在文本中。系统应返回'未知_角色'或'未知_讨债人'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'戴面具的人'是视觉描述，不能当角色名用。系统应返回'未知_角色'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "西方译名+未知说话人。'乔尼·乔司达'是带间隔号的译名，需要NER正确合并。说话人是'高大的身影'，系统应返回未知而非乱匹配": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "西方译名+自我介绍。'亚历山大·安德森'是三段译名，需要NER正确处理。说话人通过自我介绍确定身份": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "西方单字译名+未知说话人。'克里斯汀'是单行译名。说话人'银发女子'是描述，系统应返回'未知_女法师'或临时角色": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "西方译名+头衔。'艾琳'是简单译名。说话人'老管家'是描述+身份后缀，系统应识别。需要在NER中正确处理老管家不打断其后的'艾琳'": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "西方译名+现代语境。'约翰·史密斯'是标准英文名译名。说话人未明确，系统应返回未知": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "西方译名+描述性角色。'莉莉丝'是常见西幻译名。说话人'黑袍法师'是描述性称呼，系统应正确识别": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "西方译名+说话人是描述性角色。'尼古拉·特斯拉'是历史人物名。说话人'戴着护目镜的助手'不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "西方多段译名+未知说话人。'维克托·冯·凯恩'是贵族式命名格式。说话人是代词'他'，系统应返回未知": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "西方超长译名。'克劳迪娅·奥古斯都·冯·瓦尔德施泰因'是五段式贵族名，测试NER合并的极限。说话人'紫发女子'不在CharacterManager中，系统应返回'未知_女贵族'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "西方译名+别名关系。'凯'是'凯瑟琳'的简称，需要别名系统建立映射。说话人'短发女孩'是描述，不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字人名。'林'是单字姓氏称呼，容易触发单字过滤。说话人未知，系统应返回未知而非过滤掉'林'": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字人名+未知说话人。'苏'是单字姓氏称呼，是GT标注中的角色名。系统单字过滤不应将其丢弃": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字人名+未知说话人。'安'可能被误判为非人名。说话人'那年轻人'是描述，系统应返回未知": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字人名+未知说话人。'苏'是听者，说话人是代词'她'。需要正确区分谁在说话、谁在听": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字姓氏+尊称。'林兄'是'单字姓+兄'的称呼格式，不是完整人名。说话人未知，听者是该称呼指代对象": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字人名+自我介绍。'苏'作为单字名通过自我介绍确立。说话人'新来的转校生'不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "单字姓氏+哥。'燕哥'是'单字姓+哥'的昵称。说话人'小丫鬟'不在CharacterManager中，系统应返回未知": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "单字人名+未知说话人。'琴'是单字名，易被单字过滤误杀。说话人是代词'她'，不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "动作插入打断对话。同一句话被'一阵剧烈的咳嗽打断了'的叙述动作分割成两段。SpeakerMatcher需要识别这仍是同一人说话，不能被动作描述误导为两个不同说话人": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词消解+未知说话人。说话人是'她'，需要代词消解。角色名完全不在文本中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "多角色密集交织。四句对话在同一条记录中来回切换说话人，没有显式说话人提示。系统需要至少能识别这是多角色对话": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "无引导词的上下文推断。没有'苏夜说道'这类显式提示，只有'放下茶杯'的动作暗示。系统需要从'动作+紧接对话'推断说话人": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "极短应答+无引导词。'嗯'是最短的对话，说话人通过前文'林雪'确定。系统需要从前文动作推断说这个词的人是林雪": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "无引导词的多轮对话。四句对话来回切换说话人，只有开头的场景描述交代了双方身份（魔尊和剑修）。系统至少需要识别这是两个不同的人在交替说话": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "多角色+人称代词指代。'先开口的那个'是描述，不是角色名。后续'他'需要代词消解。中间'你……'是另一个角色被打断的回应": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "多角色相连对话+无引导词。三句对话在一条记录里，两个说话人交替。系统至少需要区分这是两个不同的角色在对话": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人'她'，需要从前文推断。角色名完全不在文本中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "密集交替对话。四句对话在两个角色间来回切换，没有角色名，只有'两个人'的交代。上下文中的'他的手'指向其中一人": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "无引导词的上下文推断。说话人通过前文'老者叹了口气'推断。没有显式'说道'标记": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "动作插入打断对话+西式译名佐证。萧炎的说话被'脚步声打断'的叙述截断。其中提及'佐罗'作为西式译名的佐证。系统需识别这是同一人继续说话": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "未知说话人。'女子'是描述，角色名不在上下文中": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "代词+未知。说话人是'她'，不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "代词消解。说话人是'他'，不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。'他'是代词，不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知角色群体对话。说话人不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "自称词+未知说话人。'属下'是自称词，但说话人'黑衣人'不在CharacterManager中。系统应返回'未知_角色'或'未知_下属'": {
+      "total": 1,
+      "speaker_correct": 0,
+      "accuracy": 0.0
+    },
+    "未知角色群体对话。蜡烛熄灭的密室，说话人未指明": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    },
+    "未知说话人。代词'她'，不在CharacterManager中": {
+      "total": 1,
+      "speaker_correct": 1,
+      "accuracy": 1.0
+    }
+  },
+  "by_emotion_challenge": {
+    "显式脏话+感叹号。情绪信号明确，应被EmotionExtractor正确识别为anger。这是简单情绪case": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "字面是谦辞，情绪来自上下文——赵天行'冷冷地扫'造成的压迫感。上下文依赖case": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "表面平静实则压抑的怨恨。无显式情绪词，低唤醒愤怒。上下文依赖case": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "惊讶关键词+感叹号。情绪信号明确，但夹杂激动。surprise为主，带joy": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "朝堂奏对，仪式性平静。无情绪词，应被识别为neutral": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "笑声+反问。情绪明确但需区分joy（嘲讽）和anger（愤怒）。嘲讽类joy": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "反问句式+威胁语境。字面无情绪词但语境是愤怒。上下文依赖+句式识别": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "命令句式但情绪是恐惧/担忧。fear的高唤醒变体（panic）。句式可能触发anger规则，需区分命令句的愤怒与担忧": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "称呼+好消息。字面无情绪词但场景是喜悦通报。上下文依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "宗教宣言句式+感叹号。庄严的愤怒。情绪信号明确，应正确识别": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "省略号+疑问句+离别语境。悲伤。单句情绪信号较弱，依赖上下文判断": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "极简短句+句号。字面中性实则逞强。上下文极度依赖——单人无法识别，必须看前文'擦去血迹'才知道是悲伤/隐忍": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "自我反思句式。句号结尾，情绪隐含在'是我太急了'中——惭愧/悲伤": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "感叹句+美好事物。表面是joy（感叹美景），语境是离别前夕，情绪才是sadness。上下文极度依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反问句。情绪是惊讶/警告。句式特征明显，应被识别为非neutral": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "祈使句+紧迫语境。命令句式但情绪是恐惧/担忧（为对方安全担忧）。句式可能触发anger，需区分命令句的愤怒与担忧": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反讽。字面中性（陈述句+句号），实则威胁/愤怒。上下文极度依赖——'笑容怎么看都不是善意'决定了情绪": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "感叹号+训斥词'放肆'。情绪信号明确，应正确识别为anger": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "祈使句+句号。字面平静实则悲伤/诀别。'趁我还没后悔'暗示难过。上下文依赖": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "命令+感叹号。激昂/愤怒。情绪信号明确": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "事务性对话。祈使句但语气平淡，无情绪信号。应识别为neutral": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "短句+句号。表面平静实则压抑的愤怒。'到此为止'+碎纸动作暗示决断和愤怒。上下文依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "感叹句+哀求词'三思'。悲伤带愤怒。情绪信号明确": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "转述句。无情绪信号，应识别为neutral。但'他不来了'可能被误判为sadness": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "天哪+感叹号+复活事件。极强惊讶信号，应被正确识别": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "评价句。字面不温和但无攻击性。应识别为neutral而非anger。容易误判为批评/愤怒": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "省略号+疑问词'为什么'。字面是疑问但情绪是悲伤/失望。'为什么'可能触发surprise规则，需区分疑问与悲伤": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "高难度反讽。字面赞美（'有本事'），实则怒气/威胁。上下文极度依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "感叹句+军令语。激昂/愤怒的混合。情绪信号明确": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "字面是肯定陈述。情绪是欣慰/喜悦。'没有让我失望'带正面情感但表达含蓄": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "陈述句+认出。轻微惊讶。'我认识你'可能被识别为neutral，但认出旧识是轻度surprise": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "否定句+指责。愤怒带惊讶。'不配'是强负面评价词，应被识别为anger": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "表面关切实则威胁。字面中性（陈述句+句号），语境是暴力的。上下文极度依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "感谢句+说明原因。喜悦/感激。'谢谢你'是明确的正面信号，但语气温和（句号结尾），偏subdued": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反问句。怀疑/惊讶。句式特征明显，应识别为非neutral": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句+希望意象。灾难后安抚，悲伤带希望。字面正面但语境沉重": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句+死亡警告。恐惧/担忧。字面是陈述但情绪是深深的担忧": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "表面抱怨实则轻笑。字面可能是批评但语境是轻微的笑意。中性偏喜悦。容易误判为anger": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "停顿+回忆+认出。轻度惊讶。'等等'和'好像'暗示不确定+惊讶": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "祈使句+保护性威胁。愤怒但克制。'离我女儿远一点'是强威胁信号，但语气低沉": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "呼唤+感叹号+紧急军情。恐惧带惊讶。'急报'暗示危险，应被识别为fear": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "疑问句+关心。担忧/悲伤。语气温和但语境是心疼。中性偏悲伤": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句+承诺。感激/郑重。正面情绪但表达含蓄": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句+句号。字面中性但情绪是失落/悲伤。'还是'暗示长期未解的矛盾。上下文极度依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "日常军事询问。疑问句但语气平淡。应识别为neutral": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "陈述句+威胁。'欠我的'和'该还了'是威胁信号。情绪明确但无感叹号": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "否定句+句号。责备中带失望。悲伤/愤怒的混合，悲伤为主。'不该瞒'是'发现被欺骗后的痛心'": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "简短陈述句。呈递物品，仪式性平静。无情绪信号": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "祈使句+极端威胁。极强愤怒信号。'杀'字是明确的暴力/愤怒指示词": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句+仪式性动作。极强悲伤。'死去的兄弟们'是明确的悲伤指示，但表达克制": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "祈使句+紧迫语境，情绪明确为恐惧/紧张": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反问句+审问语境，情绪为愤怒/质问": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "表面平静实则威胁，上下文极度依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "简单问句，情绪中性偏冷": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "问句语气中性": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "军事命令，情绪严肃但信号不明显": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "喝问句式，情绪为警惕/惊讶": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句但语境是愤怒/压抑，上下文依赖": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反问句，情绪为悬念/惊讶": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "命令句但语气平淡": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "陈述句+威胁。'欠我的'和'该还了'是威胁信号，情绪明确": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "祈使句但情绪色彩不明显": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "重逢场景，情绪为暗喜/得意": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "自我介绍，情绪中性偏正式": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "反问句+阻拦动作，情绪为担忧/恐惧": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "日常通报，中性情绪": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "欢迎句+终于，情绪为惊喜/恭敬": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "警告+动作强调，情绪为愤怒/威严": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "陈述句，中性": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "反问句+威胁动作，恐惧带惊讶": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述+反问，情绪为玩味/自豪": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "不耐烦的语气，情绪为烦躁/愤怒": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "单字呼唤，情绪标签需要谨慎——字太少，信号弱": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "简单呼唤，中性情绪": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "短句+动作，情绪不明显": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "拒绝+颤抖，情绪为悲伤/痛苦": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "问句，情绪中性": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "自我介绍，中性": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "感叹句+好消息，情绪明确为喜悦": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "简单陈述，中性": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "重复质问句式，愤怒带虚弱": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "省略号+疑问句，悲伤/不确定": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "快速问答，情绪为惊讶/争论": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反问句+平静语气，情绪压抑": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "极短应答，情绪来自上下文——长解释后的敷衍，可能是失落/冷淡": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "刑场对峙，愤怒与挑衅": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "轻蔑/嘲讽。'哼'+反问": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "黄昏+城墙+后悔，情绪为淡淡的悲伤": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "克制表达中的复杂情绪——恨带悲伤": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    },
+    "反复否认被戳穿，愤怒带窘迫": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "感叹句+动作，沉重悲伤": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "打断+追问，惊讶与急切": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反讽/含蓄表达。字面赞美，实则暗讽。需要上下文判断——语气淡却信息量大": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "表面平静实则难过。'松开攥着的衣角'的动作暗示了不舍": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "不悲不怒。反问句但情绪是失落/悲伤": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "混合情绪。'天意'被反驳+染血的玉佩，悲愤交加": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "省略号+不确定，恐惧/紧张": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反讽/双重含义。字面请罪，语境暗示不服气": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "陈述句+恐怖语境，恐惧/紧张": {
+      "total": 1,
+      "emotion_correct": 0,
+      "accuracy": 0.0
+    },
+    "反讽/双重含义。字面赞扬，语境是伤心极致的反话": {
+      "total": 1,
+      "emotion_correct": 1,
+      "accuracy": 1.0
+    }
+  },
+  "speaker_confusion": {
+    "苏夜": {
+      "苏夜": 4
+    },
+    "未知": {
+      "未知_角色": 4,
+      "赵天行": 1,
+      "圣骑士团团长": 1
+    },
+    "韩将军": {
+      "韩将军": 1
+    },
+    "萧炎": {
+      "萧炎": 1,
+      "药老": 1
+    },
+    "未知_文臣": {
+      "未知_文臣": 1
+    },
+    "黑甲骑士": {
+      "黑甲骑士": 1
+    },
+    "林轩": {
+      "林轩": 1
+    },
+    "丫鬟": {
+      "丫鬟": 1
+    },
+    "圣骑士": {
+      "圣骑士": 1,
+      "跪在面前的圣骑士": 1
+    },
+    "未知_修士": {
+      "未知_角色": 1,
+      "一": 1
+    },
+    "年轻弟子": {
+      "年轻弟子": 1
+    },
+    "林雪": {
+      "林雪": 2,
+      "苏夜": 1
+    },
+    "老人": {
+      "老人": 2,
+      "未知_角色": 1
+    },
+    "药老": {
+      "药老": 2
+    },
+    "部门经理": {
+      "老陈": 1
+    },
+    "赵天行": {
+      "未知_角色": 2
+    },
+    "老丞相": {
+      "老丞相": 1
+    },
+    "冒险者": {
+      "一": 1
+    },
+    "老剑客": {
+      "老剑客": 1
+    },
+    "女修": {
+      "未知_角色": 1,
+      "她蹲在失忆的少年": 1
+    },
+    "年轻将领": {
+      "元帅": 1
+    },
+    "前辈": {
+      "未知_角色": 1
+    },
+    "年轻人": {
+      "着那块刻着'族长": 1,
+      "老铁匠": 1
+    },
+    "杀手": {
+      "未知_角色": 1
+    },
+    "女角色": {
+      "未知_角色": 3
+    },
+    "老总管": {
+      "老总管": 1
+    },
+    "中年男人": {
+      "中年男人": 1
+    },
+    "斥候": {
+      "名浑身是血的斥候": 1
+    },
+    "获救者": {
+      "未知_角色": 1
+    },
+    "老兵": {
+      "年轻士兵": 1
+    },
+    "讨债人": {
+      "未知_角色": 1
+    },
+    "黑衣男子": {
+      "名黑衣男子": 1
+    },
+    "魔尊": {
+      "未知_角色": 1
+    },
+    "老将军": {
+      "老将军": 1
+    },
+    "未知_角色": {
+      "未知_角色": 28,
+      "坐在角落里的男人": 1,
+      "走进来的中年男人": 1,
+      "坐在阴影中的男人": 1,
+      "子上的剑修一": 1
+    },
+    "未知_武将": {
+      "未知_角色": 1
+    },
+    "巡逻队长": {
+      "巡逻队长": 1
+    },
+    "未知_讨债人": {
+      "未知_角色": 1
+    },
+    "亚历山大·安德森": {
+      "未知_角色": 1
+    },
+    "未知_女法师": {
+      "未知_角色": 1
+    },
+    "老管家": {
+      "未知_角色": 1
+    },
+    "黑袍法师": {
+      "未知_角色": 1
+    },
+    "未知_助手": {
+      "未知_角色": 1
+    },
+    "未知_女贵族": {
+      "未知_角色": 1
+    },
+    "未知_丫鬟": {
+      "小丫鬟": 1
+    },
+    "老者": {
+      "老者": 1
+    }
+  },
+  "emotion_confusion": {
+    "anger": {
+      "neutral": 23,
+      "anger": 5
+    },
+    "fear": {
+      "neutral": 6,
+      "anger": 2,
+      "fear": 1,
+      "sadness": 1
+    },
+    "surprise": {
+      "neutral": 9,
+      "surprise": 2
+    },
+    "neutral": {
+      "neutral": 16,
+      "joy": 1
+    },
+    "joy": {
+      "neutral": 8,
+      "joy": 3,
+      "anger": 1
+    },
+    "sadness": {
+      "neutral": 13,
+      "surprise": 3,
+      "sadness": 3,
+      "fear": 1,
+      "joy": 1
+    }
+  },
+  "all_errors": [
+    {
+      "id": "re_002",
+      "text": "「属下不敢。」",
+      "gt_speaker": "未知",
+      "pred_speaker": "赵天行",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "赵天行",
+      "gt_emotion": "fear",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_003",
+      "text": "「我等这一天，等了十年。」",
+      "gt_speaker": "韩将军",
+      "pred_speaker": "韩将军",
+      "gt_speaker_norm": "韩将军",
+      "pred_speaker_norm": "韩将军",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_007",
+      "text": "「你当真以为我怕你？」",
+      "gt_speaker": "未知",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_008",
+      "text": "「不必管我！你们快走！」",
+      "gt_speaker": "林轩",
+      "pred_speaker": "林轩",
+      "gt_speaker_norm": "林轩",
+      "pred_speaker_norm": "林轩",
+      "gt_emotion": "fear",
+      "pred_emotion": "anger",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_009",
+      "text": "「大小姐，姑爷回来了。」",
+      "gt_speaker": "丫鬟",
+      "pred_speaker": "丫鬟",
+      "gt_speaker_norm": "丫鬟",
+      "pred_speaker_norm": "丫鬟",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_010",
+      "text": "「以神之名，净化你！」",
+      "gt_speaker": "圣骑士",
+      "pred_speaker": "圣骑士",
+      "gt_speaker_norm": "圣骑士",
+      "pred_speaker_norm": "圣骑士",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_011",
+      "text": "「你为什么偏偏要选这条路……」",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "gt_speaker_norm": "苏夜",
+      "pred_speaker_norm": "苏夜",
+      "gt_emotion": "sadness",
+      "pred_emotion": "surprise",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_012",
+      "text": "「我没事。」",
+      "gt_speaker": "未知_修士",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_013",
+      "text": "「师兄说得对，是我太急了。」",
+      "gt_speaker": "年轻弟子",
+      "pred_speaker": "年轻弟子",
+      "gt_speaker_norm": "年轻弟子",
+      "pred_speaker_norm": "年轻弟子",
+      "gt_emotion": "sadness",
+      "pred_emotion": "fear",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_014",
+      "text": "「今晚的月亮真圆啊。」",
+      "gt_speaker": "未知",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_015",
+      "text": "「你不知道他是谁吗？」",
+      "gt_speaker": "林雪",
+      "pred_speaker": "林雪",
+      "gt_speaker_norm": "林雪",
+      "pred_speaker_norm": "林雪",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_016",
+      "text": "「你必须离开这里，现在就走。」",
+      "gt_speaker": "老人",
+      "pred_speaker": "老人",
+      "gt_speaker_norm": "老人",
+      "pred_speaker_norm": "老人",
+      "gt_emotion": "fear",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_020",
+      "text": "「骑士们，冲锋！」",
+      "gt_speaker": "未知",
+      "pred_speaker": "圣骑士团团长",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "圣骑士团团长",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_021",
+      "text": "「老陈，把这份文件送到财务部。」",
+      "gt_speaker": "部门经理",
+      "pred_speaker": "老陈",
+      "gt_speaker_norm": "部门经理",
+      "pred_speaker_norm": "老陈",
+      "gt_emotion": "neutral",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_022",
+      "text": "「这件事，到此为止。」",
+      "gt_speaker": "赵天行",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "赵天行",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_023",
+      "text": "「陛下三思啊！」",
+      "gt_speaker": "老丞相",
+      "pred_speaker": "老丞相",
+      "gt_speaker_norm": "老丞相",
+      "pred_speaker_norm": "老丞相",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_024",
+      "text": "「他说他不来了。」",
+      "gt_speaker": "林雪",
+      "pred_speaker": "苏夜",
+      "gt_speaker_norm": "林雪",
+      "pred_speaker_norm": "苏夜",
+      "gt_emotion": "neutral",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_025",
+      "text": "「天哪！龙竟然复活了！」",
+      "gt_speaker": "冒险者",
+      "pred_speaker": "一",
+      "gt_speaker_norm": "冒险者",
+      "pred_speaker_norm": "",
+      "gt_emotion": "surprise",
+      "pred_emotion": "surprise",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_027",
+      "text": "「为什么偏偏是你……」",
+      "gt_speaker": "女修",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "女修",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "surprise",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_028",
+      "text": "「你可真有本事。」",
+      "gt_speaker": "赵天行",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "赵天行",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_029",
+      "text": "「末将愿往！」",
+      "gt_speaker": "年轻将领",
+      "pred_speaker": "元帅",
+      "gt_speaker_norm": "年轻将领",
+      "pred_speaker_norm": "元帅",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_030",
+      "text": "「你果然没有让我失望。」",
+      "gt_speaker": "前辈",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "前辈",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "joy",
+      "pred_emotion": "joy",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_031",
+      "text": "「我认识你，你是那个在茶馆里说书的人。」",
+      "gt_speaker": "老人",
+      "pred_speaker": "老人",
+      "gt_speaker_norm": "老人",
+      "pred_speaker_norm": "老人",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_032",
+      "text": "「你不配叫这个名字。」",
+      "gt_speaker": "年轻人",
+      "pred_speaker": "着那块刻着'族长",
+      "gt_speaker_norm": "年轻人",
+      "pred_speaker_norm": "着那块刻着'族长",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_033",
+      "text": "「你可要想好了。」",
+      "gt_speaker": "杀手",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "杀手",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_034",
+      "text": "「谢谢你，如果不是你，我早就放弃了。」",
+      "gt_speaker": "年轻人",
+      "pred_speaker": "老铁匠",
+      "gt_speaker_norm": "年轻人",
+      "pred_speaker_norm": "老铁匠",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_035",
+      "text": "「你能保证他说的都是真的？」",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "gt_speaker_norm": "苏夜",
+      "pred_speaker_norm": "苏夜",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_036",
+      "text": "「光明终会降临。」",
+      "gt_speaker": "圣骑士",
+      "pred_speaker": "跪在面前的圣骑士",
+      "gt_speaker_norm": "圣骑士",
+      "pred_speaker_norm": "跪在面前的圣骑士",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_037",
+      "text": "「你这样下去会死的。」",
+      "gt_speaker": "药老",
+      "pred_speaker": "药老",
+      "gt_speaker_norm": "药老",
+      "pred_speaker_norm": "药老",
+      "gt_emotion": "fear",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_038",
+      "text": "「你倒是挺会挑时候。」",
+      "gt_speaker": "女角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "女",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_039",
+      "text": "「等等，我好象见过这个人。」",
+      "gt_speaker": "老总管",
+      "pred_speaker": "老总管",
+      "gt_speaker_norm": "老总管",
+      "pred_speaker_norm": "老总管",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_040",
+      "text": "「不管你是谁，离我女儿远一点。」",
+      "gt_speaker": "中年男人",
+      "pred_speaker": "中年男人",
+      "gt_speaker_norm": "中年男人",
+      "pred_speaker_norm": "中年男人",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_041",
+      "text": "「陛下，边关急报！」",
+      "gt_speaker": "斥候",
+      "pred_speaker": "名浑身是血的斥候",
+      "gt_speaker_norm": "斥候",
+      "pred_speaker_norm": "名浑身是血的斥候",
+      "gt_emotion": "fear",
+      "pred_emotion": "fear",
+      "style": "历史",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_042",
+      "text": "「你真的什么都想不起来了吗？」",
+      "gt_speaker": "女修",
+      "pred_speaker": "她蹲在失忆的少年",
+      "gt_speaker_norm": "女修",
+      "pred_speaker_norm": "她蹲在失忆的少年",
+      "gt_emotion": "sadness",
+      "pred_emotion": "surprise",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_043",
+      "text": "「这份恩情，我记下了。」",
+      "gt_speaker": "获救者",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "获救者",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_044",
+      "text": "「你还是在怪我。」",
+      "gt_speaker": "女角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "女",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "joy",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_045",
+      "text": "「王都那边有消息了吗？」",
+      "gt_speaker": "老兵",
+      "pred_speaker": "年轻士兵",
+      "gt_speaker_norm": "老兵",
+      "pred_speaker_norm": "年轻士兵",
+      "gt_emotion": "neutral",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_046",
+      "text": "「你欠我的，今天该还了。」",
+      "gt_speaker": "讨债人",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "讨债人",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_047",
+      "text": "「你不该瞒着我的。」",
+      "gt_speaker": "女角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "女",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "anger",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_048",
+      "text": "「苏先生，您要的东西。」",
+      "gt_speaker": "黑衣男子",
+      "pred_speaker": "名黑衣男子",
+      "gt_speaker_norm": "黑衣男子",
+      "pred_speaker_norm": "名黑衣男子",
+      "gt_emotion": "neutral",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_049",
+      "text": "「给我一个不杀你的理由。」",
+      "gt_speaker": "魔尊",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "魔尊",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_050",
+      "text": "「这杯酒，敬死去的兄弟们。」",
+      "gt_speaker": "老将军",
+      "pred_speaker": "老将军",
+      "gt_speaker_norm": "老将军",
+      "pred_speaker_norm": "老将军",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_051",
+      "text": "“快走，别回头。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "fear",
+      "pred_emotion": "sadness",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_052",
+      "text": "“你把东西藏哪儿了？”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_053",
+      "text": "“我劝你最好别动。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_056",
+      "text": "“传令下去，全军戒备。”",
+      "gt_speaker": "未知_武将",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_057",
+      "text": "“山门已闭，来者何人？”",
+      "gt_speaker": "未知_修士",
+      "pred_speaker": "一",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_058",
+      "text": "“这已经是这个月第三次了。”",
+      "gt_speaker": "巡逻队长",
+      "pred_speaker": "巡逻队长",
+      "gt_speaker_norm": "巡逻队长",
+      "pred_speaker_norm": "巡逻队长",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_059",
+      "text": "“你想知道真相？”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_061",
+      "text": "“你欠我的，今天该还了。”",
+      "gt_speaker": "未知_讨债人",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_063",
+      "text": "“乔尼·乔司达，我们又见面了。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "坐在角落里的男人",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "坐在角落里的男人",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_064",
+      "text": "“亚历山大·安德森，圣骑士团第三席。”",
+      "gt_speaker": "亚历山大·安德森",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "亚历山大·安德森",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "neutral",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_065",
+      "text": "“克里斯汀，你确定要这么做？”",
+      "gt_speaker": "未知_女法师",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "fear",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_066",
+      "text": "“艾琳小姐，马车已经备好了。”",
+      "gt_speaker": "老管家",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "老管家",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "neutral",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_067",
+      "text": "“约翰·史密斯先生，您终于来了。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "走进来的中年男人",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "走进来的中年男人",
+      "gt_emotion": "joy",
+      "pred_emotion": "joy",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_068",
+      "text": "“莉莉丝，我警告过你不要靠近那些东西。”",
+      "gt_speaker": "黑袍法师",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "黑袍法师",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "anger",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_070",
+      "text": "“你到底是什么人，维克托·冯·凯恩？”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "坐在阴影中的男人",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "坐在阴影中的男人",
+      "gt_emotion": "fear",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_071",
+      "text": "“克劳迪娅·奥古斯都·冯·瓦尔德施泰因，这个名字够长吧？”",
+      "gt_speaker": "未知_女贵族",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_072",
+      "text": "“我叫凯，不是凯瑟琳，就是凯。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_073",
+      "text": "“林！”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_075",
+      "text": "“安，够了。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_076",
+      "text": "“别碰我，苏。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_079",
+      "text": "“燕哥回来了！”",
+      "gt_speaker": "未知_丫鬟",
+      "pred_speaker": "小丫鬟",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "小丫鬟",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_080",
+      "text": "“叫我琴就行了。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "neutral",
+      "pred_emotion": "joy",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_081",
+      "text": "“你到底——”他的话被一阵剧烈的咳嗽打断了，“——到底有没有放在心上？”",
+      "gt_speaker": "老人",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "老人",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_082",
+      "text": "“我只是想问一句……我们还有机会吗？”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_083",
+      "text": "“你看到了吗？”、“看到了。”、“到底是什么？”、“你自己看。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_084",
+      "text": "“你当真是这样想的？”",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "gt_speaker_norm": "苏夜",
+      "pred_speaker_norm": "苏夜",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_085",
+      "text": "“嗯。”",
+      "gt_speaker": "林雪",
+      "pred_speaker": "林雪",
+      "gt_speaker_norm": "林雪",
+      "pred_speaker_norm": "林雪",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_086",
+      "text": "“你当真不怕死？”、“死有什么可怕的。”、“你以为你真的很强？”、“至少比你活得",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "子上的剑修一",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "子上的剑修一",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_087",
+      "text": "“哼，就这点本事？”、“你……”、“能接我三招再说吧。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "joy",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_090",
+      "text": "“我没有。”、“你有。”、“我没有！”、“你每次说谎都会摸耳垂。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_091",
+      "text": "“你这又是何苦。”",
+      "gt_speaker": "老者",
+      "pred_speaker": "老者",
+      "gt_speaker_norm": "老者",
+      "pred_speaker_norm": "老者",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_092",
+      "text": "“那个叫佐罗的家伙——”萧炎的话被一阵急促的脚步声打断，“——他到底是什么来头？",
+      "gt_speaker": "萧炎",
+      "pred_speaker": "药老",
+      "gt_speaker_norm": "萧炎",
+      "pred_speaker_norm": "药老",
+      "gt_emotion": "surprise",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_093",
+      "text": "“好一个惩恶扬善的少年侠客，我等你来统领六国。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "女子",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "女子",
+      "gt_emotion": "joy",
+      "pred_emotion": "anger",
+      "style": "修仙",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_094",
+      "text": "“那你去吧，记得早些回来。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "都市",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_095",
+      "text": "“你不是说天下没有你做不到的事么。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "sadness",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_096",
+      "text": "“天意？天意就是让我活着回来见你。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "修仙",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_097",
+      "text": "“你们听，好像是……风声？”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "fear",
+      "pred_emotion": "neutral",
+      "style": "西幻",
+      "speaker_ok": true
+    },
+    {
+      "id": "re_098",
+      "text": "“属下无能，请大人责罚。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "下属",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "下属",
+      "gt_emotion": "anger",
+      "pred_emotion": "neutral",
+      "style": "历史",
+      "speaker_ok": false
+    },
+    {
+      "id": "re_099",
+      "text": "“我们当中有一个叛徒。”",
+      "gt_speaker": "未知_角色",
+      "pred_speaker": "未知_角色",
+      "gt_speaker_norm": "未知",
+      "pred_speaker_norm": "未知",
+      "gt_emotion": "fear",
+      "pred_emotion": "anger",
+      "style": "西幻",
+      "speaker_ok": true
+    }
+  ]
+}

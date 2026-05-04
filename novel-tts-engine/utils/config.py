@@ -14,3 +14,6 @@ MEMORY_LIMIT_GB = 3.0
 
 # 输入文本长度限制（10MB）
 MAX_INPUT_CHARS = 10 * 1024 * 1024
+
+# 结果缓存容量限制（最多缓存多少本书的结果）
+MAX_RESULT_CACHE_SIZE = 10

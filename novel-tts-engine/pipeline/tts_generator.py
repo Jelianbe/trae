@@ -3,13 +3,15 @@
 
 本模块实现了从文本到音频的完整转换流程，支持：
 1. Kokoro 离线 TTS（100+ 中文音色）
-2. 旁白/对话声线分离
-3. 多角色声音映射
-4. 情绪驱动的声音调整（预留接口）
-5. 音频文件导出 + 章节合并
+2. Index-TTS HTTP API 服务（音色克隆 + 情感控制）
+3. 旁白/对话声线分离
+4. 多角色声音映射
+5. 情绪驱动的声音调整
+6. 音频文件导出 + 章节合并
 
-技术选型：Kokoro 82M
-优势：离线、高质量、多音色、CPU 可运行
+技术选型：
+- 默认引擎：Kokoro 82M（离线、高质量、多音色）
+- 可选引擎：Index-TTS（音色克隆、情感控制）
 """
 
 import os
@@ -29,6 +31,11 @@ from pipeline.tts_kokoro import (
     NARRATOR_VOICE,
     ROLE_VOICE_MAP,
     merge_audio_files,
+)
+from pipeline.tts_indextts import (
+    IndexTTSEngine,
+    get_index_tts_engine,
+    DEFAULT_INDEX_TTS_AUDIO,
 )
 
 logger = logging.getLogger(__name__)
@@ -54,14 +61,34 @@ class AudioSegment:
 class TTSGenerator:
     """TTS 音频生成器
     
-    使用 Kokoro 离线 TTS 将文本转换为音频。
+    支持 Kokoro 和 Index-TTS 两种引擎。
     旁白和对话使用不同音色，角色各有专属音色。
     """
     
-    def __init__(self, voice_map: Optional[Dict[str, str]] = None):
-        self.voice_map = {**VOICE_MAP, **(voice_map or {})}
+    def __init__(
+        self,
+        voice_map: Optional[Dict[str, str]] = None,
+        engine: str = "kokoro",
+        indextts_url: str = "http://localhost:7860",
+        indextts_audio_path: Optional[str] = None,
+    ):
+        """
+        Args:
+            voice_map: 角色音色映射（仅 Kokoro 使用）
+            engine: 引擎名称 ("kokoro" | "indextts")
+            indextts_url: Index-TTS 服务地址
+            indextts_audio_path: Index-TTS 参考音频路径
+        """
+        self.engine = engine.lower()
+        self.voice_map = {**ROLE_VOICE_MAP, **(voice_map or {})}
         self._lock = threading.Lock()
         self._kokoro: Optional[KokoroTTSGenerator] = None
+        self._indextts: Optional[IndexTTSEngine] = None
+        self._indextts_url = indextts_url
+        self._indextts_audio_path = indextts_audio_path or DEFAULT_INDEX_TTS_AUDIO
+        
+        if self.engine not in ("kokoro", "indextts"):
+            raise ValueError(f"Unknown engine: {engine}. Must be 'kokoro' or 'indextts'")
     
     def _get_kokoro(self) -> KokoroTTSGenerator:
         """懒加载 Kokoro 实例"""
@@ -71,16 +98,28 @@ class TTSGenerator:
                     self._kokoro = get_kokoro_generator()
         return self._kokoro
     
+    def _get_indextts(self) -> IndexTTSEngine:
+        """懒加载 Index-TTS 实例"""
+        if self._indextts is None:
+            with self._lock:
+                if self._indextts is None:
+                    self._indextts = get_index_tts_engine(
+                        base_url=self._indextts_url,
+                        default_audio_path=self._indextts_audio_path,
+                    )
+        return self._indextts
+    
     def _get_voice_id(self, speaker: str, sentence_type: str) -> str:
-        """
-        获取音色ID
-        
-        旁白 -> NARRATOR_VOICE
-        对话 -> 角色映射 -> 默认男声
-        """
+        """获取音色ID（仅 Kokoro 使用）"""
         if sentence_type == "narration":
             return NARRATOR_VOICE
         return self._get_kokoro().get_voice_for_speaker(speaker)
+    
+    def _get_audio_path(self, speaker: str, sentence_type: str) -> str:
+        """获取参考音频路径（仅 Index-TTS 使用）"""
+        if sentence_type == "narration":
+            return self._indextts_audio_path
+        return self._get_indextts().get_voice_for_speaker(speaker)
     
     async def generate_audio_async(
         self,
@@ -91,20 +130,31 @@ class TTSGenerator:
         sentence_type: str = "narration",
     ) -> Path:
         """异步生成音频"""
-        kokoro = self._get_kokoro()
-        voice_id = self._get_voice_id(speaker, sentence_type)
-        
         if output_file is None:
             fd, output_file = tempfile.mkstemp(suffix=".wav")
             os.close(fd)
             output_file = Path(output_file)
         
-        kokoro.generate_audio_to_file(
-            text=text,
-            voice_id=voice_id,
-            output_file=output_file,
-            emotion=emotion,
-        )
+        if self.engine == "indextts":
+            indextts = self._get_indextts()
+            audio_path = self._get_audio_path(speaker, sentence_type)
+            
+            indextts.generate_audio_to_file(
+                text=text,
+                output_file=output_file,
+                audio_path=audio_path,
+                emotion=emotion if sentence_type == "dialogue" else None,
+            )
+        else:
+            kokoro = self._get_kokoro()
+            voice_id = self._get_voice_id(speaker, sentence_type)
+            
+            kokoro.generate_audio_to_file(
+                text=text,
+                voice_id=voice_id,
+                output_file=output_file,
+                emotion=emotion,
+            )
         
         return output_file
     
@@ -219,16 +269,28 @@ _generator: Optional[TTSGenerator] = None
 _generator_lock = threading.Lock()
 
 
-def get_tts_generator(voice_map: Optional[Dict[str, str]] = None) -> TTSGenerator:
+def get_tts_generator(
+    voice_map: Optional[Dict[str, str]] = None,
+    engine: str = "kokoro",
+    indextts_url: str = "http://localhost:7860",
+    indextts_audio_path: Optional[str] = None,
+) -> TTSGenerator:
+    """获取全局单例"""
     global _generator
     if _generator is None:
         with _generator_lock:
             if _generator is None:
-                _generator = TTSGenerator(voice_map)
+                _generator = TTSGenerator(
+                    voice_map=voice_map,
+                    engine=engine,
+                    indextts_url=indextts_url,
+                    indextts_audio_path=indextts_audio_path,
+                )
     return _generator
 
 
 def reset_tts_generator() -> None:
+    """重置全局单例（用于测试）"""
     global _generator
     with _generator_lock:
         _generator = None

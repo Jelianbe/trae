@@ -231,10 +231,15 @@ def evaluate_end_to_end(text, gt_dialogue_speakers, char_manager, enable_l2=True
         l2_threshold=0.55,
     )
 
-    # Build GT mapping
+    # Build GT mapping (normalize quotes for matching)
+    def normalize_quotes(text):
+        """统一中英文引号为英文引号，便于匹配"""
+        return text.replace('\u201c', '"').replace('\u201d', '"')
+    
     gt_map = {}
     for item in gt_dialogue_speakers:
-        text_key = item["text"][:30]
+        # 移除引号后取前30字符作为key
+        text_key = normalize_quotes(item["text"]).strip('"\'"\'')[:30]
         gt_map[text_key] = item["speaker"]
 
     def is_dialogue_line(line):
@@ -259,8 +264,9 @@ def evaluate_end_to_end(text, gt_dialogue_speakers, char_manager, enable_l2=True
             continue
 
         gt_speaker = None
+        normalized_line = normalize_quotes(line)
         for key, speaker in gt_map.items():
-            if key in line:
+            if key in normalized_line:
                 gt_speaker = speaker
                 break
         if gt_speaker:
@@ -288,8 +294,9 @@ def evaluate_end_to_end(text, gt_dialogue_speakers, char_manager, enable_l2=True
             continue
 
         gt_speaker = None
+        normalized_line = normalize_quotes(line)
         for key, speaker in gt_map.items():
-            if key in line:
+            if key in normalized_line:
                 gt_speaker = speaker
                 break
         if not gt_speaker:
@@ -330,10 +337,15 @@ def evaluate_speaker_matcher(text, gt_dialogue_speakers, char_manager, enable_l2
         l2_threshold=0.55,
     )
     
-    # 构建GT映射
+    # 构建GT映射（统一引号格式以便匹配）
+    def normalize_quotes(text):
+        """统一中英文引号为英文引号，便于匹配"""
+        return text.replace('\u201c', '"').replace('\u201d', '"')
+    
     gt_map = {}
     for item in gt_dialogue_speakers:
-        text_key = item["text"][:30]
+        # 移除引号后取前30字符作为key，这样无论GT用中文还是英文引号都能匹配
+        text_key = normalize_quotes(item["text"]).strip('"\'"\'')[:30]
         gt_map[text_key] = item["speaker"]
     
     def is_dialogue_line(line):
@@ -359,8 +371,9 @@ def evaluate_speaker_matcher(text, gt_dialogue_speakers, char_manager, enable_l2
             continue
         
         gt_speaker = None
+        normalized_line = normalize_quotes(line)
         for key, speaker in gt_map.items():
-            if key in line:
+            if key in normalized_line:
                 gt_speaker = speaker
                 break
         if gt_speaker:

@@ -105,8 +105,14 @@ class KokoroTTSGenerator:
             
             if not model_path.exists():
                 raise FileNotFoundError(
-                    f"Kokoro model not found at {model_path}. "
-                    f"Please download it first."
+                    f"Kokoro 模型文件未找到: {model_path}\n"
+                    f"请按照以下步骤下载模型文件:\n"
+                    f"1. 从 HuggingFace 下载模型: https://huggingface.co/hexgrad/Kokoro-82M-v1.1-zh\n"
+                    f"2. 将 kokoro-v1_1-zh.pth 和 config.json 放到: {KOKORO_MODEL_DIR}\n"
+                    f"3. 将 voices/*.pt 音色文件放到: {KOKORO_MODEL_DIR}/voices/\n"
+                    f"\n"
+                    f"或者使用 huggingface-cli 下载:\n"
+                    f"  huggingface-cli download hexgrad/Kokoro-82M-v1.1-zh --local-dir {KOKORO_MODEL_DIR}"
                 )
             
             device = "cuda" if torch.cuda.is_available() else "cpu"
