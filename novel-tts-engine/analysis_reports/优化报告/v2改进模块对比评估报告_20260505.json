@@ -1,0 +1,151 @@
+{
+  "v1": {
+    "total": 100,
+    "accuracy_l2": 0.29,
+    "accuracy_l1": 0.29,
+    "by_emotion": {
+      "anger": {
+        "total": 28,
+        "correct": 6
+      },
+      "fear": {
+        "total": 10,
+        "correct": 0
+      },
+      "surprise": {
+        "total": 11,
+        "correct": 2
+      },
+      "neutral": {
+        "total": 17,
+        "correct": 17
+      },
+      "joy": {
+        "total": 12,
+        "correct": 2
+      },
+      "sadness": {
+        "total": 22,
+        "correct": 2
+      }
+    },
+    "by_style": {
+      "都市": {
+        "total": 40,
+        "correct": 11
+      },
+      "历史": {
+        "total": 17,
+        "correct": 6
+      },
+      "修仙": {
+        "total": 23,
+        "correct": 4
+      },
+      "西幻": {
+        "total": 20,
+        "correct": 8
+      }
+    },
+    "confusion": {
+      "anger": {
+        "anger": 6,
+        "neutral": 22
+      },
+      "fear": {
+        "neutral": 9,
+        "anger": 1
+      },
+      "surprise": {
+        "surprise": 2,
+        "neutral": 9
+      },
+      "neutral": {
+        "neutral": 17
+      },
+      "joy": {
+        "joy": 2,
+        "neutral": 10
+      },
+      "sadness": {
+        "neutral": 20,
+        "sadness": 2
+      }
+    }
+  },
+  "v2": {
+    "total": 100,
+    "accuracy_l2": 0.27,
+    "accuracy_l1": 0.27,
+    "by_emotion": {
+      "anger": {
+        "total": 28,
+        "correct": 4
+      },
+      "fear": {
+        "total": 10,
+        "correct": 0
+      },
+      "surprise": {
+        "total": 11,
+        "correct": 3
+      },
+      "neutral": {
+        "total": 17,
+        "correct": 17
+      },
+      "joy": {
+        "total": 12,
+        "correct": 2
+      },
+      "sadness": {
+        "total": 22,
+        "correct": 1
+      }
+    },
+    "by_style": {
+      "都市": {
+        "total": 40,
+        "correct": 11
+      },
+      "历史": {
+        "total": 17,
+        "correct": 6
+      },
+      "修仙": {
+        "total": 23,
+        "correct": 3
+      },
+      "西幻": {
+        "total": 20,
+        "correct": 7
+      }
+    },
+    "confusion": {
+      "anger": {
+        "neutral": 24,
+        "anger": 4
+      },
+      "fear": {
+        "neutral": 9,
+        "anger": 1
+      },
+      "surprise": {
+        "surprise": 3,
+        "neutral": 8
+      },
+      "neutral": {
+        "neutral": 17
+      },
+      "joy": {
+        "joy": 2,
+        "neutral": 10
+      },
+      "sadness": {
+        "neutral": 20,
+        "sadness": 1,
+        "surprise": 1
+      }
+    }
+  }
+}

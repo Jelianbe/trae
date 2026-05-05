@@ -1,0 +1,1931 @@
+{
+  "gt_100": {
+    "v1": {
+      "total": 100,
+      "accuracy_l2": 0.29,
+      "accuracy_l1": 0.29,
+      "by_emotion": {
+        "anger": {
+          "total": 28,
+          "correct": 6
+        },
+        "fear": {
+          "total": 10,
+          "correct": 0
+        },
+        "surprise": {
+          "total": 11,
+          "correct": 2
+        },
+        "neutral": {
+          "total": 17,
+          "correct": 17
+        },
+        "joy": {
+          "total": 12,
+          "correct": 2
+        },
+        "sadness": {
+          "total": 22,
+          "correct": 2
+        }
+      },
+      "by_genre": {
+        "unknown": {
+          "total": 100,
+          "correct": 29
+        }
+      },
+      "by_difficulty": {
+        "unknown": {
+          "total": 100,
+          "correct": 29
+        }
+      },
+      "confusion": {
+        "anger": {
+          "anger": 6,
+          "neutral": 22
+        },
+        "fear": {
+          "neutral": 9,
+          "anger": 1
+        },
+        "surprise": {
+          "surprise": 2,
+          "neutral": 9
+        },
+        "neutral": {
+          "neutral": 17
+        },
+        "joy": {
+          "joy": 2,
+          "neutral": 10
+        },
+        "sadness": {
+          "neutral": 20,
+          "sadness": 2
+        }
+      }
+    },
+    "v2": {
+      "total": 100,
+      "accuracy_l2": 0.27,
+      "accuracy_l1": 0.27,
+      "by_emotion": {
+        "anger": {
+          "total": 28,
+          "correct": 4
+        },
+        "fear": {
+          "total": 10,
+          "correct": 0
+        },
+        "surprise": {
+          "total": 11,
+          "correct": 3
+        },
+        "neutral": {
+          "total": 17,
+          "correct": 17
+        },
+        "joy": {
+          "total": 12,
+          "correct": 2
+        },
+        "sadness": {
+          "total": 22,
+          "correct": 1
+        }
+      },
+      "by_genre": {
+        "unknown": {
+          "total": 100,
+          "correct": 27
+        }
+      },
+      "by_difficulty": {
+        "unknown": {
+          "total": 100,
+          "correct": 27
+        }
+      },
+      "confusion": {
+        "anger": {
+          "neutral": 24,
+          "anger": 4
+        },
+        "fear": {
+          "neutral": 9,
+          "anger": 1
+        },
+        "surprise": {
+          "surprise": 3,
+          "neutral": 8
+        },
+        "neutral": {
+          "neutral": 17
+        },
+        "joy": {
+          "joy": 2,
+          "neutral": 10
+        },
+        "sadness": {
+          "neutral": 20,
+          "sadness": 1,
+          "surprise": 1
+        }
+      }
+    }
+  },
+  "v2_198": {
+    "v1": {
+      "total": 198,
+      "accuracy_l2": 0.3888888888888889,
+      "accuracy_l1": 0.5,
+      "by_emotion": {
+        "anger": {
+          "total": 25,
+          "correct": 7
+        },
+        "fear": {
+          "total": 27,
+          "correct": 8
+        },
+        "sadness": {
+          "total": 34,
+          "correct": 11
+        },
+        "joy": {
+          "total": 41,
+          "correct": 17
+        },
+        "surprise": {
+          "total": 20,
+          "correct": 7
+        },
+        "neutral": {
+          "total": 51,
+          "correct": 27
+        }
+      },
+      "by_genre": {
+        "xianxia": {
+          "total": 20,
+          "correct": 9
+        },
+        "western": {
+          "total": 20,
+          "correct": 7
+        },
+        "urban": {
+          "total": 20,
+          "correct": 9
+        },
+        "historical": {
+          "total": 20,
+          "correct": 9
+        },
+        "japanese_ln": {
+          "total": 20,
+          "correct": 9
+        },
+        "scifi": {
+          "total": 19,
+          "correct": 5
+        },
+        "romance": {
+          "total": 20,
+          "correct": 2
+        },
+        "mystery": {
+          "total": 20,
+          "correct": 10
+        },
+        "wuxia": {
+          "total": 20,
+          "correct": 11
+        },
+        "net_novel": {
+          "total": 19,
+          "correct": 6
+        }
+      },
+      "by_difficulty": {
+        "medium": {
+          "total": 108,
+          "correct": 43
+        },
+        "easy": {
+          "total": 41,
+          "correct": 18
+        },
+        "hard": {
+          "total": 49,
+          "correct": 16
+        }
+      },
+      "confusion": {
+        "anger": {
+          "fear": 2,
+          "anger": 7,
+          "surprise": 3,
+          "neutral": 11,
+          "joy": 2
+        },
+        "fear": {
+          "fear": 8,
+          "neutral": 10,
+          "anger": 5,
+          "sadness": 3,
+          "surprise": 1
+        },
+        "sadness": {
+          "neutral": 14,
+          "joy": 1,
+          "sadness": 11,
+          "fear": 4,
+          "anger": 4
+        },
+        "joy": {
+          "joy": 17,
+          "neutral": 18,
+          "sadness": 1,
+          "anger": 5
+        },
+        "surprise": {
+          "fear": 2,
+          "joy": 2,
+          "neutral": 6,
+          "surprise": 7,
+          "anger": 3
+        },
+        "neutral": {
+          "anger": 9,
+          "neutral": 27,
+          "fear": 4,
+          "sadness": 4,
+          "joy": 5,
+          "surprise": 2
+        }
+      }
+    },
+    "v2": {
+      "total": 198,
+      "accuracy_l2": 0.5404040404040404,
+      "accuracy_l1": 0.6212121212121212,
+      "by_emotion": {
+        "anger": {
+          "total": 25,
+          "correct": 7
+        },
+        "fear": {
+          "total": 27,
+          "correct": 11
+        },
+        "sadness": {
+          "total": 34,
+          "correct": 18
+        },
+        "joy": {
+          "total": 41,
+          "correct": 24
+        },
+        "surprise": {
+          "total": 20,
+          "correct": 11
+        },
+        "neutral": {
+          "total": 51,
+          "correct": 36
+        }
+      },
+      "by_genre": {
+        "xianxia": {
+          "total": 20,
+          "correct": 14
+        },
+        "western": {
+          "total": 20,
+          "correct": 12
+        },
+        "urban": {
+          "total": 20,
+          "correct": 12
+        },
+        "historical": {
+          "total": 20,
+          "correct": 12
+        },
+        "japanese_ln": {
+          "total": 20,
+          "correct": 9
+        },
+        "scifi": {
+          "total": 19,
+          "correct": 8
+        },
+        "romance": {
+          "total": 20,
+          "correct": 5
+        },
+        "mystery": {
+          "total": 20,
+          "correct": 10
+        },
+        "wuxia": {
+          "total": 20,
+          "correct": 14
+        },
+        "net_novel": {
+          "total": 19,
+          "correct": 11
+        }
+      },
+      "by_difficulty": {
+        "medium": {
+          "total": 108,
+          "correct": 58
+        },
+        "easy": {
+          "total": 41,
+          "correct": 25
+        },
+        "hard": {
+          "total": 49,
+          "correct": 24
+        }
+      },
+      "confusion": {
+        "anger": {
+          "fear": 2,
+          "anger": 7,
+          "surprise": 3,
+          "neutral": 11,
+          "joy": 2
+        },
+        "fear": {
+          "fear": 11,
+          "neutral": 10,
+          "anger": 2,
+          "sadness": 4
+        },
+        "sadness": {
+          "sadness": 18,
+          "neutral": 12,
+          "fear": 3,
+          "anger": 1
+        },
+        "joy": {
+          "joy": 24,
+          "neutral": 13,
+          "sadness": 1,
+          "anger": 1,
+          "surprise": 2
+        },
+        "surprise": {
+          "fear": 3,
+          "surprise": 11,
+          "neutral": 5,
+          "joy": 1
+        },
+        "neutral": {
+          "neutral": 36,
+          "fear": 4,
+          "sadness": 4,
+          "joy": 5,
+          "surprise": 2
+        }
+      }
+    }
+  },
+  "novels": {
+    "都市": {
+      "v1": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 191,
+          "anger": 4,
+          "fear": 2,
+          "joy": 2,
+          "surprise": 1
+        },
+        "by_class": {
+          "neutral": 191,
+          "excited": 7,
+          "subdued": 2
+        },
+        "sample_predictions": [
+          {
+            "text": "卷一 暗流涌动\n\n第一章 异能觉醒\n\n夜幕降临，霓虹灯照亮了这座不眠的城市",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "苏夜独自坐在天台上，俯瞰着脚下的车水马龙",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "三个月前，他还只是一名普通的程序员，直到那场意外改变了一切",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"轰隆",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"远处的雷声滚滚而来，暴雨即将来临",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "苏夜伸出手，指尖隐约闪烁着微弱的蓝色光芒",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "那是他觉醒的异能——操控电流",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "\"苏夜，你在这里",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"一个清脆的女声从楼梯口传来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "苏夜转头看去，只见林雪快步走来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "她是苏夜的同事，也是唯一知道他秘密的人",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"林雪，你怎么上来了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"苏夜收起手中的电光，轻声问道",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"公司出事了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"林雪脸色凝重，\"今天有个神秘组织来公司搜查，说是要找什么异能者",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n苏夜眉头一皱：\"他们怎么知道这里有异能者",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n\"不清楚",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"林雪摇摇头，\"但我听到他们说一个叫暗影会的神秘组织，似乎在暗中收集所有觉醒者",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n苏夜握紧了拳头",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "他知道，平静的日子结束了",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          }
+        ]
+      },
+      "v2": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 183,
+          "anger": 4,
+          "fear": 3,
+          "joy": 3,
+          "sadness": 4,
+          "surprise": 3
+        },
+        "by_class": {
+          "neutral": 183,
+          "excited": 10,
+          "subdued": 7
+        },
+        "sample_predictions": [
+          {
+            "text": "卷一 暗流涌动\n\n第一章 异能觉醒\n\n夜幕降临，霓虹灯照亮了这座不眠的城市",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "苏夜独自坐在天台上，俯瞰着脚下的车水马龙",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "三个月前，他还只是一名普通的程序员，直到那场意外改变了一切",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"轰隆",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"远处的雷声滚滚而来，暴雨即将来临",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "苏夜伸出手，指尖隐约闪烁着微弱的蓝色光芒",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "那是他觉醒的异能——操控电流",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "\"苏夜，你在这里",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"一个清脆的女声从楼梯口传来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "苏夜转头看去，只见林雪快步走来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "她是苏夜的同事，也是唯一知道他秘密的人",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"林雪，你怎么上来了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"苏夜收起手中的电光，轻声问道",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"公司出事了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"林雪脸色凝重，\"今天有个神秘组织来公司搜查，说是要找什么异能者",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n苏夜眉头一皱：\"他们怎么知道这里有异能者",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n\"不清楚",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"林雪摇摇头，\"但我听到他们说一个叫暗影会的神秘组织，似乎在暗中收集所有觉醒者",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n苏夜握紧了拳头",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "他知道，平静的日子结束了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          }
+        ]
+      }
+    },
+    "西幻": {
+      "v1": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 195,
+          "joy": 4,
+          "anger": 1
+        },
+        "by_class": {
+          "neutral": 195,
+          "excited": 5
+        },
+        "sample_predictions": [
+          {
+            "text": "# 西方奇幻测试小说 - 艾德温与炎魔的传说\n# 风格：翻译体西幻，魔法与骑士的世界\n# 字数：约8000字，8章，2卷\n\n## 第一卷：黑暗降临\n\n### 第一章：边境哨站\n\n寒风呼啸着穿过灰石哨站的城墙",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "年轻的骑士艾德温站在塔楼上，凝视着远方被白雪覆盖的荒原",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "他的披风在风中猎猎作响",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"你在这里站了整整一夜",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n一个温柔的声音从身后传来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "伊莉雅提着魔法灯走上塔楼，银色的长发在灯光下闪闪发光",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "她是一位出色的法师，来自北方魔法学院",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"北方有异动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"艾德温说，声音中带着担忧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"我能感觉到魔力的波动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"伊莉雅走到他身边，望向远方",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "轰隆——\n\n远处传来雷鸣般的声音",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "艾德温的手握住了剑柄",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"那不是雷声",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"他沉声说道",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "伊莉雅闭上眼睛，感受了一下",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"是炎魔，至少有三只",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"她睁开眼，神色凝重",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "艾德温转身跑下塔楼，大声命令道：\n\n\"全体集合",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "准备战斗",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          }
+        ]
+      },
+      "v2": {
+        "total": 200,
+        "by_emotion": {
+          "joy": 5,
+          "neutral": 193,
+          "surprise": 1,
+          "anger": 1
+        },
+        "by_class": {
+          "excited": 7,
+          "neutral": 193
+        },
+        "sample_predictions": [
+          {
+            "text": "# 西方奇幻测试小说 - 艾德温与炎魔的传说\n# 风格：翻译体西幻，魔法与骑士的世界\n# 字数：约8000字，8章，2卷\n\n## 第一卷：黑暗降临\n\n### 第一章：边境哨站\n\n寒风呼啸着穿过灰石哨站的城墙",
+            "emotion": "joy",
+            "class": "excited",
+            "confidence": 0.4
+          },
+          {
+            "text": "年轻的骑士艾德温站在塔楼上，凝视着远方被白雪覆盖的荒原",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "他的披风在风中猎猎作响",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"你在这里站了整整一夜",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"\n\n一个温柔的声音从身后传来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "伊莉雅提着魔法灯走上塔楼，银色的长发在灯光下闪闪发光",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "她是一位出色的法师，来自北方魔法学院",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"北方有异动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"艾德温说，声音中带着担忧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"我能感觉到魔力的波动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"伊莉雅走到他身边，望向远方",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "轰隆——\n\n远处传来雷鸣般的声音",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "艾德温的手握住了剑柄",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"那不是雷声",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"他沉声说道",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "伊莉雅闭上眼睛，感受了一下",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"是炎魔，至少有三只",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "\"她睁开眼，神色凝重",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "艾德温转身跑下塔楼，大声命令道：\n\n\"全体集合",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "准备战斗",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          }
+        ]
+      }
+    },
+    "修仙": {
+      "v1": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 161,
+          "anger": 18,
+          "joy": 13,
+          "surprise": 8
+        },
+        "by_class": {
+          "neutral": 161,
+          "excited": 39
+        },
+        "sample_predictions": [
+          {
+            "text": "第1章 陨落的天才\n\n“斗之力，三段",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n望着测验魔石碑上面闪亮得甚至有些刺眼的五个大字，少年面无表情，唇角有着一抹自嘲，紧握的手掌，因为大力，而导致略微尖锐的指甲深深的刺进了掌心之中，带来一阵阵钻心的疼痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“萧炎，斗之力，三段",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "级别：低级",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”测验魔石碑之旁，一位中年男子，看了一眼碑上所显示出来的信息，语气漠然的将之公布了出来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "中年男子话刚刚脱口，便是不出意外的在人头汹涌的广场上带起了一阵嘲讽的骚动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“三段",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "嘿嘿，果然不出我所料，这个‘天才’这一年又是在原地踏步",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n“哎，这废物真是把家族的脸都给丢光了",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "”\n“要不是族长是他的父亲，这种废物，早就被驱赶出家族，任其自生自灭了，哪还有机会待在家族中白吃白喝",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "”\n“唉，昔年那名闻乌坦城的天才少年，如今怎么落魄成这般模样了啊",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n“谁知道呢，或许做了什么亏心事，惹得神灵降怒了吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n周围传来的不屑嘲笑以及惋惜轻叹，落在那如木桩待在原地的少年耳中，恍如一根根利刺狠狠的扎在心脏一般，让得少年呼吸微微急促",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "少年缓缓抬起头来，露出一张有些清秀的稚嫩脸庞，漆黑的眸子木然的在周围那些嘲讽的同龄人身上扫过，少年嘴角的自嘲，似乎变得更加苦涩了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“这些人，都如此刻薄势力吗",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "或许是因为三年前他们曾经在自己面前露出过最谦卑的笑容，所以，如今想要讨还回去吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”苦涩的一笑，萧炎落寞的转身，安静的回到了队伍的最后一排，孤单的身影，与周围的世界，有些格格不入",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“下一个，萧媚",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n听着测验人的喊声，一名少女快速的人群中跑出，少女刚刚出场，附近的议论声便是小了许多，一双双略微火热的目光，牢牢的锁定着少女的脸颊",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "少女年龄不过十四左右，虽然并算不上绝色，不过那张稚气未脱的小脸，却是蕴含着淡淡的妩媚，清纯与妩媚，矛盾的集合，让得她成功的成为了全场瞩目的焦点",
+            "emotion": "joy",
+            "class": "excited",
+            "confidence": 0.5
+          }
+        ]
+      },
+      "v2": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 172,
+          "anger": 6,
+          "joy": 15,
+          "surprise": 7
+        },
+        "by_class": {
+          "neutral": 172,
+          "excited": 28
+        },
+        "sample_predictions": [
+          {
+            "text": "第1章 陨落的天才\n\n“斗之力，三段",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n望着测验魔石碑上面闪亮得甚至有些刺眼的五个大字，少年面无表情，唇角有着一抹自嘲，紧握的手掌，因为大力，而导致略微尖锐的指甲深深的刺进了掌心之中，带来一阵阵钻心的疼痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“萧炎，斗之力，三段",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "级别：低级",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”测验魔石碑之旁，一位中年男子，看了一眼碑上所显示出来的信息，语气漠然的将之公布了出来",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "中年男子话刚刚脱口，便是不出意外的在人头汹涌的广场上带起了一阵嘲讽的骚动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“三段",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "嘿嘿，果然不出我所料，这个‘天才’这一年又是在原地踏步",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n“哎，这废物真是把家族的脸都给丢光了",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "”\n“要不是族长是他的父亲，这种废物，早就被驱赶出家族，任其自生自灭了，哪还有机会待在家族中白吃白喝",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.5
+          },
+          {
+            "text": "”\n“唉，昔年那名闻乌坦城的天才少年，如今怎么落魄成这般模样了啊",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n“谁知道呢，或许做了什么亏心事，惹得神灵降怒了吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n周围传来的不屑嘲笑以及惋惜轻叹，落在那如木桩待在原地的少年耳中，恍如一根根利刺狠狠的扎在心脏一般，让得少年呼吸微微急促",
+            "emotion": "anger",
+            "class": "excited",
+            "confidence": 0.4
+          },
+          {
+            "text": "少年缓缓抬起头来，露出一张有些清秀的稚嫩脸庞，漆黑的眸子木然的在周围那些嘲讽的同龄人身上扫过，少年嘴角的自嘲，似乎变得更加苦涩了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“这些人，都如此刻薄势力吗",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "或许是因为三年前他们曾经在自己面前露出过最谦卑的笑容，所以，如今想要讨还回去吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”苦涩的一笑，萧炎落寞的转身，安静的回到了队伍的最后一排，孤单的身影，与周围的世界，有些格格不入",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "“下一个，萧媚",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "”\n听着测验人的喊声，一名少女快速的人群中跑出，少女刚刚出场，附近的议论声便是小了许多，一双双略微火热的目光，牢牢的锁定着少女的脸颊",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "少女年龄不过十四左右，虽然并算不上绝色，不过那张稚气未脱的小脸，却是蕴含着淡淡的妩媚，清纯与妩媚，矛盾的集合，让得她成功的成为了全场瞩目的焦点",
+            "emotion": "joy",
+            "class": "excited",
+            "confidence": 0.5
+          }
+        ]
+      }
+    },
+    "悬疑": {
+      "v1": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 183,
+          "anger": 10,
+          "joy": 1,
+          "fear": 2,
+          "surprise": 4
+        },
+        "by_class": {
+          "neutral": 183,
+          "excited": 15,
+          "subdued": 2
+        },
+        "sample_predictions": [
+          {
+            "text": "第1章 绯红\n　　第1章 绯红\n　　痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "好痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "头好痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "光怪陆离满是低语的梦境迅速支离破碎，熟睡中的周明瑞只觉脑袋抽痛异常，仿佛被人用棒子狠狠抡了一下，不，更像是遭尖锐的物品刺入太阳穴并伴随有搅动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "嘶",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "迷迷糊糊间，周明瑞想要翻身，想要捂头，想要坐起，可完全无法挪动手脚，身体似乎失去了控制",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "看来我还没有真醒，还在梦里",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "等下说不定还会出现自以为已经醒了，实际依然在睡的情况",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "对类似遭遇不算陌生的周明瑞竭力集中意志，以彻底摆脱黑暗和迷幻的桎梏",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "然而，半睡半醒之时，意志总是飘忽如同烟雾，难以控制，难以收束，他再怎幺努力，依旧忍不住思维发散，杂念浮现",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "好端端的，大半夜的，怎幺会突然头痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "还痛得这幺厉害",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "不会是脑溢血什幺的吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "我擦，我不会就这样英年早逝了吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "赶紧醒",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "赶紧醒",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "咦，好像没刚才那幺痛了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "但脑子里还是跟有把钝刀子在慢慢割一样",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "看来没法继续睡了，明天还怎幺上班",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "还想什幺上班",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          }
+        ]
+      },
+      "v2": {
+        "total": 200,
+        "by_emotion": {
+          "neutral": 190,
+          "joy": 1,
+          "fear": 2,
+          "surprise": 4,
+          "sadness": 2,
+          "anger": 1
+        },
+        "by_class": {
+          "neutral": 190,
+          "excited": 6,
+          "subdued": 4
+        },
+        "sample_predictions": [
+          {
+            "text": "第1章 绯红\n　　第1章 绯红\n　　痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "好痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "头好痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "光怪陆离满是低语的梦境迅速支离破碎，熟睡中的周明瑞只觉脑袋抽痛异常，仿佛被人用棒子狠狠抡了一下，不，更像是遭尖锐的物品刺入太阳穴并伴随有搅动",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "嘶",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "迷迷糊糊间，周明瑞想要翻身，想要捂头，想要坐起，可完全无法挪动手脚，身体似乎失去了控制",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "看来我还没有真醒，还在梦里",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "等下说不定还会出现自以为已经醒了，实际依然在睡的情况",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "对类似遭遇不算陌生的周明瑞竭力集中意志，以彻底摆脱黑暗和迷幻的桎梏",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "然而，半睡半醒之时，意志总是飘忽如同烟雾，难以控制，难以收束，他再怎幺努力，依旧忍不住思维发散，杂念浮现",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "好端端的，大半夜的，怎幺会突然头痛",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "还痛得这幺厉害",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "不会是脑溢血什幺的吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "我擦，我不会就这样英年早逝了吧",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "赶紧醒",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "赶紧醒",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "咦，好像没刚才那幺痛了",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "但脑子里还是跟有把钝刀子在慢慢割一样",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "看来没法继续睡了，明天还怎幺上班",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          },
+          {
+            "text": "还想什幺上班",
+            "emotion": "neutral",
+            "class": "neutral",
+            "confidence": 0.3
+          }
+        ]
+      }
+    }
+  },
+  "arbitrariness": {
+    "gt_100": {
+      "overconfidence": {
+        "v1": 0,
+        "v2": 0,
+        "cases_v1": [],
+        "cases_v2": []
+      },
+      "emotion_blindness": {
+        "v1": 70,
+        "v2": 71,
+        "cases_v1": [
+          {
+            "text": "「属下不敢。」",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「我等这一天，等了十年。」",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「你当真以为我怕你？」",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「不必管我！你们快走！」",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「大小姐，姑爷回来了。」",
+            "gt_emotion": "joy",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          }
+        ],
+        "cases_v2": [
+          {
+            "text": "「你给我滚出去！」",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「属下不敢。」",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「我等这一天，等了十年。」",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「你当真以为我怕你？」",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          },
+          {
+            "text": "「不必管我！你们快走！」",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "unknown",
+            "difficulty": "unknown",
+            "correct_l2": false
+          }
+        ]
+      },
+      "inconsistency": {
+        "count": 4,
+        "pairs": [
+          {
+            "text": "「你给我滚出去！」",
+            "v1": "anger",
+            "v2": "neutral",
+            "gt": "anger"
+          },
+          {
+            "text": "“莉莉丝，我警告过你不要靠近那些东西。”",
+            "v1": "anger",
+            "v2": "neutral",
+            "gt": "anger"
+          },
+          {
+            "text": "“你看到了吗？”、“看到了。”、“到底是什么？”、“你自己看。”",
+            "v1": "neutral",
+            "v2": "surprise",
+            "gt": "surprise"
+          },
+          {
+            "text": "“你后悔吗？”、“后悔什么？”、“后悔认识我。”",
+            "v1": "sadness",
+            "v2": "surprise",
+            "gt": "sadness"
+          }
+        ]
+      }
+    },
+    "v2_198": {
+      "overconfidence": {
+        "v1": 14,
+        "v2": 9,
+        "cases_v1": [
+          {
+            "text": "龙穴入口。巨龙的咆哮从洞穴深处传来，热浪扑面而来。「快跑！它醒了！」理查德大喊一声，拉着艾琳就往回跑。身后的岩石被龙焰融化，滚烫的岩浆在脚下流淌。",
+            "gt_emotion": "fear",
+            "pred_emotion": "anger",
+            "pred_class": "excited",
+            "confidence": 0.9,
+            "genre": "western",
+            "difficulty": "easy",
+            "correct_l2": false
+          },
+          {
+            "text": "城堡地牢。「你以为你能困住我？」吸血鬼伯爵缓缓站起身，嘴角浮现出一抹危险的笑容。铁栏杆在他面前如同纸糊一般脆弱。「三百年了……我终于自由了。」",
+            "gt_emotion": "anger",
+            "pred_emotion": "joy",
+            "pred_class": "excited",
+            "confidence": 0.7,
+            "genre": "western",
+            "difficulty": "hard",
+            "correct_l2": false
+          },
+          {
+            "text": "高考成绩查询日。「我考上了！我考上了！」她兴奋地跳了起来，手机差点甩出去。「多少分？多少分？」室友们围了过来。「698！全省第37名！」房间里爆发出尖叫声。",
+            "gt_emotion": "joy",
+            "pred_emotion": "anger",
+            "pred_class": "excited",
+            "confidence": 0.7,
+            "genre": "urban",
+            "difficulty": "easy",
+            "correct_l2": false
+          },
+          {
+            "text": "长亭外，古道边。「此去山高路远，兄台一路保重。」他拱手行礼，声音有些哽咽。对面的中年人也红了眼眶：「后会有期。」说罢，翻身上马，扬鞭而去。马蹄声渐远，只留下古道上的滚滚黄沙。",
+            "gt_emotion": "sadness",
+            "pred_emotion": "anger",
+            "pred_class": "excited",
+            "confidence": 0.7,
+            "genre": "historical",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "太和殿前。「来人！将这个欺君罔上的贼子拖出去斩了！」皇帝怒不可遏。那大臣面不改色，仰天大笑：「哈哈哈！昏君！你杀了我一个，还有千千万万个我！",
+            "gt_emotion": "anger",
+            "pred_emotion": "joy",
+            "pred_class": "excited",
+            "confidence": 0.95,
+            "genre": "historical",
+            "difficulty": "medium",
+            "correct_l2": false
+          }
+        ],
+        "cases_v2": [
+          {
+            "text": "龙穴入口。巨龙的咆哮从洞穴深处传来，热浪扑面而来。「快跑！它醒了！」理查德大喊一声，拉着艾琳就往回跑。身后的岩石被龙焰融化，滚烫的岩浆在脚下流淌。",
+            "gt_emotion": "fear",
+            "pred_emotion": "anger",
+            "pred_class": "excited",
+            "confidence": 0.95,
+            "genre": "western",
+            "difficulty": "easy",
+            "correct_l2": false
+          },
+          {
+            "text": "城堡地牢。「你以为你能困住我？」吸血鬼伯爵缓缓站起身，嘴角浮现出一抹危险的笑容。铁栏杆在他面前如同纸糊一般脆弱。「三百年了……我终于自由了。」",
+            "gt_emotion": "anger",
+            "pred_emotion": "joy",
+            "pred_class": "excited",
+            "confidence": 0.7,
+            "genre": "western",
+            "difficulty": "hard",
+            "correct_l2": false
+          },
+          {
+            "text": "太和殿前。「来人！将这个欺君罔上的贼子拖出去斩了！」皇帝怒不可遏。那大臣面不改色，仰天大笑：「哈哈哈！昏君！你杀了我一个，还有千千万万个我！",
+            "gt_emotion": "anger",
+            "pred_emotion": "joy",
+            "pred_class": "excited",
+            "confidence": 0.95,
+            "genre": "historical",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "教室里，午后的阳光透过窗帘洒进来。「佐藤くん、放課後一緒に帰らない？」田中笑嘻嘻地凑过来。佐藤头也不抬：「いいえ、部活があるから。」他的声音平淡，但耳根微微泛红。",
+            "gt_emotion": "neutral",
+            "pred_emotion": "joy",
+            "pred_class": "excited",
+            "confidence": 0.95,
+            "genre": "japanese_ln",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "基因实验室。「你疯了吗？这种实验是被国际法禁止的！」她拍着桌子。「如果成功了，人类将永远不再受疾病困扰。」他平静地回答，将注射器推进了培养皿。",
+            "gt_emotion": "neutral",
+            "pred_emotion": "joy",
+            "pred_class": "excited",
+            "confidence": 0.8,
+            "genre": "scifi",
+            "difficulty": "hard",
+            "correct_l2": false
+          }
+        ]
+      },
+      "emotion_blindness": {
+        "v1": 59,
+        "v2": 51,
+        "cases_v1": [
+          {
+            "text": "苏瑶站在山门前，远远望着那个熟悉的身影。「师兄……你真的要走吗？」她的声音微微发颤，眼眶泛红。他背对着她，沉默了许久：「师门有难，我不得不回。你……好好照顾自己。」说完，他纵身一跃，消失在云海之中。",
+            "gt_emotion": "sadness",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "宗门大比决赛现场。「好！好一个剑意凌云！」裁判长老抚须赞叹。陈长生收剑而立，面不改色。台下的师妹们纷纷欢呼雀跃，而他的对手已经瘫倒在地，口吐鲜血。",
+            "gt_emotion": "joy",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "战后废墟。「师父……」他跪在碎石堆中，双手刨着瓦砾，指甲已经磨破流血。身旁的师兄弟们默默站着，没有人说话。天空飘起了细雨，打在他满是伤痕的脸上。",
+            "gt_emotion": "sadness",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "渡劫场上，雷云密布。第一道天雷轰然落下，他咬紧牙关硬扛。第二道、第三道……到了第七道，他的护体灵光已经碎裂。第八道天雷在云层中酝酿，紫色的电光照亮了整片天空。",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "王座大厅内，烛火通明。「For the Alliance!」亚瑟·潘德拉贡高举圣剑，金色的光芒从剑身上迸发。骑士们齐声呐喊，声震穹顶。对面的黑暗领主冷哼一声，举起了手中的暗影之杖。",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "western",
+            "difficulty": "medium",
+            "correct_l2": false
+          }
+        ],
+        "cases_v2": [
+          {
+            "text": "宗门大比决赛现场。「好！好一个剑意凌云！」裁判长老抚须赞叹。陈长生收剑而立，面不改色。台下的师妹们纷纷欢呼雀跃，而他的对手已经瘫倒在地，口吐鲜血。",
+            "gt_emotion": "joy",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "战后废墟。「师父……」他跪在碎石堆中，双手刨着瓦砾，指甲已经磨破流血。身旁的师兄弟们默默站着，没有人说话。天空飘起了细雨，打在他满是伤痕的脸上。",
+            "gt_emotion": "sadness",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "渡劫场上，雷云密布。第一道天雷轰然落下，他咬紧牙关硬扛。第二道、第三道……到了第七道，他的护体灵光已经碎裂。第八道天雷在云层中酝酿，紫色的电光照亮了整片天空。",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "xianxia",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "王座大厅内，烛火通明。「For the Alliance!」亚瑟·潘德拉贡高举圣剑，金色的光芒从剑身上迸发。骑士们齐声呐喊，声震穹顶。对面的黑暗领主冷哼一声，举起了手中的暗影之杖。",
+            "gt_emotion": "anger",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "western",
+            "difficulty": "medium",
+            "correct_l2": false
+          },
+          {
+            "text": "精灵森林深处。「Legolas，你听到了吗？」阿拉贡停下脚步，手按在剑柄上。精灵王子微微侧头，长耳轻颤：「黑暗正在逼近。是奥克的军队……至少三千人。」",
+            "gt_emotion": "fear",
+            "pred_emotion": "neutral",
+            "pred_class": "neutral",
+            "confidence": 0.3,
+            "genre": "western",
+            "difficulty": "medium",
+            "correct_l2": false
+          }
+        ]
+      },
+      "inconsistency": {
+        "count": 43,
+        "pairs": [
+          {
+            "text": "苏瑶站在山门前，远远望着那个熟悉的身影。「师兄……你真的要走吗？」她的声音微微发颤，眼眶泛红。他背对着她，沉默了许久：「师门有难，我不得不回。你……好好照顾自己",
+            "v1": "neutral",
+            "v2": "sadness",
+            "gt": "sadness"
+          },
+          {
+            "text": "清晨，山谷中薄雾弥漫。叶凡盘膝而坐，缓缓运转体内灵力。丹田中的灵气如涓涓细流，沿着经脉缓缓运行。周身泛起淡淡的光芒，草木为之轻轻摇曳。一个时辰后，他缓缓睁开双眼",
+            "v1": "anger",
+            "v2": "neutral",
+            "gt": "neutral"
+          },
+          {
+            "text": "拍卖会上。「三千万！」「三千五百万！」「四千万！」竞价声此起彼伏。坐在角落的蒙面女子微微一笑，举起了手中的号牌：「一个亿。」全场鸦雀无声。",
+            "v1": "joy",
+            "v2": "surprise",
+            "gt": "surprise"
+          },
+          {
+            "text": "悬崖边，风声呼啸。她望着他远去的背影，嘴唇微微颤抖，却一个字也说不出来。身旁的侍女轻声道：「小姐，我们回去吧。」她摇了摇头，泪水终于滑落。",
+            "v1": "joy",
+            "v2": "sadness",
+            "gt": "sadness"
+          },
+          {
+            "text": "炼丹室内。丹炉中传来一声闷响，紧接着黑烟滚滚。他连忙后退几步，咳嗽不止。「又失败了……」他望着满地狼藉，叹了口气，重新取出一份药材。",
+            "v1": "anger",
+            "v2": "neutral",
+            "gt": "neutral"
+          },
+          {
+            "text": "魔法塔顶层。「不可能……这绝对不可能！」梅林大法师瞪大了眼睛，手中的水晶球碎裂成粉末。「预言上写的不是这样的……命运之轮已经被改变了？」",
+            "v1": "neutral",
+            "v2": "surprise",
+            "gt": "surprise"
+          },
+          {
+            "text": "港口码头。「I'll be back. I promise.」杰克紧紧抱住她，声音有些哽咽。她埋在他怀里，肩膀微微颤抖：「你每次都这么说……」船笛响起，他松开手",
+            "v1": "fear",
+            "v2": "sadness",
+            "gt": "sadness"
+          },
+          {
+            "text": "战场帐篷。「将军，敌军兵力是我们的五倍，我们……」副将的声音越来越小。老将军沉默良久，缓缓站起身来：「传令三军，明日清晨，全员出击。」「可是将军……」「没有可是",
+            "v1": "anger",
+            "v2": "neutral",
+            "gt": "neutral"
+          },
+          {
+            "text": "矮人锻造大厅。「Perfect!」矮人铁匠锤下了最后一锤，将烧红的剑刃浸入冰水中。白色的蒸汽升腾而起，剑身上浮现出精美的符文。他满意地擦了擦汗：「这把剑，我花了",
+            "v1": "neutral",
+            "v2": "joy",
+            "gt": "joy"
+          },
+          {
+            "text": "婚礼现场。「你愿意嫁给我吗？」他单膝跪地，手中捧着一枚钻戒。她的泪水夺眶而出，用力地点了点头：「我愿意！我愿意！」周围的宾客们纷纷起立，掌声雷动。",
+            "v1": "sadness",
+            "v2": "joy",
+            "gt": "joy"
+          }
+        ]
+      }
+    }
+  }
+}

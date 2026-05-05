@@ -1,0 +1,261 @@
+{
+  "v1": {
+    "total": 198,
+    "accuracy_l2": 0.3888888888888889,
+    "accuracy_l1": 0.5,
+    "by_emotion": {
+      "anger": {
+        "total": 25,
+        "correct": 7
+      },
+      "fear": {
+        "total": 27,
+        "correct": 8
+      },
+      "sadness": {
+        "total": 34,
+        "correct": 11
+      },
+      "joy": {
+        "total": 41,
+        "correct": 17
+      },
+      "surprise": {
+        "total": 20,
+        "correct": 7
+      },
+      "neutral": {
+        "total": 51,
+        "correct": 27
+      }
+    },
+    "by_genre": {
+      "xianxia": {
+        "total": 20,
+        "correct": 9
+      },
+      "western": {
+        "total": 20,
+        "correct": 7
+      },
+      "urban": {
+        "total": 20,
+        "correct": 9
+      },
+      "historical": {
+        "total": 20,
+        "correct": 9
+      },
+      "japanese_ln": {
+        "total": 20,
+        "correct": 9
+      },
+      "scifi": {
+        "total": 19,
+        "correct": 5
+      },
+      "romance": {
+        "total": 20,
+        "correct": 2
+      },
+      "mystery": {
+        "total": 20,
+        "correct": 10
+      },
+      "wuxia": {
+        "total": 20,
+        "correct": 11
+      },
+      "net_novel": {
+        "total": 19,
+        "correct": 6
+      }
+    },
+    "by_difficulty": {
+      "medium": {
+        "total": 108,
+        "correct": 43
+      },
+      "easy": {
+        "total": 41,
+        "correct": 18
+      },
+      "hard": {
+        "total": 49,
+        "correct": 16
+      }
+    },
+    "confusion": {
+      "anger": {
+        "fear": 2,
+        "anger": 7,
+        "surprise": 3,
+        "neutral": 11,
+        "joy": 2
+      },
+      "fear": {
+        "fear": 8,
+        "neutral": 10,
+        "anger": 5,
+        "sadness": 3,
+        "surprise": 1
+      },
+      "sadness": {
+        "neutral": 14,
+        "joy": 1,
+        "sadness": 11,
+        "fear": 4,
+        "anger": 4
+      },
+      "joy": {
+        "joy": 17,
+        "neutral": 18,
+        "sadness": 1,
+        "anger": 5
+      },
+      "surprise": {
+        "fear": 2,
+        "joy": 2,
+        "neutral": 6,
+        "surprise": 7,
+        "anger": 3
+      },
+      "neutral": {
+        "anger": 9,
+        "neutral": 27,
+        "fear": 4,
+        "sadness": 4,
+        "joy": 5,
+        "surprise": 2
+      }
+    }
+  },
+  "v2": {
+    "total": 198,
+    "accuracy_l2": 0.5404040404040404,
+    "accuracy_l1": 0.6212121212121212,
+    "by_emotion": {
+      "anger": {
+        "total": 25,
+        "correct": 7
+      },
+      "fear": {
+        "total": 27,
+        "correct": 11
+      },
+      "sadness": {
+        "total": 34,
+        "correct": 18
+      },
+      "joy": {
+        "total": 41,
+        "correct": 24
+      },
+      "surprise": {
+        "total": 20,
+        "correct": 11
+      },
+      "neutral": {
+        "total": 51,
+        "correct": 36
+      }
+    },
+    "by_genre": {
+      "xianxia": {
+        "total": 20,
+        "correct": 14
+      },
+      "western": {
+        "total": 20,
+        "correct": 12
+      },
+      "urban": {
+        "total": 20,
+        "correct": 12
+      },
+      "historical": {
+        "total": 20,
+        "correct": 12
+      },
+      "japanese_ln": {
+        "total": 20,
+        "correct": 9
+      },
+      "scifi": {
+        "total": 19,
+        "correct": 8
+      },
+      "romance": {
+        "total": 20,
+        "correct": 5
+      },
+      "mystery": {
+        "total": 20,
+        "correct": 10
+      },
+      "wuxia": {
+        "total": 20,
+        "correct": 14
+      },
+      "net_novel": {
+        "total": 19,
+        "correct": 11
+      }
+    },
+    "by_difficulty": {
+      "medium": {
+        "total": 108,
+        "correct": 58
+      },
+      "easy": {
+        "total": 41,
+        "correct": 25
+      },
+      "hard": {
+        "total": 49,
+        "correct": 24
+      }
+    },
+    "confusion": {
+      "anger": {
+        "fear": 2,
+        "anger": 7,
+        "surprise": 3,
+        "neutral": 11,
+        "joy": 2
+      },
+      "fear": {
+        "fear": 11,
+        "neutral": 10,
+        "anger": 2,
+        "sadness": 4
+      },
+      "sadness": {
+        "sadness": 18,
+        "neutral": 12,
+        "fear": 3,
+        "anger": 1
+      },
+      "joy": {
+        "joy": 24,
+        "neutral": 13,
+        "sadness": 1,
+        "anger": 1,
+        "surprise": 2
+      },
+      "surprise": {
+        "fear": 3,
+        "surprise": 11,
+        "neutral": 5,
+        "joy": 1
+      },
+      "neutral": {
+        "neutral": 36,
+        "fear": 4,
+        "sadness": 4,
+        "joy": 5,
+        "surprise": 2
+      }
+    }
+  }
+}
