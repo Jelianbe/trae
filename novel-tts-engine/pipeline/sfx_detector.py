@@ -256,52 +256,48 @@ class SfxDetector:
         self._trie_built = True
 
     def detect(self, text: str) -> List[SfxWord]:
-        results = []
+        results: Dict[int, SfxWord] = {}  # position -> SfxWord (keep longest per position)
         
         if self._trie_built:
             for i in range(len(text)):
                 node = self._trie
-                if text[i] in node:
-                    node = node[text[i]]
-                    if '#' in node:
-                        word = node['#']
+                if text[i] not in node:
+                    continue
+                node = node[text[i]]
+                if '#' in node:
+                    word = node['#']
+                    if i not in results or len(word) > len(results[i].text):
                         sfx_type = self._get_sfx_type(word)
-                        results.append(SfxWord(
-                            text=word,
-                            position=i,
-                            sfx_type=sfx_type
-                        ))
-                    for j in range(i + 1, len(text)):
-                        if text[j] in node:
-                            node = node[text[j]]
-                            if '#' in node:
-                                word = node['#']
+                        results[i] = SfxWord(text=word, position=i, sfx_type=sfx_type)
+                for j in range(i + 1, len(text)):
+                    if text[j] in node:
+                        node = node[text[j]]
+                        if '#' in node:
+                            word = node['#']
+                            if i not in results or len(word) > len(results[i].text):
                                 sfx_type = self._get_sfx_type(word)
-                                results.append(SfxWord(
-                                    text=word,
-                                    position=i,
-                                    sfx_type=sfx_type
-                                ))
-                        else:
-                            break
+                                results[i] = SfxWord(text=word, position=i, sfx_type=sfx_type)
+                    else:
+                        break
         
+        # Regex pass: only add if no trie match covers this position
+        trie_ranges = [(pos, pos + len(sfx.text)) for pos, sfx in results.items()]
         for pattern in self.SFX_PATTERNS:
             for match in pattern.finditer(text):
                 word = match.group()
                 if word in self.SFX_EXCLUDE:
                     continue
-                if word not in self.sfx_words and len(word) >= 2:
-                    sfx_type = self._get_sfx_type(word)
-                    results.append(SfxWord(
-                        text=word,
-                        position=match.start(),
-                        sfx_type=sfx_type
-                    ))
+                if len(word) >= 2:
+                    is_covered = False
+                    for (s, e) in trie_ranges:
+                        if not (match.end() <= s or match.start() >= e):
+                            is_covered = True
+                            break
+                    if not is_covered and match.start() not in results:
+                        sfx_type = self._get_sfx_type(word)
+                        results[match.start()] = SfxWord(text=word, position=match.start(), sfx_type=sfx_type)
         
-        results = self._deduplicate(results)
-        results.sort(key=lambda x: x.position)
-        
-        return results
+        return sorted(results.values(), key=lambda x: x.position)
 
     def _get_sfx_type(self, word: str) -> str:
         for sfx_type, chars in self.SFX_TYPE_MAP.items():
@@ -372,16 +368,24 @@ class SfxDetector:
         return sorted(list(self.sfx_words))
 
 
+# Module-level SfxDetector singleton for convenience functions
+_default_detector: Optional['SfxDetector'] = None
+
+
+def _get_detector() -> 'SfxDetector':
+    global _default_detector
+    if _default_detector is None:
+        _default_detector = SfxDetector()
+    return _default_detector
+
+
 def detect_sfx(text: str) -> List[SfxWord]:
-    detector = SfxDetector()
-    return detector.detect(text)
+    return _get_detector().detect(text)
 
 
 def is_sfx_word(word: str) -> bool:
-    detector = SfxDetector()
-    return detector.is_sfx(word)
+    return _get_detector().is_sfx(word)
 
 
 def get_sfx_words() -> List[str]:
-    detector = SfxDetector()
-    return detector.get_all_words()
+    return _get_detector().get_all_words()

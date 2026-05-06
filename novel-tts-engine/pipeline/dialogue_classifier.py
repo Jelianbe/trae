@@ -20,16 +20,16 @@ class ClassifiedSentence:
 
 class DialogueClassifier:
     DIALOGUE_PATTERNS = [
-        re.compile(r'[""「」『』【】《》]'),
-        re.compile(r'^[「『"].*[」』]'),
-        re.compile(r'[""].*[""]'),
+        re.compile(r'["\u201c\u201d「」『』【】《》]'),
+        re.compile(r'^[「『"].*[」』"]'),
+        re.compile(r'["\u201c]["\u201d]'),
         re.compile(r'「[^」]*」'),
         re.compile(r'『[^』]*』'),
         re.compile(r'"[^"]*"'),
-        re.compile(r'"[^"]*"'),
+        re.compile(r'\u201c[^\u201d]*\u201d'),
     ]
     
-    DIALOGUE_MARKERS = ['"', '"', '「', '」', '『', '』', '【', '】']
+    DIALOGUE_MARKERS = ['"', '"', '\u201c', '\u201d', '「', '」', '『', '』', '【', '】']
     
     NARRATION_INDICATORS = [
         '心想', '暗道', '想到', '觉得', '认为', '感觉',

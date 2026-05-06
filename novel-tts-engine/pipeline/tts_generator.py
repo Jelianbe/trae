@@ -65,25 +65,31 @@ class TTSGenerator:
     
     支持 Kokoro 和 Index-TTS 两种引擎。
     旁白和对话使用不同音色，角色各有专属音色。
+    
+    特性：
+    - 默认使用 Index-TTS（音色克隆 + 情感控制）
+    - Index-TTS 不可用时自动回退 Kokoro
     """
     
     def __init__(
         self,
         voice_map: Optional[Dict[str, str]] = None,
-        engine: str = "kokoro",
-        indextts_url: str = "http://localhost:7860",
+        engine: str = "indextts",
+        indextts_url: str = "http://localhost:8300",
         indextts_audio_path: Optional[str] = None,
         max_retries: int = 3,
         retry_delay: float = 1.0,
+        fallback_to_kokoro: bool = True,
     ):
         """
         Args:
             voice_map: 角色音色映射（仅 Kokoro 使用）
-            engine: 引擎名称 ("kokoro" | "indextts")
+            engine: 引擎名称 ("kokoro" | "indextts" | "auto")
             indextts_url: Index-TTS 服务地址
             indextts_audio_path: Index-TTS 参考音频路径
             max_retries: 最大重试次数
             retry_delay: 重试间隔（秒）
+            fallback_to_kokoro: Index-TTS 失败时是否回退 Kokoro
         """
         self.engine = engine.lower()
         self.voice_map = {**ROLE_VOICE_MAP, **(voice_map or {})}
@@ -94,22 +100,26 @@ class TTSGenerator:
         self._indextts_audio_path = indextts_audio_path or DEFAULT_INDEX_TTS_AUDIO
         self._max_retries = max_retries
         self._retry_delay = retry_delay
-        
-        if self.engine not in ("kokoro", "indextts"):
-            raise ValueError(f"Unknown engine: {engine}. Must be 'kokoro' or 'indextts'")
-        
-        if self.engine == "indextts":
-            self._test_indextts_on_startup()
+        self._fallback_to_kokoro = fallback_to_kokoro
+        self._indextts_available = False
     
     def _test_indextts_on_startup(self):
         """启动时测试 Index-TTS 连接"""
-        if not self._test_indextts_connection():
-            logger.warning(
-                f"Index-TTS service is not reachable at {self._indextts_url}. "
-                f"Will retry on first request. Ensure the service is running."
-            )
-        else:
+        if self._test_indextts_connection():
+            self._indextts_available = True
             logger.info(f"Index-TTS service is available at {self._indextts_url}")
+        else:
+            self._indextts_available = False
+            if self._fallback_to_kokoro:
+                logger.info(
+                    f"Index-TTS service is not reachable at {self._indextts_url}. "
+                    f"Will fall back to Kokoro engine."
+                )
+            else:
+                logger.warning(
+                    f"Index-TTS service is not reachable at {self._indextts_url}. "
+                    f"Set fallback_to_kokoro=True to enable automatic fallback."
+                )
     
     def _get_kokoro(self) -> KokoroTTSGenerator:
         """懒加载 Kokoro 实例"""
@@ -122,7 +132,7 @@ class TTSGenerator:
     def _test_indextts_connection(self) -> bool:
         """测试 Index-TTS 服务连接"""
         try:
-            response = requests.get(f"{self._indextts_url}/health", timeout=5)
+            response = requests.get(f"{self._indextts_url}/", timeout=5)
             return response.status_code == 200
         except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
             return False
@@ -152,7 +162,7 @@ class TTSGenerator:
         return self._get_indextts().get_voice_for_speaker(speaker)
     
     def _generate_with_retry(self, func, *args, **kwargs):
-        """带重试机制的生成函数包装器"""
+        """带重试机制的生成函数包装器（指数退避策略）"""
         last_error = None
         
         for attempt in range(1, self._max_retries + 1):
@@ -161,22 +171,22 @@ class TTSGenerator:
             except requests.exceptions.Timeout:
                 last_error = RuntimeError(f"Index-TTS request timeout (attempt {attempt}/{self._max_retries})")
                 logger.warning(f"Index-TTS timeout, retrying ({attempt}/{self._max_retries})...")
-                time.sleep(self._retry_delay * attempt)
+                time.sleep(self._retry_delay * (2 ** (attempt - 1)))
             except requests.exceptions.ConnectionError:
                 last_error = RuntimeError(f"Cannot connect to Index-TTS service (attempt {attempt}/{self._max_retries})")
                 logger.warning(f"Index-TTS connection failed, retrying ({attempt}/{self._max_retries})...")
-                time.sleep(self._retry_delay * attempt)
+                time.sleep(self._retry_delay * (2 ** (attempt - 1)))
             except RuntimeError as e:
                 if "timeout" in str(e).lower() or "connect" in str(e).lower():
                     last_error = e
                     logger.warning(f"Index-TTS error: {e}, retrying ({attempt}/{self._max_retries})...")
-                    time.sleep(self._retry_delay * attempt)
+                    time.sleep(self._retry_delay * (2 ** (attempt - 1)))
                 else:
                     raise
             except Exception as e:
                 last_error = e
                 logger.warning(f"Index-TTS error: {e}, retrying ({attempt}/{self._max_retries})...")
-                time.sleep(self._retry_delay * attempt)
+                time.sleep(self._retry_delay * (2 ** (attempt - 1)))
         
         raise last_error or RuntimeError("Max retries exceeded")
     
@@ -188,33 +198,54 @@ class TTSGenerator:
         output_file: Optional[Path] = None,
         sentence_type: str = "narration",
     ) -> Path:
-        """异步生成音频"""
+        """异步生成音频
+        
+        如果 engine 为 "indextts" 或 "auto"，优先使用 Index-TTS。
+        Index-TTS 不可用时自动回退 Kokoro（如果 fallback_to_kokoro=True）。
+        """
         if output_file is None:
             fd, output_file = tempfile.mkstemp(suffix=".wav")
             os.close(fd)
             output_file = Path(output_file)
         
-        if self.engine == "indextts":
-            indextts = self._get_indextts()
-            audio_path = self._get_audio_path(speaker, sentence_type)
+        use_indextts = self.engine in ("indextts", "auto")
+        
+        if use_indextts:
+            try:
+                if not self._indextts_available:
+                    self._test_indextts_on_startup()
+                
+                if self._indextts_available:
+                    indextts = self._get_indextts()
+                    audio_path = self._get_audio_path(speaker, sentence_type)
+                    
+                    self._generate_with_retry(
+                        indextts.generate_audio_to_file,
+                        text=text,
+                        output_file=output_file,
+                        audio_path=audio_path,
+                        emotion=emotion if sentence_type == "dialogue" else None,
+                    )
+                    return output_file
+            except Exception as e:
+                self._indextts_available = False
+                logger.warning(f"Index-TTS failed: {e}")
             
-            self._generate_with_retry(
-                indextts.generate_audio_to_file,
-                text=text,
-                output_file=output_file,
-                audio_path=audio_path,
-                emotion=emotion if sentence_type == "dialogue" else None,
-            )
-        else:
-            kokoro = self._get_kokoro()
-            voice_id = self._get_voice_id(speaker, sentence_type)
-            
-            kokoro.generate_audio_to_file(
-                text=text,
-                voice_id=voice_id,
-                output_file=output_file,
-                emotion=emotion,
-            )
+            if self._fallback_to_kokoro:
+                logger.info("Falling back to Kokoro engine...")
+            else:
+                raise RuntimeError(f"Index-TTS unavailable and fallback disabled. Last error: {e}")
+        
+        # Use Kokoro
+        kokoro = self._get_kokoro()
+        voice_id = self._get_voice_id(speaker, sentence_type)
+        
+        kokoro.generate_audio_to_file(
+            text=text,
+            voice_id=voice_id,
+            output_file=output_file,
+            emotion=emotion,
+        )
         
         return output_file
     
@@ -331,8 +362,8 @@ _generator_lock = threading.Lock()
 
 def get_tts_generator(
     voice_map: Optional[Dict[str, str]] = None,
-    engine: str = "kokoro",
-    indextts_url: str = "http://localhost:7860",
+    engine: str = "indextts",
+    indextts_url: str = "http://localhost:8300",
     indextts_audio_path: Optional[str] = None,
 ) -> TTSGenerator:
     """获取全局单例"""

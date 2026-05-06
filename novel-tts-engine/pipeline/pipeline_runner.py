@@ -21,7 +21,7 @@ from pipeline.entity_clusterer import get_entity_clusterer, EntityClusterer
 from pipeline.character_manager import CharacterManager, get_character_manager
 from pipeline.speaker_matcher import SpeakerMatcher
 from pipeline.semantic_ranker import get_semantic_ranker, SemanticRanker
-from pipeline.emotion_tagger import EmotionTagger, get_emotion_tagger
+from pipeline._emotion_tagger_legacy import EmotionTagger, get_emotion_tagger
 from pipeline.emotion_extractor import get_emotion_extractor  # 方案B：独立情绪提取模块
 from pipeline.quotation_classifier import QuotationClassifier, QuotationType
 from utils.text_utils import split_sentences_smart

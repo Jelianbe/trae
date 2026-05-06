@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovelTTS Cloud - 小说转语音平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#1a1a1e;--bg-secondary:#232328;--bg-tertiary:#2c2c33;--bg-elevated:#33333b;
+  --border:#3a3a44;--border-light:#45454f;
+  --accent:#e8e4df;--accent-hover:#f5f2ed;--accent-muted:rgba(232,228,223,0.1);--accent-medium:rgba(232,228,223,0.2);
+  --success:#7ec89b;--warning:#e8c87e;--error:#d4727a;--info:#7ea8c8;
+  --text-primary:#e8e4df;--text-secondary:#9e9a95;--text-muted:#6e6a65;
+  --font-cn:'Noto Serif SC',serif;--font-en:'DM Sans',sans-serif;
+  --radius:12px;--radius-lg:16px;
+  --shadow:0 4px 24px rgba(0,0,0,0.2);
+  --transition:0.3s cubic-bezier(0.4,0,0.2,1);
+}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:var(--font-cn);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;color:var(--text-primary);background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;outline:none;transition:border-color var(--transition)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent-muted)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239e9a95' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+textarea{resize:vertical;min-height:80px}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
+
+/* ===== NAV ===== */
+.navbar{position:fixed;top:0;left:0;right:0;height:60px;background:var(--bg-secondary);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;z-index:1000;box-shadow:0 2px 16px rgba(0,0,0,0.15)}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-en);font-weight:600;font-size:1.15rem;color:var(--accent);white-space:nowrap}
+.nav-logo i{font-size:1.3rem}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:48px}
+.nav-link{padding:8px 16px;border-radius:var(--radius);font-size:0.92rem;color:var(--text-secondary);transition:all var(--transition);position:relative}
+.nav-link:hover{color:var(--text-primary);background:var(--accent-muted)}
+.nav-link.active{color:var(--accent);background:var(--accent-medium)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.nav-icon-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all var(--transition);position:relative}
+.nav-icon-btn:hover{background:var(--accent-muted);color:var(--accent)}
+.nav-icon-btn .badge{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--error);border-radius:50%;border:2px solid var(--bg-secondary)}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--bg-elevated),var(--accent-medium));display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--accent);cursor:pointer;transition:all var(--transition)}
+.nav-avatar:hover{box-shadow:0 0 0 2px var(--accent-muted)}
+
+/* ===== MAIN ===== */
+.main{margin-top:60px;min-height:calc(100vh - 60px);padding:24px}
+.page{display:none;animation:fadeIn 0.4s ease-out}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== BUTTONS ===== */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:var(--radius);font-size:0.92rem;font-weight:500;transition:all var(--transition);white-space:nowrap}
+.btn-ghost{border:1px solid var(--border);color:var(--text-secondary)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-muted)}
+.btn-primary{background:var(--accent);color:var(--bg-primary);font-weight:600}
+.btn-primary:hover{background:var(--accent-hover);box-shadow:0 4px 16px rgba(232,228,223,0.15)}
+.btn-danger{border:1px solid var(--error);color:var(--error)}
+.btn-danger:hover{background:var(--error);color:#fff}
+.btn-sm{padding:6px 14px;font-size:0.85rem}
+.btn-icon{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);border:1px solid var(--border);color:var(--text-secondary);transition:all var(--transition)}
+.btn-icon:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-muted)}
+
+/* ===== CARDS ===== */
+.card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;transition:all var(--transition)}
+.card:hover{border-color:var(--border-light)}
+
+/* ===== STAT CARDS ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;display:flex;align-items:center;gap:16px;transition:all var(--transition)}
+.stat-card:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:var(--shadow)}
+.stat-icon{width:48px;height:48px;border-radius:var(--radius);background:var(--accent-muted);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:var(--accent)}
+.stat-info h3{font-size:1.6rem;font-weight:600;color:var(--accent);font-family:var(--font-en)}
+.stat-info p{font-size:0.85rem;color:var(--text-secondary);margin-top:2px}
+
+/* ===== PROJECT CARDS ===== */
+.project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.project-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden}
+.project-card:hover{border-color:var(--border-light);transform:translateY(-4px);box-shadow:var(--shadow)}
+.project-card .delete-btn{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);opacity:0;transition:all var(--transition);background:var(--bg-tertiary)}
+.project-card:hover .delete-btn{opacity:1}
+.project-card .delete-btn:hover{color:var(--error);background:rgba(212,114,122,0.1)}
+.project-card h3{font-size:1.1rem;font-weight:600;margin-bottom:4px}
+.project-card .author{font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px}
+.project-card .meta{display:flex;gap:16px;font-size:0.82rem;color:var(--text-muted);margin-bottom:16px}
+.project-card .meta span{display:flex;align-items:center;gap:4px}
+.status-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:500}
+.status-tag.completed{background:rgba(126,200,155,0.12);color:var(--success)}
+.status-tag.analyzing{background:rgba(126,168,200,0.12);color:var(--info)}
+.status-tag.pending{background:var(--accent-muted);color:var(--text-muted)}
+.status-tag.analyzing::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--info);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.progress-bar{height:4px;background:var(--bg-tertiary);border-radius:2px;overflow:hidden;margin-top:12px}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--accent-muted),var(--accent));border-radius:2px;transition:width 0.6s ease-out}
+.project-card .last-edit{font-size:0.78rem;color:var(--text-muted);margin-top:10px}
+
+/* ===== PAGE HEADER ===== */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-header h1{font-size:1.4rem;font-weight:600}
+
+/* ===== BREADCRUMB ===== */
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-secondary);margin-bottom:20px;flex-wrap:wrap}
+.breadcrumb a{color:var(--text-secondary);transition:color var(--transition)}
+.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb .sep{color:var(--text-muted)}
+.breadcrumb .current{color:var(--text-primary);font-weight:500}
+
+/* ===== DETAIL LAYOUT ===== */
+.detail-layout{display:flex;gap:0;height:calc(100vh - 60px - 48px);margin:-24px;margin-top:0;position:relative}
+.detail-left{width:260px;min-width:260px;max-width:260px;background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:all var(--transition);overflow:visible;position:relative;flex-shrink:0}
+.detail-left.collapsed{width:0;min-width:0;max-width:0;border-right:none;padding:0;overflow:hidden}
+.detail-left.collapsed .panel-toggle-left{right:0}
+.detail-center{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:200px}
+.detail-right{width:280px;min-width:280px;max-width:280px;background:var(--bg-secondary);border-left:1px solid var(--border);display:flex;flex-direction:column;transition:all var(--transition);overflow:visible;position:relative;flex-shrink:0}
+.detail-right.collapsed{width:0;min-width:0;max-width:0;border-left:none;padding:0;overflow:hidden}
+.detail-right.collapsed .panel-toggle-right{left:0}
+.panel-toggle{display:none}
+
+/* ===== CHAPTER TREE ===== */
+.chapter-tree-header{padding:16px;border-bottom:1px solid var(--border)}
+.chapter-tree-header h3{font-size:1rem;font-weight:600;margin-bottom:12px}
+.chapter-search{width:100%}
+.chapter-tree{flex:1;overflow-y:auto;padding:8px;overflow-x:hidden}
+.volume-group{margin-bottom:4px}
+.volume-header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius);cursor:pointer;transition:all var(--transition);font-size:0.9rem;font-weight:500;color:var(--text-secondary)}
+.volume-header:hover{background:var(--accent-muted);color:var(--text-primary)}
+.volume-header i{font-size:0.7rem;transition:transform var(--transition);width:12px;text-align:center}
+.volume-header.open i{transform:rotate(90deg)}
+.volume-chapters{overflow:hidden;max-height:0;transition:max-height 0.4s ease-out}
+.volume-chapters.open{max-height:1000px}
+.chapter-item{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 32px;border-radius:8px;cursor:pointer;transition:all var(--transition);font-size:0.85rem;color:var(--text-secondary)}
+.chapter-item:hover{background:var(--accent-muted);color:var(--text-primary)}
+.chapter-item.active{background:var(--accent-medium);color:var(--accent)}
+.chapter-item .ch-icon{width:16px;text-align:center;font-size:0.75rem}
+.chapter-item .ch-icon.done{color:var(--success)}
+.chapter-item .ch-icon.processing{color:var(--info)}
+.chapter-item .ch-icon.pending{color:var(--text-muted)}
+.chapter-tree-footer{padding:16px;border-top:1px solid var(--border)}
+.chapter-tree-footer .btn{width:100%;justify-content:center}
+
+/* ===== CONTENT AREA ===== */
+.content-toolbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.content-toolbar h2{font-size:1rem;font-weight:600;white-space:nowrap}
+.toolbar-actions{display:flex;align-items:center;gap:8px}
+.font-size-control{display:flex;align-items:center;gap:4px}
+.font-size-control .btn-icon{width:30px;height:30px;font-size:0.8rem}
+.toggle-switch{position:relative;width:40px;height:22px;background:var(--bg-tertiary);border-radius:11px;cursor:pointer;transition:background var(--transition);border:1px solid var(--border)}
+.toggle-switch.active{background:var(--accent-medium);border-color:var(--accent)}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--text-muted);transition:all var(--transition)}
+.toggle-switch.active::after{left:20px;background:var(--accent)}
+.content-body{flex:1;overflow-y:auto;padding:24px}
+.segment{padding:10px 14px;border-radius:var(--radius);margin-bottom:4px;cursor:pointer;transition:all var(--transition);border:1px solid transparent;position:relative}
+.segment:hover{background:var(--accent-muted);border-color:var(--border)}
+.segment.selected{background:var(--accent-medium);border-color:var(--border-light)}
+.segment.narration{font-size:0.95rem;line-height:1.8}
+.segment.dialogue{background:rgba(74,74,85,0.2);border-left:3px solid var(--border-light);padding-left:18px}
+.segment.dialogue .speaker-tag{font-size:0.78rem;color:var(--text-secondary);margin-bottom:2px;font-weight:500}
+.segment.dialogue.no-speaker{border-left-color:rgba(255,255,255,0.3)}
+.segment.dialogue.no-speaker .speaker-tag{color:var(--text-muted)}
+.seg-text{outline:none;min-height:1em}
+.seg-text:focus{background:rgba(232,228,223,0.05);border-radius:4px;padding:0 2px}
+.segment.onomatopoeia{color:var(--accent);font-style:italic;font-weight:600}
+.segment-edit{max-height:0;overflow:hidden;transition:max-height 0.4s ease-out,opacity 0.3s ease-out;opacity:0}
+.segment-edit.open{max-height:200px;opacity:1;margin-top:8px}
+.segment-edit-inner{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-wrap:wrap;gap:16px;align-items:end}
+.slider-group{flex:1;min-width:140px}
+.slider-group label{display:block;font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px}
+.slider-group input[type=range]{width:100%;accent-color:var(--accent);height:4px;-webkit-appearance:none;background:var(--bg-tertiary);border-radius:2px;border:none;padding:0}
+.slider-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+.type-switcher{display:flex;gap:4px}
+.type-btn{padding:4px 10px;border-radius:6px;font-size:0.78rem;border:1px solid var(--border);color:var(--text-secondary);transition:all var(--transition)}
+.type-btn:hover,.type-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-muted)}
+
+/* ===== AUDIO PLAYER ===== */
+.audio-player{border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:16px;background:var(--bg-secondary)}
+.play-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--accent);transition:all var(--transition)}
+.play-btn:hover{background:var(--accent-muted);border-color:var(--accent)}
+.player-progress{flex:1;display:flex;align-items:center;gap:10px}
+.player-bar{flex:1;height:4px;background:var(--bg-tertiary);border-radius:2px;cursor:pointer;position:relative}
+.player-bar .fill{height:100%;background:var(--accent);border-radius:2px;width:35%;transition:width 0.1s}
+.player-time{font-size:0.78rem;color:var(--text-muted);font-family:var(--font-en);white-space:nowrap}
+.player-speed{display:flex;align-items:center;gap:6px}
+.player-speed select{padding:4px 24px 4px 8px;font-size:0.82rem;border-radius:8px}
+
+/* ===== RIGHT PANEL ===== */
+.right-section{border-bottom:1px solid var(--border)}
+.right-section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;transition:all var(--transition)}
+.right-section-header:hover{background:var(--accent-muted)}
+.right-section-header h4{font-size:0.9rem;font-weight:600}
+.right-section-header i{font-size:0.7rem;color:var(--text-muted);transition:transform var(--transition)}
+.right-section-header.open i{transform:rotate(180deg)}
+.right-section-body{max-height:0;overflow:hidden;transition:max-height 0.4s ease-out}
+.right-section-body.open{max-height:800px}
+.right-section-body-inner{padding:0 16px 16px}
+.character-card{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;transition:all var(--transition);margin-bottom:4px}
+.character-card:hover{background:var(--accent-muted)}
+.character-card.active{background:var(--accent-medium)}
+.char-color{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.char-info{flex:1;min-width:0}
+.char-info .name{font-size:0.85rem;font-weight:500}
+.char-info .count{font-size:0.75rem;color:var(--text-muted)}
+.char-star{color:var(--text-muted);font-size:0.75rem}
+.char-star.active{color:var(--warning)}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat-item{background:var(--bg-tertiary);border-radius:var(--radius);padding:10px;text-align:center}
+.stat-item .val{font-size:1.2rem;font-weight:600;color:var(--accent);font-family:var(--font-en)}
+.stat-item .lbl{font-size:0.75rem;color:var(--text-muted);margin-top:2px}
+
+/* ===== VOICE LIBRARY ===== */
+.voice-layout{display:flex;gap:24px;height:calc(100vh - 60px - 48px - 60px)}
+.voice-sidebar{width:180px;flex-shrink:0;display:flex;flex-direction:column;gap:4px}
+.voice-sidebar-item{padding:10px 16px;border-radius:var(--radius);font-size:0.9rem;color:var(--text-secondary);cursor:pointer;transition:all var(--transition)}
+.voice-sidebar-item:hover{background:var(--accent-muted);color:var(--text-primary)}
+.voice-sidebar-item.active{background:var(--accent-medium);color:var(--accent)}
+.voice-main{flex:1;overflow-y:auto}
+.voice-search{margin-bottom:20px;max-width:400px}
+.voice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.voice-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:all var(--transition)}
+.voice-card:hover{border-color:var(--border-light);transform:translateY(-2px);box-shadow:var(--shadow)}
+.voice-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.voice-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent-muted);display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--accent)}
+.voice-card-header h3{font-size:1rem;font-weight:600}
+.voice-card-header .gender{font-size:0.78rem;color:var(--text-muted)}
+.voice-card .desc{font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.5}
+.voice-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.voice-tag{padding:3px 10px;border-radius:20px;font-size:0.75rem;background:var(--accent-muted);color:var(--text-secondary)}
+.waveform{display:flex;align-items:end;gap:2px;height:32px;margin-bottom:14px}
+.waveform .bar{flex:1;background:var(--accent-muted);border-radius:2px 2px 0 0;transition:height 0.3s ease-out}
+.voice-card:hover .waveform .bar{background:var(--accent-medium)}
+.voice-card .btn{width:100%;justify-content:center}
+
+/* ===== SETTINGS ===== */
+.settings-grid{max-width:720px;display:flex;flex-direction:column;gap:20px}
+.settings-card{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px}
+.settings-card h3{font-size:1rem;font-weight:600;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;gap:16px}
+.setting-row+.setting-row{border-top:1px solid var(--border)}
+.setting-label{font-size:0.9rem;color:var(--text-primary)}
+.setting-label small{display:block;font-size:0.78rem;color:var(--text-muted);margin-top:2px}
+.setting-row select{min-width:160px}
+
+/* ===== MODALS ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:all 0.3s ease-out;backdrop-filter:blur(4px)}
+.modal-overlay.open{opacity:1;visibility:visible}
+.modal{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);width:90%;max-width:560px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;transform:scale(0.95) translateY(10px);transition:transform 0.3s ease-out;box-shadow:0 16px 48px rgba(0,0,0,0.3)}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-header h2{font-size:1.1rem;font-weight:600}
+.modal-close{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all var(--transition)}
+.modal-close:hover{background:var(--accent-muted);color:var(--accent)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+/* Character Library Modal */
+.char-lib-search{margin-bottom:16px;width:100%}
+.char-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.char-lib-card{background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;cursor:pointer;transition:all var(--transition)}
+.char-lib-card:hover{border-color:var(--accent);background:var(--accent-muted)}
+.char-lib-card .char-dot{width:24px;height:24px;border-radius:50%;margin:0 auto 8px}
+.char-lib-card .char-name{font-size:0.9rem;font-weight:500}
+
+/* Character Edit Modal */
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%}
+.color-picker{display:flex;gap:8px;flex-wrap:wrap}
+.color-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all var(--transition)}
+.color-dot:hover,.color-dot.active{border-color:var(--accent);transform:scale(1.15)}
+
+/* Confirm Dialog */
+.confirm-icon{width:56px;height:56px;border-radius:50%;background:rgba(212,114,122,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.4rem;color:var(--error)}
+.confirm-text{text-align:center;font-size:0.95rem;color:var(--text-secondary);margin-bottom:24px}
+
+/* ===== TOAST ===== */
+.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{padding:12px 24px;border-radius:var(--radius);background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-primary);font-size:0.9rem;box-shadow:var(--shadow);animation:toastIn 0.3s ease-out;display:flex;align-items:center;gap:10px;white-space:nowrap}
+.toast.out{animation:toastOut 0.3s ease-out forwards}
+.toast i{font-size:1rem}
+.toast.success i{color:var(--success)}
+.toast.error i{color:var(--error)}
+.toast.info i{color:var(--info)}
+.toast.warning i{color:var(--warning)}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(16px)}}
+
+/* ===== WELCOME ===== */
+.welcome{margin-bottom:32px}
+.welcome h1{font-size:1.6rem;font-weight:600;margin-bottom:4px}
+.welcome p{color:var(--text-secondary);font-size:0.95rem}
+
+/* ===== RESPONSIVE ===== */
+
+/* ===== Tablet (768px - 1024px) ===== */
+@media(max-width:1024px){
+  /* Nav: compact */
+  .nav-logo{font-size:1rem}
+  .nav-link{padding:8px 10px;font-size:0.85rem}
+  .nav-link i{display:none}
+  
+  /* Detail: panels overlay on tablet */
+  .detail-layout{position:relative}
+  .detail-left,.detail-right{position:absolute;z-index:50;height:100%;top:0;transition:all var(--transition)}
+  .detail-left{left:0;box-shadow:4px 0 16px rgba(0,0,0,0.3)}
+  .detail-right{right:0;box-shadow:-4px 0 16px rgba(0,0,0,0.3)}
+  .detail-left.collapsed,.detail-right.collapsed{width:0;min-width:0;max-width:0;overflow:hidden}
+  
+  /* Voice sidebar */
+  .voice-sidebar{width:140px}
+  
+  /* Project cards */
+  .project-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+}
+
+/* ===== Mobile / Small Tablet (<768px) ===== */
+@media(max-width:768px){
+  html{font-size:13px}
+  
+  /* Nav: hamburger menu */
+  .nav-links{display:none;position:fixed;top:60px;left:0;right:0;background:var(--bg-secondary);border-bottom:1px solid var(--border);flex-direction:column;padding:8px;gap:4px;box-shadow:var(--shadow);z-index:999}
+  .nav-links.open{display:flex}
+  .nav-link{padding:12px 16px;border-radius:var(--radius);font-size:0.95rem}
+  .nav-link i{margin-right:8px;font-size:0.85rem}
+  .nav-hamburger{display:flex}
+  
+  /* Main */
+  .main{padding:12px}
+  
+  /* Welcome */
+  .welcome h1{font-size:1.3rem}
+  
+  /* Stat cards */
+  .stat-grid{grid-template-columns:1fr;gap:10px}
+  .stat-card{padding:16px}
+  
+  /* Project cards */
+  .project-grid{grid-template-columns:1fr}
+  .project-card{padding:18px}
+  
+  /* Page header */
+  .page-header{flex-direction:column;align-items:flex-start;gap:12px}
+  .page-header h1{font-size:1.2rem}
+  
+  /* Breadcrumb */
+  .breadcrumb{font-size:0.8rem;flex-wrap:wrap;gap:4px}
+  
+  /* Detail layout */
+  .detail-layout{height:auto;min-height:calc(100vh - 120px);flex-direction:column;margin:-12px;margin-top:0}
+  .detail-left,.detail-right{position:relative;width:100%!important;min-width:100%!important;max-width:100%!important;height:auto;max-height:50vh;border:none;box-shadow:none}
+  .detail-left.collapsed,.detail-right.collapsed{max-height:0;min-height:0;padding:0;overflow:hidden}
+  .detail-center{min-width:100%}
+  
+  /* Content toolbar */
+  .content-toolbar{padding:10px 12px;gap:8px}
+  .content-toolbar h2{font-size:0.9rem}
+  .toolbar-actions{gap:6px;flex-wrap:wrap}
+  .font-size-control .btn-icon{width:28px;height:28px;font-size:0.75rem}
+  .btn-icon{width:32px;height:32px;font-size:0.8rem}
+  
+  /* Content body */
+  .content-body{padding:16px}
+  .segment{padding:8px 10px}
+  .segment-edit-inner{padding:12px;gap:10px}
+  .slider-group{min-width:100px}
+  
+  /* Audio player */
+  .audio-player{padding:10px 12px;gap:10px;flex-wrap:wrap}
+  .player-progress{order:3;flex-basis:100%;gap:6px}
+  .player-speed{order:2}
+  
+  /* Voice layout */
+  .voice-layout{flex-direction:column;height:auto}
+  .voice-sidebar{width:100%;flex-direction:row;overflow-x:auto;padding-bottom:8px;gap:4px}
+  .voice-sidebar-item{white-space:nowrap;padding:8px 14px;font-size:0.85rem}
+  .voice-grid{grid-template-columns:1fr}
+  .voice-search{max-width:100%}
+  
+  /* Settings */
+  .settings-grid{gap:16px}
+  .settings-card{padding:18px}
+  .setting-row{flex-direction:column;align-items:flex-start;gap:8px}
+  .setting-row select{min-width:100%}
+  
+  /* Modals */
+  .modal{width:95%;max-height:90vh}
+  .modal-header{padding:16px 18px}
+  .modal-body{padding:18px}
+  .modal-footer{padding:12px 18px}
+  .char-lib-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+  
+  /* Toast */
+  .toast{padding:10px 18px;font-size:0.85rem}
+  
+  /* Right section */
+  .right-section-body-inner{padding:0 12px 12px}
+  .stats-grid{gap:6px}
+  .stat-item{padding:8px}
+  .stat-item .val{font-size:1.1rem}
+}
+
+/* Hamburger button (hidden on desktop, shown on mobile) */
+.nav-hamburger{display:none;width:36px;height:36px;border-radius:var(--radius);align-items:center;justify-content:center;color:var(--text-secondary);cursor:pointer;transition:all var(--transition);font-size:1.1rem}
+.nav-hamburger:hover{background:var(--accent-muted);color:var(--accent)}
+@media(max-width:768px){
+  .nav-hamburger{display:flex}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="nav-logo"><i class="fa-solid fa-book-open"></i> NovelTTS Cloud</div>
+  <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></button>
+  <div class="nav-links" id="nav-links">
+    <a class="nav-link active" data-page="home" href="#home"><i class="fa-solid fa-house" style="margin-right:6px;font-size:0.8rem"></i>首页</a>
+    <a class="nav-link" data-page="projects" href="#projects"><i class="fa-solid fa-folder" style="margin-right:6px;font-size:0.8rem"></i>项目管理</a>
+    <a class="nav-link" data-page="voices" href="#voices"><i class="fa-solid fa-microphone" style="margin-right:6px;font-size:0.8rem"></i>音色库</a>
+    <a class="nav-link" data-page="settings" href="#settings"><i class="fa-solid fa-gear" style="margin-right:6px;font-size:0.8rem"></i>系统设置</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-icon-btn" title="通知"><i class="fa-solid fa-bell"></i><span class="badge"></span></button>
+    <button class="nav-icon-btn" title="帮助"><i class="fa-solid fa-circle-question"></i></button>
+    <div class="nav-avatar" title="用户"><i class="fa-solid fa-user"></i></div>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="welcome">
+      <h1>欢迎回来，今天继续创作吧</h1>
+      <p>NovelTTS Cloud 让你的小说拥有声音</p>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-spinner"></i></div>
+        <div class="stat-info"><h3>3 / 4</h3><p>处理进度</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-info"><h3>4</h3><p>角色统计</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fa-solid fa-waveform-lines fa-wave-square"></i></div>
+        <div class="stat-info"><h3>75%</h3><p>音频状态</p></div>
+      </div>
+    </div>
+    <div class="page-header">
+      <h1>最近项目</h1>
+      <a href="#projects" class="btn btn-ghost btn-sm">查看全部 <i class="fa-solid fa-arrow-right" style="font-size:0.75rem"></i></a>
+    </div>
+    <div class="project-grid" id="home-projects"></div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="page" id="page-projects">
+    <div class="page-header">
+      <h1>我的项目</h1>
+      <button class="btn btn-primary" onclick="openModal('new-project')"><i class="fa-solid fa-plus"></i> 新建项目</button>
+    </div>
+    <div class="project-grid" id="projects-list"></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="page" id="page-detail">
+    <div class="breadcrumb">
+      <a href="#projects">项目管理</a>
+      <span class="sep"><i class="fa-solid fa-chevron-right" style="font-size:0.6rem"></i></span>
+      <span class="current" id="detail-book-title">《星辰变》</span>
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('char-lib')"><i class="fa-solid fa-users"></i> 角色库</button>
+    </div>
+    <div class="detail-layout" id="detail-layout">
+      <!-- Left Panel -->
+      <div class="detail-left" id="detail-left">
+        <div class="chapter-tree-header">
+          <h3 id="detail-tree-title">星辰变</h3>
+          <input class="chapter-search" type="text" placeholder="搜索章节..." oninput="filterChapters(this.value)">
+        </div>
+        <div class="chapter-tree" id="chapter-tree"></div>
+        <div class="chapter-tree-footer">
+          <button class="btn btn-ghost" onclick="showToast('开始分析全书...','info')"><i class="fa-solid fa-play"></i> 开始分析</button>
+        </div>
+      </div>
+      <!-- Center -->
+      <div class="detail-center">
+        <div class="content-toolbar">
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn-icon" onclick="togglePanel('left')" title="折叠/展开章节栏" id="tb-toggle-left"><i class="fa-solid fa-bars"></i></button>
+            <h2 id="content-title">第一章 陨落的天才</h2>
+          </div>
+          <div class="toolbar-actions">
+            <span style="font-size:0.82rem;color:var(--text-secondary)">编辑模式</span>
+            <div class="toggle-switch" id="edit-toggle" onclick="toggleEditMode()"></div>
+            <div class="font-size-control">
+              <button class="btn-icon" onclick="changeFontSize(-1)" title="缩小字号">A-</button>
+              <button class="btn-icon" onclick="changeFontSize(1)" title="放大字号">A+</button>
+            </div>
+            <button class="btn-icon" onclick="togglePanel('right')" title="折叠/展开角色栏" id="tb-toggle-right"><i class="fa-solid fa-address-book"></i></button>
+            <button class="btn-icon" onclick="toggleFullscreen()" title="全屏"><i class="fa-solid fa-expand"></i></button>
+          </div>
+        </div>
+        <div class="content-body" id="content-body"></div>
+        <div class="audio-player">
+          <button class="play-btn" id="play-btn" onclick="togglePlay()"><i class="fa-solid fa-play"></i></button>
+          <div class="player-progress">
+            <span class="player-time">01:24</span>
+            <div class="player-bar"><div class="fill" id="player-fill"></div></div>
+            <span class="player-time">04:02</span>
+          </div>
+          <div class="player-speed">
+            <span style="font-size:0.78rem;color:var(--text-muted)">语速</span>
+            <select>
+              <option>0.75x</option>
+              <option selected>1.0x</option>
+              <option>1.25x</option>
+              <option>1.5x</option>
+              <option>2.0x</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!-- Right Panel -->
+      <div class="detail-right" id="detail-right">
+        <div class="right-section">
+          <div class="right-section-header open" onclick="toggleSection(this)">
+            <h4>角色列表</h4><i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="right-section-body open">
+            <div class="right-section-body-inner" id="character-list"></div>
+          </div>
+        </div>
+        <div class="right-section">
+          <div class="right-section-header open" onclick="toggleSection(this)">
+            <h4>章节统计</h4><i class="fa-solid fa-chevron-down"></i>
+          </div>
+          <div class="right-section-body open">
+            <div class="right-section-body-inner">
+              <div class="stats-grid">
+                <div class="stat-item"><div class="val">47</div><div class="lbl">总句数</div></div>
+                <div class="stat-item"><div class="val">23</div><div class="lbl">对话数</div></div>
+                <div class="stat-item"><div class="val">18</div><div class="lbl">旁白数</div></div>
+                <div class="stat-item"><div class="val">6</div><div class="lbl">拟声词</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="panel-toggle panel-toggle-right" onclick="togglePanel('right')" title="折叠"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOICES -->
+  <div class="page" id="page-voices">
+    <div class="page-header"><h1>音色库</h1></div>
+    <div class="voice-layout">
+      <div class="voice-sidebar" id="voice-sidebar">
+        <div class="voice-sidebar-item active" data-cat="all">全部</div>
+        <div class="voice-sidebar-item" data-cat="male">男声</div>
+        <div class="voice-sidebar-item" data-cat="female">女声</div>
+        <div class="voice-sidebar-item" data-cat="neutral">中性</div>
+        <div class="voice-sidebar-item" data-cat="special">特殊</div>
+      </div>
+      <div class="voice-main">
+        <input class="voice-search" type="text" placeholder="搜索音色..." style="width:100%;max-width:400px;margin-bottom:20px" oninput="filterVoices(this.value)">
+        <div class="voice-grid" id="voice-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="page-header"><h1>系统设置</h1></div>
+    <div class="settings-grid">
+      <div class="settings-card">
+        <h3><i class="fa-solid fa-sliders" style="margin-right:8px;color:var(--text-muted)"></i>语音合成设置</h3>
+        <div class="setting-row">
+          <div class="setting-label">默认引擎<small>选择语音合成引擎</small></div>
+          <select><option>NovelTTS Pro</option><option>Edge TTS</option><option>VITS</option></select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">默认语速<small>全局默认语速倍率</small></div>
+          <select><option>0.75x</option><option selected>1.0x</option><option>1.25x</option><option>1.5x</option></select>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">自动检测对话<small>自动识别对话并分配角色</small></div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3><i class="fa-solid fa-palette" style="margin-right:8px;color:var(--text-muted)"></i>显示设置</h3>
+        <div class="setting-row">
+          <div class="setting-label">对话高亮<small>在正文中高亮显示对话段落</small></div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">角色标签<small>在对话段落显示角色名称</small></div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">正文字号<small>正文显示的字体大小</small></div>
+          <select><option>小</option><option selected>中</option><option>大</option><option>特大</option></select>
+        </div>
+      </div>
+      <div class="settings-card">
+        <h3><i class="fa-solid fa-database" style="margin-right:8px;color:var(--text-muted)"></i>数据管理</h3>
+        <div class="setting-row">
+          <div class="setting-label">自动保存<small>编辑时自动保存进度</small></div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-label">导出数据<small>导出所有项目数据</small></div>
+          <button class="btn btn-ghost btn-sm" onclick="showToast('数据导出成功','success')"><i class="fa-solid fa-download"></i> 导出</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Character Library -->
+<div class="modal-overlay" id="modal-char-lib">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header"><h2>角色库</h2><button class="modal-close" onclick="closeModal('char-lib')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <input class="char-lib-search" type="text" placeholder="搜索角色...">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span style="font-size:0.85rem;color:var(--text-secondary)">共 4 个角色</span>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('char-edit');closeModal('char-lib')"><i class="fa-solid fa-plus"></i> 新增角色</button>
+      </div>
+      <div class="char-lib-grid" id="char-lib-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Character Edit -->
+<div class="modal-overlay" id="modal-char-edit">
+  <div class="modal">
+    <div class="modal-header"><h2>编辑角色</h2><button class="modal-close" onclick="closeModal('char-edit')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>角色名称</label><input type="text" value="秦羽" id="char-edit-name"></div>
+      <div class="form-group"><label>角色颜色</label>
+        <div class="color-picker" id="color-picker">
+          <div class="color-dot active" style="background:#6b7b8d" data-color="#6b7b8d"></div>
+          <div class="color-dot" style="background:#8d6b7b" data-color="#8d6b7b"></div>
+          <div class="color-dot" style="background:#7b8d6b" data-color="#7b8d6b"></div>
+          <div class="color-dot" style="background:#8d8d6b" data-color="#8d8d6b"></div>
+          <div class="color-dot" style="background:#6b8d8d" data-color="#6b8d8d"></div>
+          <div class="color-dot" style="background:#7b6b8d" data-color="#7b6b8d"></div>
+          <div class="color-dot" style="background:#8d7b6b" data-color="#8d7b6b"></div>
+          <div class="color-dot" style="background:#6b6b8d" data-color="#6b6b8d"></div>
+        </div>
+      </div>
+      <div class="form-group"><label>性别</label>
+        <select><option>男</option><option>女</option><option>中性</option></select>
+      </div>
+      <div class="form-group"><label>重要性</label>
+        <select><option>主角</option><option>主要配角</option><option>次要配角</option><option>龙套</option></select>
+      </div>
+      <div class="form-group"><label>声线描述</label><input type="text" value="沉稳磁性，少年音"></div>
+      <div class="form-group"><label>音调</label><input type="range" min="0" max="100" value="50" style="width:100%;accent-color:var(--accent)"></div>
+      <div class="form-group"><label>语速</label><input type="range" min="0" max="100" value="50" style="width:100%;accent-color:var(--accent)"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('char-edit')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('char-edit');showToast('角色已保存','success')">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Project -->
+<div class="modal-overlay" id="modal-new-project">
+  <div class="modal">
+    <div class="modal-header"><h2>新建项目</h2><button class="modal-close" onclick="closeModal('new-project')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>书名</label><input type="text" placeholder="请输入书名" id="new-project-title"></div>
+      <div class="form-group"><label>作者</label><input type="text" placeholder="请输入作者" id="new-project-author"></div>
+      <div class="form-group"><label>小说内容</label><textarea placeholder="请粘贴或输入小说内容..." rows="8" id="new-project-content"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('new-project')">取消</button>
+      <button class="btn btn-primary" onclick="createProject()">创建项目</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="modal-overlay" id="modal-confirm-delete">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-body" style="padding:32px 24px">
+      <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="confirm-text">确定要删除这个项目吗？<br><small style="color:var(--text-muted)">此操作不可撤销</small></div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="btn btn-ghost" onclick="closeModal('confirm-delete')">取消</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">删除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ===== DATA =====
+const projects = [
+  { id:1, title:'星辰变', author:'我吃西红柿', words:'3,240,000', chapters:487, progress:75, status:'analyzing', lastEdit:'2026-05-04 14:30' },
+  { id:2, title:'斗破苍穹', author:'天蚕土豆', words:'5,300,000', chapters:1624, progress:30, status:'pending', lastEdit:'2026-05-03 09:15' },
+  { id:3, title:'凡人修仙传', author:'忘语', words:'7,450,000', chapters:2446, progress:0, status:'pending', lastEdit:'2026-04-28 16:45' }
+];
+
+const characters = [
+  { id:1, name:'秦羽', color:'#6b7b8d', gender:'男', importance:'主角', voice:'沉稳磁性', count:156, starred:true },
+  { id:2, name:'秦德', color:'#8d6b7b', gender:'男', importance:'主要配角', voice:'威严低沉', count:89, starred:true },
+  { id:3, name:'秦宏', color:'#7b8d6b', gender:'男', importance:'次要配角', voice:'温和儒雅', count:42, starred:false },
+  { id:4, name:'秦风', color:'#8d8d6b', gender:'男', importance:'次要配角', voice:'活泼少年', count:35, starred:false }
+];
+
+const chapters = [
+  { volume:'第一卷 潜龙', chapters:[
+    { id:1, title:'第一章 陨落的天才', status:'done' },
+    { id:2, title:'第二章 奇异的变化', status:'done' },
+    { id:3, title:'第三章 功法', status:'processing' },
+    { id:4, title:'第四章 修炼', status:'pending' }
+  ]},
+  { volume:'第二卷 蛟龙', chapters:[
+    { id:5, title:'第五章 瀑布', status:'pending' },
+    { id:6, title:'第六章 突破', status:'pending' },
+    { id:7, title:'第七章 离开', status:'pending' }
+  ]}
+];
+
+const segments = [
+  { type:'narration', text:'秦羽站在悬崖边，望着远方的云海，心中百感交集。三年来，他从一个天才少年变成了一个无法修炼的废人，这种落差让他几乎无法承受。' },
+  { type:'dialogue', speaker:'秦羽', speakerColor:'#6b7b8d', text:'"父亲，我一定会重新站起来。无论付出什么代价。"' },
+  { type:'narration', text:'秦德看着儿子的背影，眼中闪过一丝心疼。作为秦家的家主，他何尝不希望儿子能够继承衣钵。' },
+  { type:'dialogue', speaker:'秦德', speakerColor:'#8d6b7b', text:'"羽儿，修炼之路并非只有一条。或许你的路，与常人不同。"' },
+  { type:'narration', text:'夜幕降临，秦羽独自回到房间，盘膝坐在床上。他闭上眼睛，尝试感受体内那股若有若无的气流。' },
+  { type:'onomatopoeia', text:'轰隆隆——' },
+  { type:'narration', text:'突然，一道惊雷划破夜空。秦羽猛地睁开眼睛，他感受到了——体内深处，有什么东西正在觉醒。' },
+  { type:'dialogue', speaker:'秦宏', speakerColor:'#7b8d6b', text:'"大哥，你感觉到了吗？刚才那股气息……"' },
+  { type:'dialogue', speaker:'秦风', speakerColor:'#8d8d6b', text:'"嗯，好强的灵力波动。难道是……"' },
+  { type:'narration', text:'月光透过窗户洒在秦羽的脸上，映出他坚毅的神情。从今夜开始，一切都将不同。' }
+];
+
+const voices = [
+  { id:1, name:'云深', gender:'male', cat:'male', desc:'沉稳磁性，适合旁白和成熟男性角色', tags:['磁性','沉稳','旁白'], bars:[40,65,50,80,55,70,45,60,75,50,65,40,70,55,80,60,45,70,50,65] },
+  { id:2, name:'凌风', gender:'male', cat:'male', desc:'清朗少年音，适合年轻男性角色', tags:['少年','清朗','热血'], bars:[60,40,75,50,80,45,70,55,40,65,80,50,60,75,40,55,70,45,80,60] },
+  { id:3, name:'若水', gender:'female', cat:'female', desc:'温婉知性，适合女性角色和内心独白', tags:['温婉','知性','柔美'], bars:[30,50,40,60,35,55,45,50,30,60,40,55,35,50,60,45,40,55,30,50] },
+  { id:4, name:'铁马', gender:'male', cat:'male', desc:'豪迈刚毅，适合武将和豪爽角色', tags:['豪迈','刚毅','霸气'], bars:[80,60,90,70,85,65,80,75,60,90,70,85,65,80,90,75,60,85,70,80] },
+  { id:5, name:'素心', gender:'female', cat:'female', desc:'清冷空灵，适合仙侠女性角色', tags:['清冷','空灵','仙侠'], bars:[25,45,35,55,30,50,40,45,25,55,35,50,30,45,55,40,35,50,25,45] },
+  { id:6, name:'墨言', gender:'neutral', cat:'neutral', desc:'中性沉稳，适合旁白和叙述', tags:['中性','沉稳','叙述'], bars:[50,55,45,60,50,55,45,60,50,55,45,60,50,55,45,60,50,55,45,60] }
+];
+
+// ===== STATE =====
+let currentPage = 'home';
+let currentChapter = 1;
+let selectedSegment = null;
+let editMode = false;
+let fontSize = 14;
+let activeCharFilter = null;
+let deleteTargetId = null;
+let isPlaying = false;
+let currentVoiceCat = 'all';
+
+// ===== ROUTING =====
+function toggleMobileMenu() {
+  document.getElementById('nav-links').classList.toggle('open');
+}
+
+function navigate(page) {
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById('page-' + page);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.page === page);
+  });
+  // Close mobile menu on navigation
+  document.getElementById('nav-links').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+window.addEventListener('hashchange', () => {
+  const hash = location.hash.slice(1) || 'home';
+  navigate(hash);
+});
+
+// ===== RENDER FUNCTIONS =====
+function renderProjectCard(p, showDelete) {
+  const statusMap = { completed:'已完成', analyzing:'分析中', pending:'未分析' };
+  return `<div class="project-card" onclick="openDetail(${p.id})">
+    ${showDelete ? `<button class="delete-btn" onclick="event.stopPropagation();deleteProject(${p.id})" title="删除"><i class="fa-solid fa-trash" style="font-size:0.8rem"></i></button>` : ''}
+    <h3>${p.title}</h3>
+    <div class="author">${p.author}</div>
+    <div class="meta">
+      <span><i class="fa-solid fa-file-word"></i> ${p.words} 字</span>
+      <span><i class="fa-solid fa-list"></i> ${p.chapters} 章</span>
+      <span class="status-tag ${p.status}">${statusMap[p.status]}</span>
+    </div>
+    <div class="progress-bar"><div class="fill" style="width:${p.progress}%"></div></div>
+    <div class="last-edit"><i class="fa-regular fa-clock" style="margin-right:4px"></i>${p.lastEdit}</div>
+  </div>`;
+}
+
+function renderHomeProjects() {
+  document.getElementById('home-projects').innerHTML = projects.map(p => renderProjectCard(p, false)).join('');
+}
+
+function renderProjectsList() {
+  document.getElementById('projects-list').innerHTML = projects.map(p => renderProjectCard(p, true)).join('');
+}
+
+function renderChapterTree() {
+  const tree = document.getElementById('chapter-tree');
+  tree.innerHTML = chapters.map((v, vi) => `
+    <div class="volume-group">
+      <div class="volume-header ${vi===0?'open':''}" onclick="toggleVolume(this)">
+        <i class="fa-solid fa-chevron-right"></i>
+        <i class="fa-solid fa-book" style="font-size:0.8rem;color:var(--text-muted)"></i>
+        <span>${v.volume}</span>
+      </div>
+      <div class="volume-chapters ${vi===0?'open':''}">
+        ${v.chapters.map(ch => {
+          const iconMap = { done:'fa-check done', processing:'fa-hourglass-half processing', pending:'fa-circle pending' };
+          return `<div class="chapter-item ${ch.id===currentChapter?'active':''}" onclick="selectChapter(${ch.id},'${ch.title}')">
+            <span class="ch-icon ${ch.status}"><i class="fa-solid ${iconMap[ch.status]}"></i></span>
+            <span>${ch.title}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderContent() {
+  const body = document.getElementById('content-body');
+  body.style.fontSize = fontSize + 'px';
+  body.innerHTML = segments.map((seg, i) => {
+    let cls = 'segment ' + seg.type;
+    let inner = '';
+    let borderColor = seg.speakerColor || 'var(--border-light)';
+    if (seg.type === 'dialogue') {
+      const displayColor = seg.speakerColor || '#ffffff';
+      const speakerClass = seg.speakerColor ? '' : ' no-speaker';
+      inner = `<div class="speaker-tag" style="color:${displayColor}">${seg.speaker || '未分配角色'}</div><div class="seg-text" ${editMode ? 'contenteditable="true"' : ''} data-index="${i}">${seg.text}</div>`;
+      cls = 'segment dialogue' + speakerClass;
+    } else {
+      inner = `<div class="seg-text" ${editMode ? 'contenteditable="true"' : ''} data-index="${i}">${seg.text}</div>`;
+    }
+    const typeBtns = editMode ? `<div class="type-switcher">
+      <button class="type-btn ${seg.type==='narration'?'active':''}" onclick="event.stopPropagation();changeSegType(${i},'narration')">旁白</button>
+      <button class="type-btn ${seg.type==='dialogue'?'active':''}" onclick="event.stopPropagation();changeSegType(${i},'dialogue')">对话</button>
+      <button class="type-btn ${seg.type==='onomatopoeia'?'active':''}" onclick="event.stopPropagation();changeSegType(${i},'onomatopoeia')">拟声</button>
+    </div>` : '';
+    const speakerOptions = characters.map(c => `<option value="${c.id}" ${seg.speaker===c.name?'selected':''}>${c.name}</option>`).join('');
+    const speakerSelect = (seg.type === 'dialogue') ? `<div class="slider-group"><label>说话人</label><select onchange="event.stopPropagation();changeSpeaker(${i}, this.value)"><option value="">未分配</option>${speakerOptions}</select></div>` : '';
+    return `<div class="${cls}" data-index="${i}" onclick="selectSegment(${i})" ${seg.speakerColor ? `style="border-left-color:${seg.speakerColor}"` : ''}>
+      ${inner}
+      ${typeBtns}
+      <div class="segment-edit" id="seg-edit-${i}">
+        <div class="segment-edit-inner">
+          ${speakerSelect}
+          <div class="slider-group"><label>语速</label><input type="range" min="0" max="100" value="50"></div>
+          <div class="slider-group"><label>音量</label><input type="range" min="0" max="100" value="75"></div>
+          <div class="slider-group"><label>音调</label><input type="range" min="0" max="100" value="50"></div>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showToast('试听中...','info')"><i class="fa-solid fa-headphones"></i> 试听</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Bind contenteditable events to save text and prevent segment selection
+  body.querySelectorAll('.seg-text[contenteditable]').forEach(el => {
+    el.addEventListener('input', function(e) {
+      const idx = parseInt(this.dataset.index);
+      segments[idx].text = this.textContent;
+    });
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+    el.addEventListener('mousedown', function(e) {
+      e.stopPropagation();
+    });
+  });
+}
+
+function renderCharacters() {
+  document.getElementById('character-list').innerHTML = characters.map(c => `
+    <div class="character-card ${activeCharFilter===c.id?'active':''}" onclick="filterByCharacter(${c.id})">
+      <div class="char-color" style="background:${c.color}"></div>
+      <div class="char-info"><div class="name">${c.name}</div><div class="count">出现 ${c.count} 次</div></div>
+      <i class="fa-solid fa-star char-star ${c.starred?'active':''}"></i>
+    </div>
+  `).join('');
+}
+
+function renderCharLib() {
+  document.getElementById('char-lib-grid').innerHTML = characters.map(c => `
+    <div class="char-lib-card" onclick="openModal('char-edit');closeModal('char-lib')">
+      <div class="char-dot" style="background:${c.color}"></div>
+      <div class="char-name">${c.name}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">${c.voice}</div>
+    </div>
+  `).join('');
+}
+
+function renderVoices(filter) {
+  const filtered = currentVoiceCat === 'all' ? voices : voices.filter(v => v.cat === currentVoiceCat);
+  const list = filter ? filtered.filter(v => v.name.includes(filter) || v.desc.includes(filter) || v.tags.some(t => t.includes(filter))) : filtered;
+  const genderIcon = { male:'fa-mars', female:'fa-venus', neutral:'fa-genderless' };
+  document.getElementById('voice-grid').innerHTML = list.map(v => `
+    <div class="voice-card">
+      <div class="voice-card-header">
+        <div class="voice-avatar"><i class="fa-solid ${genderIcon[v.gender]}"></i></div>
+        <div><h3>${v.name}</h3><div class="gender">${v.gender==='male'?'男声':v.gender==='female'?'女声':'中性'}</div></div>
+      </div>
+      <div class="desc">${v.desc}</div>
+      <div class="voice-tags">${v.tags.map(t => `<span class="voice-tag">${t}</span>`).join('')}</div>
+      <div class="waveform">${v.bars.map(h => `<div class="bar" style="height:${h}%"></div>`).join('')}</div>
+      <button class="btn btn-ghost btn-sm" onclick="showToast('正在播放 ${v.name} 的示例','info')"><i class="fa-solid fa-play"></i> 试听</button>
+    </div>
+  `).join('');
+}
+
+// ===== INTERACTIONS =====
+function openDetail(id) {
+  const p = projects.find(x => x.id === id);
+  if (p) {
+    document.getElementById('detail-book-title').textContent = '《' + p.title + '》';
+    document.getElementById('detail-tree-title').textContent = p.title;
+  }
+  location.hash = 'detail';
+}
+
+function selectChapter(id, title) {
+  currentChapter = id;
+  document.getElementById('content-title').textContent = title;
+  renderChapterTree();
+  renderContent();
+  selectedSegment = null;
+}
+
+function selectSegment(index) {
+  if (selectedSegment === index) {
+    document.getElementById('seg-edit-' + index).classList.remove('open');
+    document.querySelectorAll('.segment')[index].classList.remove('selected');
+    selectedSegment = null;
+  } else {
+    if (selectedSegment !== null) {
+      const prev = document.getElementById('seg-edit-' + selectedSegment);
+      if (prev) prev.classList.remove('open');
+      document.querySelectorAll('.segment')[selectedSegment]?.classList.remove('selected');
+    }
+    selectedSegment = index;
+    document.querySelectorAll('.segment')[index].classList.add('selected');
+    document.getElementById('seg-edit-' + index).classList.add('open');
+  }
+}
+
+function toggleEditMode() {
+  editMode = !editMode;
+  document.getElementById('edit-toggle').classList.toggle('active', editMode);
+  renderContent();
+  showToast(editMode ? '已进入编辑模式' : '已退出编辑模式', 'info');
+}
+
+function changeFontSize(delta) {
+  fontSize = Math.max(12, Math.min(20, fontSize + delta));
+  document.getElementById('content-body').style.fontSize = fontSize + 'px';
+}
+
+function changeSegType(index, type) {
+  segments[index].type = type;
+  if (type === 'dialogue') {
+    segments[index].speaker = characters[0].name;
+    segments[index].speakerColor = characters[0].color;
+  }
+  renderContent();
+  showToast('段落类型已更改为 ' + {narration:'旁白',dialogue:'对话',onomatopoeia:'拟声'}[type], 'success');
+}
+
+function changeSpeaker(index, charId) {
+  if (!charId) {
+    segments[index].speaker = '';
+    segments[index].speakerColor = '';
+  } else {
+    const char = characters.find(c => c.id === parseInt(charId));
+    if (char) {
+      segments[index].speaker = char.name;
+      segments[index].speakerColor = char.color;
+    }
+  }
+  renderContent();
+  // Re-open the edit panel for this segment
+  const editEl = document.getElementById('seg-edit-' + index);
+  if (editEl) editEl.classList.add('open');
+  const segEl = document.querySelectorAll('.segment')[index];
+  if (segEl) segEl.classList.add('selected');
+  selectedSegment = index;
+}
+
+function toggleVolume(el) {
+  el.classList.toggle('open');
+  const chapters = el.nextElementSibling;
+  chapters.classList.toggle('open');
+}
+
+function toggleSection(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+function togglePanel(side) {
+  const panel = document.getElementById('detail-' + side);
+  panel.classList.toggle('collapsed');
+  const isCollapsed = panel.classList.contains('collapsed');
+  showToast(isCollapsed ? (side === 'left' ? '章节栏已折叠' : '角色栏已折叠') : (side === 'left' ? '章节栏已展开' : '角色栏已展开'), 'info');
+}
+
+function filterByCharacter(charId) {
+  if (activeCharFilter === charId) {
+    activeCharFilter = null;
+  } else {
+    activeCharFilter = charId;
+  }
+  renderCharacters();
+  document.querySelectorAll('.segment.dialogue').forEach(seg => {
+    const idx = parseInt(seg.dataset.index);
+    const s = segments[idx];
+    if (activeCharFilter === null) {
+      seg.style.opacity = '1';
+    } else {
+      seg.style.opacity = s.speaker === characters.find(c => c.id === activeCharFilter)?.name ? '1' : '0.3';
+    }
+  });
+}
+
+function filterChapters(query) {
+  document.querySelectorAll('.chapter-item').forEach(item => {
+    item.style.display = item.textContent.toLowerCase().includes(query.toLowerCase()) ? 'flex' : 'none';
+  });
+}
+
+function filterVoices(query) {
+  renderVoices(query);
+}
+
+function togglePlay() {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('play-btn');
+  btn.innerHTML = isPlaying ? '<i class="fa-solid fa-pause"></i>' : '<i class="fa-solid fa-play"></i>';
+  if (isPlaying) simulateProgress();
+}
+
+function simulateProgress() {
+  if (!isPlaying) return;
+  const fill = document.getElementById('player-fill');
+  let w = parseFloat(fill.style.width) || 35;
+  w += 0.3;
+  if (w > 100) { w = 0; isPlaying = false; document.getElementById('play-btn').innerHTML = '<i class="fa-solid fa-play"></i>'; return; }
+  fill.style.width = w + '%';
+  requestAnimationFrame(simulateProgress);
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// Voice sidebar
+document.getElementById('voice-sidebar').addEventListener('click', e => {
+  const item = e.target.closest('.voice-sidebar-item');
+  if (!item) return;
+  document.querySelectorAll('.voice-sidebar-item').forEach(i => i.classList.remove('active'));
+  item.classList.add('active');
+  currentVoiceCat = item.dataset.cat;
+  renderVoices();
+});
+
+// Color picker
+document.getElementById('color-picker').addEventListener('click', e => {
+  const dot = e.target.closest('.color-dot');
+  if (!dot) return;
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+});
+
+// ===== MODALS =====
+function openModal(name) {
+  document.getElementById('modal-' + name).classList.add('open');
+  if (name === 'char-lib') renderCharLib();
+}
+function closeModal(name) {
+  document.getElementById('modal-' + name).classList.remove('open');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ===== PROJECT ACTIONS =====
+function deleteProject(id) {
+  deleteTargetId = id;
+  openModal('confirm-delete');
+}
+
+function confirmDelete() {
+  if (deleteTargetId !== null) {
+    const idx = projects.findIndex(p => p.id === deleteTargetId);
+    if (idx > -1) projects.splice(idx, 1);
+    renderProjectsList();
+    renderHomeProjects();
+    showToast('项目已删除', 'success');
+  }
+  closeModal('confirm-delete');
+  deleteTargetId = null;
+}
+
+function createProject() {
+  const title = document.getElementById('new-project-title').value.trim();
+  const author = document.getElementById('new-project-author').value.trim();
+  if (!title) { showToast('请输入书名', 'warning'); return; }
+  projects.push({
+    id: Date.now(), title, author: author || '未知', words: '0',
+    chapters: 0, progress: 0, status: 'pending', lastEdit: new Date().toLocaleString('zh-CN')
+  });
+  renderProjectsList();
+  renderHomeProjects();
+  closeModal('new-project');
+  document.getElementById('new-project-title').value = '';
+  document.getElementById('new-project-author').value = '';
+  document.getElementById('new-project-content').value = '';
+  showToast('项目创建成功', 'success');
+}
+
+// ===== TOAST =====
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const iconMap = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML = `<i class="fa-solid ${iconMap[type]}"></i><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.classList.add('out'); }, 2000);
+  setTimeout(() => { toast.remove(); }, 2300);
+}
+
+// ===== INIT =====
+function init() {
+  renderHomeProjects();
+  renderProjectsList();
+  renderChapterTree();
+  renderContent();
+  renderCharacters();
+  renderVoices();
+  navigate(location.hash.slice(1) || 'home');
+}
+
+init();
+</script>
+</body>
+</html>

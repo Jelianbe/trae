@@ -166,6 +166,31 @@ class EmotionFeatures:
     is_imperative: bool = False            # 是否祈使句
     has_mood_particle: bool = False        # 是否有语气词
 
+    def to_ml_vector(self) -> List[float]:
+        """将特征转换为 ML-ready 特征向量（14维）
+        
+        用于训练决策树/随机森林等分类器
+        """
+        return [
+            self.exclamation_density,
+            self.exclamation_count,
+            self.question_count,
+            float(self.has_dirty_words),
+            float(self.has_emotion_verb),
+            float(self.has_emotion_adverb),
+            float(self.has_mood_particle),
+            float(self.is_exclamatory),
+            float(self.is_rhetorical),
+            float(self.is_imperative),
+            float(self.has_short_sentences),
+            float(self.has_repetition),
+            float(len(self.text)),
+            self.avg_sentence_len,
+        ]
+
+    def extract_emotion_words(self, text: str) -> Dict[str, List[str]]:
+        """提取文本中的情绪关键词"""
+
 
 # 脏话/粗口词表（网文常见）
 DIRTY_WORDS = [
@@ -198,6 +223,14 @@ EMOTION_VERBS = [
 # 语气词（句末，表达情绪强度）
 MOOD_PARTICLES = ['啊', '呀', '哇', '呢', '吧', '哦', '唉', '哼', '呵', '哈']
 
+# 厌恶词表（L-11 扩充：从 3 个扩充到 15+）
+_DISGUST_KEYWORDS = [
+    '恶心', '厌恶', '嫌弃', '反感', '讨厌', '作呕', '反胃',
+    '呕吐', '吐了', '倒胃口', '膈应', '恶心人',
+    '龌龊', '下流', '卑鄙', '无耻', '下作', '令人发指',
+    '嗤之以鼻', '不屑', '鄙夷', '蔑视', '轻蔑',
+]
+
 # 祈使句模式
 IMPERATIVE_PATTERNS = [
     r'^(给我|马上|立刻|立即|赶紧|快点|快|去|来)',
@@ -229,9 +262,24 @@ EXCLAMATORY_PATTERNS = [
 class EmotionExtractor:
     """独立情绪提取器 —— 不依赖角色管道，直接从原始文本提取情绪特征"""
     
+    # 否定词列表（用于极性反转检测）
+    NEGATION_WORDS = ['不', '没', '别', '莫', '勿', '并非', '从不', '毫无', '没有']
+    
     def __init__(self):
         # 预编译正则
-        self._dirty_re = re.compile('|'.join(re.escape(w) for w in DIRTY_WORDS))
+        # 脏词正则：
+        # - 多字词：直接匹配
+        # - 单字脏词：仅对真正有歧义的字（草、日）使用词边界
+        #   "草"可能匹配"草木"，"日"可能匹配"日期"
+        #   但"滚"、"靠"、"操"几乎总是作为脏词单独使用
+        SINGLE_CHAR_DIRTY = {'草', '日'}  # 仅这些需要词边界
+        dirty_patterns = []
+        for w in DIRTY_WORDS:
+            if len(w) == 1 and w in SINGLE_CHAR_DIRTY:
+                dirty_patterns.append(r'(?<![一-龥])' + re.escape(w) + r'(?![一-龥])')
+            else:
+                dirty_patterns.append(re.escape(w))
+        self._dirty_re = re.compile('|'.join(dirty_patterns))
         self._adverb_re = re.compile('|'.join(re.escape(w) for w in EMOTION_ADVERBS))
         self._verb_re = re.compile('|'.join(re.escape(w) for w in EMOTION_VERBS))
         self._mood_re = re.compile('|'.join(re.escape(w) for w in MOOD_PARTICLES))
@@ -239,6 +287,11 @@ class EmotionExtractor:
         self._rhetorical_res = [re.compile(p, re.IGNORECASE) for p in RHETORICAL_PATTERNS]
         self._exclamatory_res = [re.compile(p, re.IGNORECASE) for p in EXCLAMATORY_PATTERNS]
         self._repetition_re = re.compile(r'(.)\1{2,}')  # 字符重复 3+ 次
+        # 否定模式：检测否定词+情绪词的组合
+        self._negation_re = re.compile(
+            r'(?:' + '|'.join(re.escape(w) for w in self.NEGATION_WORDS) + r').{0,4}'
+            r'(?:[生气愤怒害怕恐惧悲伤哭恨讨厌喜欢笑高兴开心激动紧张担心])'
+        )
     
     def extract_features(self, text: str) -> EmotionFeatures:
         """提取文本的情绪特征"""
@@ -254,7 +307,7 @@ class EmotionExtractor:
         features.exclamation_density = features.exclamation_count * 10 / char_count
         
         # 平均句长
-        sentences = re.split(r'[。！？!?.]', text)
+        sentences = re.split(r'[。！？；]', text)
         sentences = [s.strip() for s in sentences if s.strip()]
         if sentences:
             features.avg_sentence_len = sum(len(s) for s in sentences) / len(sentences)
@@ -296,6 +349,10 @@ class EmotionExtractor:
         返回: EmotionResult
         """
         features = self.extract_features(text)
+        
+        # === 否定词检测 ===
+        # 检测否定词+情绪词的组合，如果命中则降低对应情绪的得分
+        has_negation = bool(self._negation_re.search(text))
         
         # 情绪打分
         scores = {
@@ -462,6 +519,54 @@ class EmotionExtractor:
         if re.search(r'(幸福|满足|开心|高兴|快乐|美好)', text):
             scores['joy'] += 0.4
         
+        # === 否定词惩罚 ===
+        # 如果检测到否定词+情绪词的组合，降低该情绪的得分
+        # 例如："不生气" → anger 分数降低，"不害怕" → fear 分数降低
+        if has_negation:
+            # 否定词会削弱所有情绪信号，使结果偏向 neutral
+            for key in scores:
+                if key != 'neutral':
+                    scores[key] *= 0.5  # 所有情绪分数减半
+        
+        # === 特殊否定模式识别 ===
+        # "不" + 情绪词（如"不生气"、"不怕"、"不难过"）
+        if '不生气' in text or '不愤怒' in text or '不恨' in text:
+            scores['anger'] *= 0.3  # 明确否定，大幅降低
+        if '不害怕' in text or '不怕' in text or '不恐惧' in text:
+            scores['fear'] *= 0.3
+        if '不难过' in text or '不悲伤' in text or '不伤心' in text:
+            scores['sadness'] *= 0.3
+        if '不高兴' in text or '不开心' in text or '不快乐' in text:
+            scores['joy'] *= 0.3
+        if '不惊讶' in text or '不惊奇' in text:
+            scores['surprise'] *= 0.3
+        
+        # === FEAR 恐惧信号（补充）===
+        # 恐慌/惊慌类
+        if re.search(r'(恐慌|惊慌|惊恐|惊惶|慌张|慌乱)', text):
+            scores['fear'] += 0.4
+        # 心跳加速/呼吸急促
+        if re.search(r'(心跳|心慌|心悸|呼吸困难|喘不过气|屏住呼吸)', text):
+            scores['fear'] += 0.3
+        # 冷汗/腿软
+        if re.search(r'(冷汗|腿软|脚软|毛骨悚然|脊背发凉|后背发凉)', text):
+            scores['fear'] += 0.3
+        # 尖叫/惊呼
+        if re.search(r'(尖叫|惊呼|惨叫|失声)', text):
+            scores['fear'] += 0.3
+        # 鬼怪/超自然恐惧
+        if re.search(r'(鬼|鬼魂|幽灵|妖怪|魔物|邪灵|怨灵|黑影|鬼影)', text):
+            scores['fear'] += 0.3
+        # 死亡/杀戮威胁
+        if re.search(r'(杀了你|弄死你|干掉|灭口|灭门|屠城)', text):
+            scores['fear'] += 0.5
+        # 绝望/无助
+        if re.search(r'(绝望|无助|无路可退|走投无路|没有办法|束手无策)', text):
+            scores['fear'] += 0.3
+        # 退缩/躲避
+        if re.search(r'(后退|退后|躲避|闪避|蜷缩|缩在|藏在)', text):
+            scores['fear'] += 0.2
+        
         # === NEUTRAL 中性信号（正向特征）===
         # neutral 不是垃圾桶，它有自己的特征
         # 调参版本：上限 0.5，只保留两个核心信号
@@ -484,28 +589,28 @@ class EmotionExtractor:
         if not has_emotion_signals:
             neutral_score += 0.2
         
-        # 归一化 neutral 分数，上限 0.35
+        # 归一化 neutral 分数，上限 0.25
         # 低于任何情绪的强信号阈值，但仍高于完全无信号时的兜底线
-        neutral_score = min(neutral_score, 0.35)
+        neutral_score = min(neutral_score, 0.25)
         scores['neutral'] = neutral_score
         
         # === 上下文干预 ===
-        # 置信度门控：仅当前句最高分<=0.35且前句置信度>=0.3时，才继承前句情绪
+        # 置信度门控：仅当前句最高分<=0.25且前句置信度>=0.3时，才继承前句情绪
         # 门控阈值从 0.5 降到 0.3，因为很多情绪句的置信度在 0.3-0.5 之间
         if context_hint and context_hint in ('sadness', 'fear', 'anger', 'joy', 'surprise'):
             if context_confidence >= 0.3:
-                # 当前句最高分 <= 0.35 时，上下文干预生效
+                # 当前句最高分 <= 0.25 时，上下文干预生效
                 current_max = max(scores.values())
-                if current_max <= 0.35:
-                    # 继承上下文情绪，给予 0.4 的基础分（超过 neutral 上限 0.35）
+                if current_max <= 0.25:
+                    # 继承上下文情绪，给予 0.4 的基础分（超过 neutral 上限 0.25）
                     scores[context_hint] += 0.4
         
         # 取最高分
         best_emotion = max(scores, key=scores.get)
         best_score = scores[best_emotion]
         
-        # 如果最高分 <= 0.35，归为 neutral
-        if best_score <= 0.35:
+        # 如果最高分 <= 0.25，归为 neutral
+        if best_score <= 0.25:
             best_emotion = 'neutral'
             best_score = 0.3
         

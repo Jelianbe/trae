@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 
 # 默认参考音频路径（可配置）
-DEFAULT_INDEX_TTS_AUDIO = "D:/TTS/IndexTTS2-SonicVale/examples/voice_01.wav"
+DEFAULT_INDEX_TTS_AUDIO = "D:/trae/novel-tts-engine/TTS/IndexTTS2-SonicVale/examples/voice_01.wav"
 
 # 情感映射：将系统情感标签映射为 Index-TTS 的情感描述文本
 EMOTION_TO_TEXT = {
@@ -71,7 +71,7 @@ class IndexTTSEngine:
     
     def __init__(
         self,
-        base_url: str = "http://localhost:7860",
+        base_url: str = "http://localhost:8300",
         default_audio_path: str = DEFAULT_INDEX_TTS_AUDIO,
         timeout: int = 120,
     ):
@@ -100,7 +100,7 @@ class IndexTTSEngine:
             
             # 检查服务是否可用
             try:
-                response = self._session.get(f"{self.base_url}/health", timeout=10)
+                response = self._session.get(self.base_url, timeout=10)
                 if response.status_code == 200:
                     logger.info("Index-TTS service is available")
                 else:
@@ -259,7 +259,7 @@ class IndexTTSEngine:
 
 
 def get_index_tts_engine(
-    base_url: str = "http://localhost:7860",
+    base_url: str = "http://localhost:8300",
     default_audio_path: str = DEFAULT_INDEX_TTS_AUDIO,
 ) -> IndexTTSEngine:
     """获取全局单例"""

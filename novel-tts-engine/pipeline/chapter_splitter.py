@@ -48,8 +48,9 @@ class ChapterSplitter:
         re.compile(r'^Volume\s*\d+.*$', re.MULTILINE | re.IGNORECASE),
     ]
 
-    def __init__(self, min_chapter_length: int = 10):
+    def __init__(self, min_chapter_length: int = 10, max_chunk_size: int = 5000):
         self.min_chapter_length = min_chapter_length
+        self.max_chunk_size = max_chunk_size
 
     def split(self, text: str) -> List[Chapter]:
         structure = self.split_with_volumes(text)
@@ -60,13 +61,45 @@ class ChapterSplitter:
         chapter_matches = self._find_chapter_positions(text)
         
         if not chapter_matches:
+            # 无章节标题时，按字数自动分块（每块 5000 字，重叠 200 字）
+            if len(text) <= self.max_chunk_size:
+                return NovelStructure(
+                    volumes=[Volume(index=0, title="全文", chapters=[
+                        Chapter(index=0, title="全文", content=text, start_pos=0, end_pos=len(text))
+                    ])],
+                    chapters=[Chapter(index=0, title="全文", content=text, start_pos=0, end_pos=len(text))],
+                    total_volumes=1,
+                    total_chapters=1
+                )
+            
+            # 自动分块
+            chunks = []
+            chunk_size = self.max_chunk_size
+            overlap = 200
+            pos = 0
+            chunk_idx = 0
+            while pos < len(text):
+                chunk_end = min(pos + chunk_size, len(text))
+                chunk_text = text[pos:chunk_end]
+                chunks.append(Chapter(
+                    index=chunk_idx,
+                    title=f"第{chunk_idx + 1}段（自动分割）",
+                    content=chunk_text,
+                    start_pos=pos,
+                    end_pos=chunk_end,
+                    volume_index=0,
+                    volume_title="全文"
+                ))
+                chunk_idx += 1
+                pos = chunk_end - overlap  # 重叠区域，避免上下文丢失
+                if pos >= len(text):
+                    break
+            
             return NovelStructure(
-                volumes=[Volume(index=0, title="全文", chapters=[
-                    Chapter(index=0, title="全文", content=text, start_pos=0, end_pos=len(text))
-                ])],
-                chapters=[Chapter(index=0, title="全文", content=text, start_pos=0, end_pos=len(text))],
+                volumes=[Volume(index=0, title="全文", chapters=chunks)],
+                chapters=chunks,
                 total_volumes=1,
-                total_chapters=1
+                total_chapters=len(chunks)
             )
         
         if volume_matches:

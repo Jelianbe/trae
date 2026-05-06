@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from pipeline.emotion_tagger import EmotionTagger, get_emotion_tagger, reset_emotion_tagger
+from pipeline._emotion_tagger_legacy import EmotionTagger, get_emotion_tagger, reset_emotion_tagger
 
 
 class TestEmotionTagger:
