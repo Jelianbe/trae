@@ -3,8 +3,13 @@ import sqlite3
 import threading
 import logging
 from contextlib import contextmanager
-from typing import List, Optional, Dict, Set
+from typing import Optional, List, Set, Dict, Tuple
 from dataclasses import dataclass, field
+
+from utils.config import (
+    CHARACTER_ACTIVITY_DECAY, CHARACTER_MIN_CONFIDENCE,
+    CONTEXT_HINT_CONFIDENCE_THRESHOLD,
+)
 from pathlib import Path
 import numpy as np
 
@@ -125,14 +130,6 @@ class CharacterManager:
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            try:
-                cursor.execute("ALTER TABLE characters ADD COLUMN activity_weight REAL DEFAULT 1.0 CHECK(activity_weight >= 0 AND activity_weight <= 10.0)")
-            except sqlite3.OperationalError:
-                pass
-            try:
-                cursor.execute("ALTER TABLE characters ADD COLUMN is_confirmed INTEGER DEFAULT 1")
-            except sqlite3.OperationalError:
-                pass
     
     def add_character(self, name: str, aliases: Set[str] = None, 
                       gender: str = "unknown", first_appearance: int = None) -> Character:
@@ -336,7 +333,8 @@ class CharacterManager:
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "UPDATE characters SET activity_weight = activity_weight * 0.95"
+                "UPDATE characters SET activity_weight = activity_weight * ?",
+                (CHARACTER_ACTIVITY_DECAY,)
             )
             cursor.execute(
                 "UPDATE characters SET activity_weight = MIN(activity_weight + ?, 10.0) WHERE id = ?",
@@ -389,7 +387,9 @@ class CharacterManager:
             return True
     
     def find_or_create(self, name: str, context: str = None, 
-                       chapter_id: int = None, min_confidence: float = 0.5) -> Character:
+                       chapter_id: int = None, min_confidence: float = None) -> Character:
+        if min_confidence is None:
+            min_confidence = CHARACTER_MIN_CONFIDENCE
         char = self.get_character_by_name(name)
         if char:
             return char
@@ -399,7 +399,7 @@ class CharacterManager:
             return char
         
         gender = self.infer_gender(name, context)
-        is_confirmed = 1 if min_confidence >= 0.5 else 0
+        is_confirmed = 1 if min_confidence >= CHARACTER_MIN_CONFIDENCE else 0
         return self.add_character(name, gender=gender, first_appearance=chapter_id)
     
     def get_characters_by_chapter(self, chapter_id: int) -> List[Character]:

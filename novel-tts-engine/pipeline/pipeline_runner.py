@@ -37,7 +37,12 @@ class PipelineState(Enum):
     ERROR = "error"
 
 
-from utils.config import COLD_START_CHARS_THRESHOLD, MAX_INPUT_CHARS, MAX_RESULT_CACHE_SIZE  # 配置已统一移至 utils.config
+from utils.config import (
+    COLD_START_CHARS_THRESHOLD, MAX_INPUT_CHARS, MAX_RESULT_CACHE_SIZE,
+    EMOTION_EXTRACT_WINDOW, DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD,
+    NARRATION_EMOTION_CONFIDENCE_THRESHOLD, EMOTION_LOW_SCORE_THRESHOLD,
+    CONTEXT_HINT_CONFIDENCE_THRESHOLD,
+)
 
 @dataclass
 class ProgressInfo:
@@ -342,10 +347,10 @@ class PipelineRunner:
             
             # 管道2（情绪）：从原始文本窗口提取情绪特征（方案B 双管道并行）
             # 方案B 核心思想：情绪信号存在于原始文本中，不应等角色匹配完再标注
-            # 取句子前后 20 字上下文作为情绪提取窗口
+            # 取句子前后 EMOTION_EXTRACT_WINDOW 字上下文作为情绪提取窗口
             emotion_extractor = get_emotion_extractor()
-            emotion_window_start = max(0, sentence_start - 20)
-            emotion_window_end = min(len(content), sentence_end + 20)
+            emotion_window_start = max(0, sentence_start - EMOTION_EXTRACT_WINDOW)
+            emotion_window_end = min(len(content), sentence_end + EMOTION_EXTRACT_WINDOW)
             emotion_context = content[emotion_window_start:emotion_window_end]
             emotion_result = emotion_extractor.classify(emotion_context, context_hint=prev_emotion, context_confidence=prev_confidence)
             
@@ -363,9 +368,9 @@ class PipelineRunner:
                         speaker = d_speaker
                         # 方案B 合并策略：
                         # - 优先使用独立情绪提取器的结果（管道2）
-                        # - 如果 confidence >= 0.5，直接使用
+                        # - 如果 confidence >= DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD，直接使用
                         # - 否则与 emotion_tagger 的结果取高置信度者
-                        if emotion_conf >= 0.5:
+                        if emotion_conf >= DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD:
                             emotion = emotion_result.emotion_label
                         else:
                             # 双管道投票
@@ -382,7 +387,7 @@ class PipelineRunner:
             else:
                 narration_count += 1
                 # 旁白句也使用情绪提取器
-                if emotion_conf >= 0.4:
+                if emotion_conf >= NARRATION_EMOTION_CONFIDENCE_THRESHOLD:
                     emotion = emotion_result.emotion_label
             
             # WRITTEN和THOUGHT类型设置默认说话人为Narrator

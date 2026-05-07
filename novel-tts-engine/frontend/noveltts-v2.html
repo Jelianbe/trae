@@ -961,9 +961,11 @@ textarea{resize:vertical;min-height:80px}
   <div class="modal">
     <div class="modal-header"><h2>新建项目</h2><button class="modal-close" onclick="closeModal('new-project')"><i class="fa-solid fa-xmark"></i></button></div>
     <div class="modal-body">
+      <div class="form-group"><label>上传 TXT 文件</label><input type="file" accept=".txt" id="file-input" onchange="uploadProject(this.files[0]);this.value=''"></div>
+      <div style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin:8px 0">或手动输入</div>
       <div class="form-group"><label>书名</label><input type="text" placeholder="请输入书名" id="new-project-title"></div>
       <div class="form-group"><label>作者</label><input type="text" placeholder="请输入作者" id="new-project-author"></div>
-      <div class="form-group"><label>小说内容</label><textarea placeholder="请粘贴或输入小说内容..." rows="8" id="new-project-content"></textarea></div>
+      <div class="form-group"><label>小说内容</label><textarea placeholder="请粘贴或输入小说内容..." rows="6" id="new-project-content"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('new-project')">取消</button>
@@ -1058,6 +1060,45 @@ let batchSelected = new Set();
 let undoStack = [];
 let redoStack = [];
 let dragSourceIndex = null;
+
+// ===== BACKEND API =====
+const API_BASE = 'http://localhost:8000/api/v1';
+
+async function apiFetch(url, options = {}) {
+  const res = await fetch(API_BASE + url, {
+    ...options,
+    headers: { 'Accept': 'application/json', ...options.headers },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+let currentProjectId = null;
+let analysisCache = {};
+
+async function uploadProject(file) {
+  const form = new FormData();
+  form.append('file', file);
+  const data = await apiFetch('/projects/upload', { method: 'POST', body: form });
+  const p = { id: data.project_id, project_id: data.project_id, title: data.book_title, total_chapters: data.total_chapters, total_volumes: data.total_volumes, author: '未知', words: '--', chapters: data.total_chapters, progress: 0, status: 'pending', lastEdit: new Date().toISOString().slice(0,10) };
+  const existing = projects.findIndex(x => x.id === p.id);
+  if (existing === -1) projects.unshift(p);
+  analysisCache = {};
+  showToast('导入成功: ' + data.book_title, 'success');
+  renderHomeProjects();
+  renderProjectsList();
+}
+
+async function analyzeChapter(id, index) {
+  const cacheKey = id + '-' + index;
+  if (analysisCache[cacheKey]) return analysisCache[cacheKey];
+  const data = await apiFetch(`/projects/${id}/chapters/${index}`);
+  analysisCache[cacheKey] = data;
+  return data;
+}
 
 // ===== ROUTING =====
 function toggleMobileMenu() {
@@ -1279,8 +1320,8 @@ function renderDrawerStats() {
 // ===== RENDER FUNCTIONS =====
 function renderProjectCard(p, showDelete) {
   const statusMap = { completed:'已完成', analyzing:'分析中', pending:'未分析' };
-  return `<div class="project-card" onclick="openDetail(${p.id})">
-    ${showDelete ? `<button class="delete-btn" onclick="event.stopPropagation();deleteProject(${p.id})" title="删除"><i class="fa-solid fa-trash" style="font-size:0.8rem"></i></button>` : ''}
+  return `<div class="project-card" onclick="openDetail('${p.id}')">
+    ${showDelete ? `<button class="delete-btn" onclick="event.stopPropagation();deleteProject('${p.id}')" title="删除"><i class="fa-solid fa-trash" style="font-size:0.8rem"></i></button>` : ''}
     <h3>${p.title}</h3>
     <div class="author">${p.author}</div>
     <div class="meta">
@@ -1490,9 +1531,28 @@ function renderVoices(filter) {
 // ===== INTERACTIONS =====
 function openDetail(id) {
   const p = projects.find(x => x.id === id);
-  if (p) {
-    document.getElementById('detail-book-title').textContent = '《' + p.title + '》';
-    document.getElementById('detail-tree-title').textContent = p.title;
+  if (!p) return;
+  currentProjectId = p.project_id || p.id;
+  document.getElementById('detail-book-title').textContent = '《' + p.title + '》';
+  document.getElementById('detail-tree-title').textContent = p.title;
+
+  // Backend project: load chapters from API
+  if (p.project_id) {
+    (async () => {
+      try {
+        const chaptersData = await apiFetch(`/projects/${p.project_id}/chapters`);
+        chapters.length = 0;
+        chapters.push({ volume: '全部章节', chapters: chaptersData.map(ch => ({ id: ch.index, title: ch.title, status: 'pending' })) });
+        renderChapterTree();
+        if (chaptersData.length > 0) {
+          document.getElementById('content-title').textContent = chaptersData[0].title;
+          renderChapterTree();
+          v2SelectChapter(p.project_id, chaptersData[0].index, chaptersData[0].title);
+        }
+      } catch (e) {
+        showToast('加载章节失败: ' + e.message, 'error');
+      }
+    })();
   }
   location.hash = 'detail';
 }
@@ -1503,6 +1563,44 @@ function selectChapter(id, title) {
   renderChapterTree();
   renderContent();
   selectedSegment = null;
+}
+
+async function v2SelectChapter(projectId, index, title) {
+  currentChapter = index;
+  currentProjectId = projectId;
+  document.getElementById('content-title').textContent = title;
+  renderChapterTree();
+  document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem"></i><p style="margin-top:12px">正在分析第 ' + (index + 1) + ' 章</p></div>';
+  try {
+    const data = await analyzeChapter(projectId, index);
+    segments.length = 0;
+    for (const sent of data.sentences) {
+      if (sent.fragments && sent.fragments.length > 1) {
+        for (const frag of sent.fragments) {
+          segments.push({
+            type: frag.type, text: frag.text, speaker: frag.speaker || '', speakerColor: '',
+            emotion: sent.emotion || 'neutral', emotion_class: sent.emotion_class || 'neutral',
+            quotation_type: frag.type === 'dialogue' ? 'dialogue' : 'none',
+            speed: 50, volume: 75, pitch: 50,
+          });
+        }
+      } else {
+        segments.push({
+          type: sent.sentence_type === 'dialogue' ? 'dialogue' : sent.sentence_type === 'onomatopoeia' ? 'onomatopoeia' : 'narration',
+          text: sent.text, speaker: sent.speaker || '', speakerColor: '',
+          emotion: sent.emotion || 'neutral', emotion_class: sent.emotion_class || 'neutral',
+          quotation_type: sent.quotation_type || 'none',
+          speed: 50, volume: 75, pitch: 50,
+        });
+      }
+    }
+    selectedSegment = null;
+    renderContent();
+    showToast('分析完成: ' + segments.length + ' 个段落', 'success');
+  } catch (e) {
+    document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:40px;color:var(--error)"><i class="fa-solid fa-triangle-exclamation" style="font-size:2rem"></i><p style="margin-top:12px">分析失败: ' + e.message + '</p></div>';
+    showToast('分析失败: ' + e.message, 'error');
+  }
 }
 
 function selectSegment(index) {

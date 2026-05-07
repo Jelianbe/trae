@@ -1,6 +1,7 @@
 import re
 import json
 import logging
+import threading
 from typing import List, Tuple, Optional, Set, Dict
 from dataclasses import dataclass
 from pathlib import Path
@@ -221,6 +222,7 @@ class SfxDetector:
         self.sfx_words: Set[str] = set()
         self._trie: Dict[str, any] = {}
         self._trie_built: bool = False
+        self._lock = threading.Lock()
         self._load_dictionary(dict_path)
 
     def _load_dictionary(self, dict_path: str = None):
@@ -347,13 +349,17 @@ class SfxDetector:
         return False
 
     def add_word(self, word: str):
-        self.sfx_words.add(word)
+        with self._lock:
+            self.sfx_words.add(word)
+            self._trie_built = False
 
     def remove_word(self, word: str) -> bool:
-        if word in self.sfx_words:
-            self.sfx_words.discard(word)
-            return True
-        return False
+        with self._lock:
+            if word in self.sfx_words:
+                self.sfx_words.discard(word)
+                self._trie_built = False
+                return True
+            return False
 
     def save_dictionary(self, path: str = None):
         save_path = Path(path) if path else SFX_DICT_PATH
@@ -370,12 +376,15 @@ class SfxDetector:
 
 # Module-level SfxDetector singleton for convenience functions
 _default_detector: Optional['SfxDetector'] = None
+_detector_lock = threading.Lock()
 
 
 def _get_detector() -> 'SfxDetector':
     global _default_detector
     if _default_detector is None:
-        _default_detector = SfxDetector()
+        with _detector_lock:
+            if _default_detector is None:
+                _default_detector = SfxDetector()
     return _default_detector
 
 

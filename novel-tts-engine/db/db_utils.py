@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import logging
+import threading
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
@@ -10,14 +11,24 @@ from utils.config import DB_PATH
 logger = logging.getLogger(__name__)
 
 
+_local = threading.local()
+
+
+def _get_connection():
+    if not hasattr(_local, 'conn') or _local.conn is None:
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
+        conn.execute("PRAGMA journal_mode = WAL")
+        conn.execute("PRAGMA synchronous = NORMAL")
+        conn.execute("PRAGMA cache_size = -2000")
+        _local.conn = conn
+    return _local.conn
+
+
 @contextmanager
 def get_connection():
-    conn = sqlite3.connect(DB_PATH, timeout=30.0)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    conn.execute("PRAGMA journal_mode = WAL")
-    conn.execute("PRAGMA synchronous = NORMAL")
-    conn.execute("PRAGMA cache_size = -2000")
+    conn = _get_connection()
     try:
         yield conn
         conn.commit()
@@ -33,8 +44,6 @@ def get_connection():
         conn.rollback()
         logger.error(f"数据库错误: {e}", exc_info=True)
         raise
-    finally:
-        conn.close()
 
 
 def init_db():
@@ -44,71 +53,6 @@ def init_db():
         with open(schema_path, 'r', encoding='utf-8') as f:
             cursor.executescript(f.read())
         conn.commit()
-
-
-class CharacterManager:
-    def create(self, name: str, aliases: List[str] = None, vector: bytes = None) -> int:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            aliases_json = json.dumps(aliases, ensure_ascii=False) if aliases else None
-            cursor.execute(
-                "INSERT INTO characters (name, aliases, vector) VALUES (?, ?, ?)",
-                (name, aliases_json, vector)
-            )
-            conn.commit()
-            return cursor.lastrowid
-
-    def get_by_id(self, character_id: int) -> Optional[Dict[str, Any]]:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM characters WHERE id = ?", (character_id,))
-            row = cursor.fetchone()
-            if row:
-                return dict(row)
-            return None
-
-    def get_by_name(self, name: str) -> Optional[Dict[str, Any]]:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM characters WHERE name = ?", (name,))
-            row = cursor.fetchone()
-            if row:
-                return dict(row)
-            return None
-
-    def get_all(self) -> List[Dict[str, Any]]:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM characters ORDER BY name")
-            return [dict(row) for row in cursor.fetchall()]
-
-    def update(self, character_id: int, **kwargs) -> bool:
-        allowed_fields = {'name', 'aliases', 'vector'}
-        updates = {k: v for k, v in kwargs.items() if k in allowed_fields}
-        if not updates:
-            return False
-        
-        if 'aliases' in updates and isinstance(updates['aliases'], list):
-            updates['aliases'] = json.dumps(updates['aliases'], ensure_ascii=False)
-        
-        set_clause = ', '.join(f"{k} = ?" for k in updates.keys())
-        values = list(updates.values()) + [character_id]
-        
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                f"UPDATE characters SET {set_clause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-                values
-            )
-            conn.commit()
-            return cursor.rowcount > 0
-
-    def delete(self, character_id: int) -> bool:
-        with get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM characters WHERE id = ?", (character_id,))
-            conn.commit()
-            return cursor.rowcount > 0
 
 
 class ChapterManager:

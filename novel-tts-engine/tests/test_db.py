@@ -6,9 +6,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from db.db_utils import (
     init_db, get_connection,
-    CharacterManager, ChapterManager, SentenceManager,
+    ChapterManager, SentenceManager,
     SfxWordManager, ProgressManager
 )
+from pipeline.character_manager import CharacterManager, get_character_manager
 from pathlib import Path
 
 TEST_DB_PATH = Path(__file__).parent.parent / "test_novel_tts.db"
@@ -31,47 +32,47 @@ def setup_test_db(monkeypatch):
 
 class TestCharacterManager:
     def test_create_character(self):
-        manager = CharacterManager()
-        char_id = manager.create("张三", ["小张", "老张"])
-        assert char_id is not None
-        assert char_id > 0
+        manager = get_character_manager()
+        char = manager.add_character("张三", {"小张", "老张"})
+        assert char is not None
+        assert char.id > 0
 
     def test_get_character_by_id(self):
-        manager = CharacterManager()
-        char_id = manager.create("李四")
-        char = manager.get_by_id(char_id)
-        assert char is not None
-        assert char['name'] == "李四"
+        manager = get_character_manager()
+        char = manager.add_character("李四")
+        retrieved = manager.get_character_by_id(char.id)
+        assert retrieved is not None
+        assert retrieved.name == "李四"
 
     def test_get_character_by_name(self):
-        manager = CharacterManager()
-        manager.create("王五")
-        char = manager.get_by_name("王五")
+        manager = get_character_manager()
+        manager.add_character("王五")
+        char = manager.get_character_by_name("王五")
         assert char is not None
-        assert char['name'] == "王五"
+        assert char.name == "王五"
 
     def test_get_all_characters(self):
-        manager = CharacterManager()
-        manager.create("角色A")
-        manager.create("角色B")
-        chars = manager.get_all()
+        manager = get_character_manager()
+        manager.add_character("角色A")
+        manager.add_character("角色B")
+        chars = manager.get_all_characters()
         assert len(chars) >= 2
 
     def test_update_character(self):
-        manager = CharacterManager()
-        char_id = manager.create("原名称")
-        result = manager.update(char_id, name="新名称")
+        manager = get_character_manager()
+        char = manager.add_character("原名称")
+        result = manager.update_character(char.id, name="新名称")
         assert result is True
-        char = manager.get_by_id(char_id)
-        assert char['name'] == "新名称"
+        retrieved = manager.get_character_by_id(char.id)
+        assert retrieved.name == "新名称"
 
     def test_delete_character(self):
-        manager = CharacterManager()
-        char_id = manager.create("待删除")
-        result = manager.delete(char_id)
+        manager = get_character_manager()
+        char = manager.add_character("待删除")
+        result = manager.delete_character(char.id)
         assert result is True
-        char = manager.get_by_id(char_id)
-        assert char is None
+        retrieved = manager.get_character_by_id(char.id)
+        assert retrieved is None
 
 
 class TestChapterManager:
