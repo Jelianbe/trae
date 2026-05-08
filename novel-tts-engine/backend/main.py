@@ -20,6 +20,9 @@ import uuid
 import tempfile
 import time
 import logging
+import subprocess
+import signal
+import atexit
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 from datetime import datetime
@@ -58,6 +61,103 @@ logging.basicConfig(
 logger = logging.getLogger("novel-tts-api")
 
 # ============================================================
+# Index-TTS 服务管理
+# ============================================================
+
+_indextts_process = None
+_indextts_port = 8300
+_indextts_ready = False
+
+def _start_indextts_service():
+    """启动 Index-TTS 服务（后台进程）"""
+    global _indextts_process, _indextts_ready
+    
+    if _indextts_process is not None:
+        logger.info("Index-TTS service is already running")
+        return
+    
+    tts_dir = PROJECT_ROOT / "TTS" / "IndexTTS2-SonicVale"
+    python_path = tts_dir / "installer_files" / "env" / "python.exe"
+    webui_path = tts_dir / "webui.py"
+    
+    if not python_path.exists():
+        logger.warning(f"Index-TTS Python environment not found: {python_path}")
+        return
+    
+    if not webui_path.exists():
+        logger.warning(f"Index-TTS webui.py not found: {webui_path}")
+        return
+    
+    try:
+        logger.info(f"Starting Index-TTS service on port {_indextts_port}...")
+        _indextts_process = subprocess.Popen(
+            [
+                str(python_path),
+                str(webui_path),
+                "--port", "7860",
+                "--api_port", str(_indextts_port),
+                "--host", "127.0.0.1",
+                "--model_dir", str(tts_dir / "checkpoints"),
+            ],
+            cwd=str(tts_dir),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+        )
+        
+        # 等待服务启动
+        time.sleep(10)
+        
+        # 检查进程是否还在运行
+        if _indextts_process.poll() is not None:
+            stdout, stderr = _indextts_process.communicate()
+            logger.error(f"Index-TTS service failed to start. stdout: {stdout.decode('utf-8', errors='ignore')}")
+            logger.error(f"stderr: {stderr.decode('utf-8', errors='ignore')}")
+            _indextts_process = None
+            return
+        
+        logger.info(f"Index-TTS service started successfully (PID: {_indextts_process.pid})")
+        _indextts_ready = True
+        
+    except Exception as e:
+        logger.error(f"Failed to start Index-TTS service: {e}")
+        _indextts_process = None
+
+def _stop_indextts_service():
+    """停止 Index-TTS 服务"""
+    global _indextts_process, _indextts_ready
+    
+    if _indextts_process is None:
+        return
+    
+    try:
+        logger.info(f"Stopping Index-TTS service (PID: {_indextts_process.pid})...")
+        
+        # 优雅停止
+        if sys.platform == "win32":
+            _indextts_process.terminate()
+        else:
+            _indextts_process.send_signal(signal.SIGTERM)
+        
+        # 等待进程结束
+        _indextts_process.wait(timeout=5)
+        logger.info("Index-TTS service stopped successfully")
+        
+    except subprocess.TimeoutExpired:
+        logger.warning("Index-TTS service did not stop gracefully, killing...")
+        _indextts_process.kill()
+        
+    except Exception as e:
+        logger.error(f"Error stopping Index-TTS service: {e}")
+        
+    finally:
+        _indextts_process = None
+        _indextts_ready = False
+
+# 注册退出处理
+atexit.register(_stop_indextts_service)
+
+# ============================================================
 # 应用初始化
 # ============================================================
 
@@ -67,6 +167,8 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    on_startup=[_start_indextts_service],
+    on_shutdown=[_stop_indextts_service],
 )
 
 # CORS 配置（开发阶段允许所有来源）
@@ -247,18 +349,14 @@ class VoiceInfo(BaseModel):
 
 
 class SentenceData(BaseModel):
-    """句子级分析数据"""
+    """句子级分析数据（MVP 7字段）"""
     text: str
     speaker: str = ""
     emotion: str = "neutral"
     emotion_class: str = "neutral"
     emotion_vector: Optional[List[float]] = None
-    emotion_intensity: float = 0.5
-    quotation_type: str = "none"
-    sfx_words: List[str] = []
     sentence_type: str = "narration"
-    sentence_id: int = 0
-    fragments: List[dict] = []
+    entities: List[dict] = []
 
 
 class ChapterAnalysisResponse(BaseModel):
@@ -395,8 +493,40 @@ async def health_check():
     )
 
 
+@app.get("/api/v1/tts/status", tags=["TTS"])
+async def tts_status():
+    """获取 TTS 服务状态"""
+    return {
+        "indextts_running": _indextts_process is not None and _indextts_process.poll() is None,
+        "indextts_ready": _indextts_ready,
+        "indextts_port": _indextts_port,
+        "indextts_pid": _indextts_process.pid if _indextts_process else None,
+    }
+
+
+@app.post("/api/v1/tts/restart", tags=["TTS"])
+async def restart_tts_service():
+    """重启 Index-TTS 服务"""
+    global _indextts_ready
+    
+    _stop_indextts_service()
+    _start_indextts_service()
+    
+    return {
+        "status": "ok" if _indextts_ready else "failed",
+        "message": "Index-TTS service restarted" if _indextts_ready else "Failed to restart Index-TTS service",
+    }
+
+
+class CreateProjectRequest(BaseModel):
+    """创建项目请求（手动输入方式）"""
+    title: str = Field(..., description="书名")
+    author: str = Field("", description="作者")
+    content: str = Field(..., description="小说内容")
+
+
 @app.post("/api/v1/projects/upload", response_model=ProjectUploadResponse, tags=["项目"])
-async def upload_project(file: UploadFile = File(...)):
+async def upload_project(file: UploadFile = File(None)):
     """
     上传小说 TXT 文件，自动分章并创建项目。
 
@@ -404,23 +534,30 @@ async def upload_project(file: UploadFile = File(...)):
     - 调用 ChapterSplitter.split_with_volumes() 分章
     - 返回项目 ID、书名、章节列表
     """
-    if not file.filename or not file.filename.endswith(".txt"):
-        raise HTTPException(status_code=400, detail="请上传 .txt 格式的文本文件")
+    content = None
+    book_title = None
 
-    try:
-        content_bytes = await file.read()
-        content = content_bytes.decode("utf-8")
-    except UnicodeDecodeError:
+    if file is not None:
+        if not file.filename or not file.filename.endswith(".txt"):
+            raise HTTPException(status_code=400, detail="请上传 .txt 格式的文本文件")
+
         try:
-            content = content_bytes.decode("gbk")
+            content_bytes = await file.read()
+            content = content_bytes.decode("utf-8")
         except UnicodeDecodeError:
-            raise HTTPException(status_code=400, detail="文件编码不支持，请使用 UTF-8 或 GBK 编码")
+            try:
+                content = content_bytes.decode("gbk")
+            except UnicodeDecodeError:
+                raise HTTPException(status_code=400, detail="文件编码不支持，请使用 UTF-8 或 GBK 编码")
+        
+        book_title = file.filename.replace(".txt", "").strip()
+    else:
+        raise HTTPException(status_code=400, detail="请上传文件或使用 /api/v1/projects/create 接口")
 
-    if not content.strip():
+    if not content or not content.strip():
         raise HTTPException(status_code=400, detail="文件内容为空")
 
     project_id = str(uuid.uuid4())[:8]
-    book_title = file.filename.replace(".txt", "").strip()
 
     try:
         splitter = get_splitter()
@@ -446,6 +583,69 @@ async def upload_project(file: UploadFile = File(...)):
         "project_id": project_id,
         "book_title": book_title,
         "content": content,
+        "novel_structure": novel_structure,
+        "total_chapters": novel_structure.total_chapters,
+        "total_volumes": novel_structure.total_volumes,
+        "total_words": total_words,
+        "created_at": datetime.now().isoformat(),
+    }
+
+    analysis_cache[project_id] = {}
+    _save_projects_db()
+
+    logger.info(f"项目 {project_id} 创建成功: {book_title}, {novel_structure.total_chapters} 章, {total_words} 字")
+
+    return ProjectUploadResponse(
+        project_id=project_id,
+        book_title=book_title,
+        total_chapters=novel_structure.total_chapters,
+        total_volumes=novel_structure.total_volumes,
+        chapters=chapters,
+    )
+
+
+@app.post("/api/v1/projects/create", response_model=ProjectUploadResponse, tags=["项目"])
+async def create_project(request: CreateProjectRequest):
+    """
+    手动创建项目（通过输入内容方式）。
+
+    - 接收书名、作者和小说内容
+    - 调用 ChapterSplitter.split_with_volumes() 分章
+    - 返回项目 ID、书名、章节列表
+    """
+    if not request.content or not request.content.strip():
+        raise HTTPException(status_code=400, detail="内容不能为空")
+
+    if not request.title or not request.title.strip():
+        raise HTTPException(status_code=400, detail="书名不能为空")
+
+    project_id = str(uuid.uuid4())[:8]
+    book_title = request.title.strip()
+
+    try:
+        splitter = get_splitter()
+        novel_structure = splitter.split_with_volumes(request.content)
+    except Exception as e:
+        logger.error(f"分章失败: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"分章处理失败: {str(e)}")
+
+    chapters = [
+        ChapterInfo(
+            index=ch.index,
+            title=ch.title,
+            word_count=len(ch.content),
+            volume_index=ch.volume_index,
+            volume_title=ch.volume_title,
+        )
+        for ch in novel_structure.chapters
+    ]
+
+    total_words = sum(len(ch.content) for ch in novel_structure.chapters)
+
+    projects_store[project_id] = {
+        "project_id": project_id,
+        "book_title": book_title,
+        "content": request.content,
         "novel_structure": novel_structure,
         "total_chapters": novel_structure.total_chapters,
         "total_volumes": novel_structure.total_volumes,
@@ -601,12 +801,8 @@ async def analyze_chapter(project_id: str, chapter_index: int):
                 emotion=sent.emotion,
                 emotion_class=getattr(sent, "emotion_class", "neutral"),
                 emotion_vector=getattr(sent, "emotion_vector", None),
-                emotion_intensity=getattr(sent, "emotion_intensity", 0.5),
-                quotation_type=getattr(sent, "quotation_type", "none"),
-                sfx_words=getattr(sent, "sfx", []),
                 sentence_type=getattr(sent, "type", "narration"),
-                sentence_id=getattr(sent, "sentence_id", 0),
-                fragments=getattr(sent, "fragments", []),
+                entities=getattr(sent, "entities", []),
             ))
 
         response = ChapterAnalysisResponse(
@@ -837,9 +1033,10 @@ async def get_audio(filename: str):
 
 FRONTEND_DIR = PROJECT_ROOT / "frontend"
 
-# 挂载 JS 和 CSS 静态目录
+# 挂载 JS、CSS 和 Audio 静态目录
 app.mount("/js", StaticFiles(directory=str(FRONTEND_DIR / "js")), name="js")
 app.mount("/css", StaticFiles(directory=str(FRONTEND_DIR / "css")), name="css")
+app.mount("/audio", StaticFiles(directory=str(FRONTEND_DIR / "audio")), name="audio")
 
 @app.get("/", include_in_schema=False)
 async def serve_index():
@@ -851,6 +1048,9 @@ async def serve_index():
 # ============================================================
 
 if __name__ == "__main__":
+    # 启动 Index-TTS 服务
+    _start_indextts_service()
+    
     import uvicorn
     uvicorn.run(
         "main:app",

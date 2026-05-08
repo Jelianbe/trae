@@ -7,7 +7,7 @@ from typing import Optional, List, Set, Dict, Tuple
 from dataclasses import dataclass, field
 
 from utils.config import (
-    CHARACTER_ACTIVITY_DECAY, CHARACTER_MIN_CONFIDENCE,
+    CHARACTER_MIN_CONFIDENCE,
     CONTEXT_HINT_CONFIDENCE_THRESHOLD,
 )
 from pathlib import Path
@@ -123,8 +123,6 @@ class CharacterManager:
                     aliases TEXT,
                     gender TEXT DEFAULT 'unknown' CHECK(gender IN ('male', 'female', 'unknown')),
                     first_appearance INTEGER,
-                    activity_weight REAL DEFAULT 1.0 CHECK(activity_weight >= 0 AND activity_weight <= 10.0),
-                    is_confirmed INTEGER DEFAULT 1,
                     vector BLOB,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -329,26 +327,6 @@ class CharacterManager:
         
         return 'unknown'
     
-    def update_activity_weight(self, char_id: int, increment: float = 0.1) -> None:
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE characters SET activity_weight = activity_weight * ?",
-                (CHARACTER_ACTIVITY_DECAY,)
-            )
-            cursor.execute(
-                "UPDATE characters SET activity_weight = MIN(activity_weight + ?, 10.0) WHERE id = ?",
-                (increment, char_id)
-            )
-            conn.commit()
-    
-    def get_activity_weight(self, char_id: int) -> float:
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT activity_weight FROM characters WHERE id = ?", (char_id,))
-            row = cursor.fetchone()
-            return row[0] if row else 1.0
-    
     def merge_characters(self, primary_id: int, secondary_id: int) -> bool:
         """
         合并两个角色，将别名合并到主角色，并更新所有相关句子
@@ -399,7 +377,6 @@ class CharacterManager:
             return char
         
         gender = self.infer_gender(name, context)
-        is_confirmed = 1 if min_confidence >= CHARACTER_MIN_CONFIDENCE else 0
         return self.add_character(name, gender=gender, first_appearance=chapter_id)
     
     def get_characters_by_chapter(self, chapter_id: int) -> List[Character]:

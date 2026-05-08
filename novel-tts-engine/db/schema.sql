@@ -1,6 +1,7 @@
 -- Novel-TTS-Engine Database Schema
--- Last updated: 2026-04-30
+-- Last updated: 2026-05-07
 -- Note: PRAGMA foreign_keys = ON must be set in application code
+-- Simplified for MVP: Removed sfx_words, progress tables and non-essential fields
 
 CREATE TABLE IF NOT EXISTS characters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -8,8 +9,6 @@ CREATE TABLE IF NOT EXISTS characters (
     aliases TEXT,
     gender TEXT DEFAULT 'unknown' CHECK(gender IN ('male', 'female', 'unknown')),
     first_appearance INTEGER,
-    activity_weight REAL DEFAULT 1.0 CHECK(activity_weight >= 0 AND activity_weight <= 10.0),
-    is_confirmed INTEGER DEFAULT 1,
     vector BLOB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -42,28 +41,9 @@ CREATE TABLE IF NOT EXISTS sentences (
     UNIQUE(chapter_id, sentence_index)
 );
 
-CREATE TABLE IF NOT EXISTS sfx_words (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    word TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS progress (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    chapter_id INTEGER NOT NULL,
-    step TEXT NOT NULL,
-    status TEXT DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (chapter_id) REFERENCES chapters(id) ON DELETE CASCADE,
-    UNIQUE(chapter_id, step)
-);
-
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_sentences_chapter ON sentences(chapter_id);
 CREATE INDEX IF NOT EXISTS idx_sentences_speaker ON sentences(speaker_id);
 CREATE INDEX IF NOT EXISTS idx_sentences_chapter_index ON sentences(chapter_id, sentence_index);
-CREATE INDEX IF NOT EXISTS idx_progress_chapter_step ON progress(chapter_id, step);
 CREATE INDEX IF NOT EXISTS idx_characters_gender ON characters(gender);
 CREATE INDEX IF NOT EXISTS idx_characters_first_appearance ON characters(first_appearance);
-CREATE INDEX IF NOT EXISTS idx_sfx_words_word ON sfx_words(word);

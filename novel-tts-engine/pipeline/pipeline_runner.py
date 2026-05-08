@@ -12,18 +12,15 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from pipeline.chapter_splitter import ChapterSplitter, Chapter
-from pipeline.sfx_detector import SfxDetector
 from pipeline.nlp_basics import get_nlp, NLPBasics
 from pipeline.context_diversity_validator import get_context_validator, ContextDiversityValidator
 from pipeline.speaker_role_filter import get_speaker_role_filter, SpeakerRoleFilter
 from pipeline.entity_linker import get_entity_linker, EntityLinker
-from pipeline.entity_clusterer import get_entity_clusterer, EntityClusterer
 from pipeline.character_manager import CharacterManager, get_character_manager
 from pipeline.speaker_matcher import SpeakerMatcher
 from pipeline.semantic_ranker import get_semantic_ranker, SemanticRanker
 from pipeline._emotion_tagger_legacy import EmotionTagger, get_emotion_tagger
 from pipeline.emotion_extractor import get_emotion_extractor  # 方案B：独立情绪提取模块
-from pipeline.quotation_classifier import QuotationClassifier, QuotationType
 from utils.text_utils import split_sentences_smart
 
 logger = logging.getLogger(__name__)
@@ -66,24 +63,14 @@ class ProgressInfo:
 
 @dataclass
 class SentenceData:
-    """单句处理结果"""
+    """单句处理结果（MVP 7字段）"""
     text: str
-    type: str = "narration"
-    speaker: str = ""
-    emotion: str = "neutral"
-    speed: float = 1.0
-    tone: str = "normal"
-    sfx: List[str] = field(default_factory=list)
+    type: str  # "dialogue" / "narration"
+    speaker: str
+    emotion: str
+    emotion_class: str
+    emotion_vector: Optional[List[float]]
     entities: List[dict] = field(default_factory=list)
-    sentence_id: int = 0
-    quotation_type: str = "none"  # none/dialogue/written/thought
-    sentence_start: int = 0  # 句子在原文中的起始位置
-    sentence_end: int = 0    # 句子在原文中的结束位置
-    # Index-TTS 2 三层标注体系
-    emotion_class: str = "neutral"  # L1: neutral / excited / subdued
-    emotion_vector: Optional[List[float]] = None  # L3: 8维向量
-    emotion_text: str = ""  # 情感软指令描述
-    emotion_intensity: float = 0.5  # 情绪强度 0.0~1.0
 
 
 @dataclass
@@ -103,14 +90,14 @@ class PipelineRunner:
     管道流程：
     1. 章节划分
     2. NER 分析 + 上下文多样性验证 + 说话角色过滤 + 实体链接
-    3. 拟声词检测
-    4. 说话人匹配
-    5. 情绪标注
+    3. 说话人匹配
+    4. 情绪标注
+
+    注：拟声词检测、实体聚类、引号分类已移入战略储备库，暂不启用。
     """
     
     def __init__(self):
         self.chapter_splitter = ChapterSplitter()
-        self.sfx_detector = SfxDetector()
         self.nlp = get_nlp()
         self.char_manager = get_character_manager()
         self.speaker_matcher = SpeakerMatcher(self.char_manager)
@@ -119,8 +106,6 @@ class PipelineRunner:
         self.context_validator = get_context_validator()
         self.speaker_role_filter = get_speaker_role_filter()
         self.entity_linker = get_entity_linker(self.char_manager)
-        self.entity_clusterer = get_entity_clusterer()
-        self.quotation_classifier = QuotationClassifier()
         
         self.progress = ProgressInfo()
         self._pause_event = threading.Event()
@@ -251,6 +236,8 @@ class PipelineRunner:
             self.progress.message = str(e)
             logger.error(f"流水线执行错误: {e}", exc_info=True)
             raise
+        finally:
+            self.speaker_matcher.reset_activity()
         
         return results
     
@@ -282,10 +269,6 @@ class PipelineRunner:
         # 第三步：实体链接
         self._set_progress("实体链接", result.chapter_id, result.chapter_id + 1, 3, "正在链接实体...")
         linked_entities = self.entity_linker.link(entities, content)
-
-        # 第四步：拟声词检测
-        self._set_progress("拟声词检测", result.chapter_id, result.chapter_id + 1, 4, "正在检测拟声词...")
-        sfx_words = self.sfx_detector.detect(content)
         
         # 第五步：说话人匹配
         self._set_progress("说话人匹配", result.chapter_id, result.chapter_id + 1, 5, "正在匹配说话人...")
@@ -305,13 +288,9 @@ class PipelineRunner:
         # 优化1：预构建对话文本集合（O(1) 查找替代 any() 遍历）
         dialogue_texts = {d.strip() for d in dialogue_map.keys()}
         
-        # 优化2：预构建拟声词文本到实体的映射（避免重复查找）
-        sfx_text_set = {sfx.text for sfx in sfx_words}
-        
         sentence_id = 0
         dialogue_count = 0
         narration_count = 0
-        sfx_count = 0
         current_pos = 0  # 跟踪当前在原文中的位置
         prev_emotion = None  # 上下文情感传递：上一句的情绪标签
         prev_confidence = 0.0  # 上下文情感传递：上一句的情绪置信度
@@ -336,14 +315,6 @@ class PipelineRunner:
             sentence_type = "dialogue" if is_dialogue else "narration"
             speaker = ""
             emotion = "neutral"
-            quotation_type = "none"
-            
-            # 引号内容分类
-            if '"' in sentence or '"' in sentence:
-                quotation_results = self.quotation_classifier.classify_all(sentence)
-                if quotation_results:
-                    best_result = max(quotation_results, key=lambda r: r.confidence)
-                    quotation_type = best_result.type.value
             
             # 管道2（情绪）：从原始文本窗口提取情绪特征（方案B 双管道并行）
             # 方案B 核心思想：情绪信号存在于原始文本中，不应等角色匹配完再标注
@@ -366,39 +337,22 @@ class PipelineRunner:
                 for d_text, d_speaker in dialogue_map.items():
                     if d_text in sentence:
                         speaker = d_speaker
-                        # 方案B 合并策略：
-                        # - 优先使用独立情绪提取器的结果（管道2）
-                        # - 如果 confidence >= DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD，直接使用
-                        # - 否则与 emotion_tagger 的结果取高置信度者
                         if emotion_conf >= DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD:
                             emotion = emotion_result.emotion_label
                         else:
-                            # 双管道投票
                             rule_emotion = self.emotion_tagger.tag(sentence, speaker)
                             if rule_emotion != 'neutral':
                                 emotion = rule_emotion
                             else:
                                 emotion = emotion_result.emotion_label
                         dialogue_count += 1
-                        # 对话句如果没有明确分类，默认为DIALOGUE
-                        if quotation_type == "none":
-                            quotation_type = "dialogue"
                         break
             else:
                 narration_count += 1
-                # 旁白句也使用情绪提取器
                 if emotion_conf >= NARRATION_EMOTION_CONFIDENCE_THRESHOLD:
                     emotion = emotion_result.emotion_label
             
-            # WRITTEN和THOUGHT类型设置默认说话人为Narrator
-            if quotation_type in ("written", "thought") and not speaker:
-                speaker = "Narrator"
-            
-            # 优化4：使用预构建的拟声词集合进行 O(1) 查找
-            sentence_sfx = list(set(sfx_text for sfx_text in sfx_text_set if sfx_text in sentence))
-            sfx_count += len(sentence_sfx)
-            
-            # 优化5：预构建实体属性字典，避免 getattr 重复调用
+            # 预构建实体属性字典
             sentence_entities = []
             for e in linked_entities:
                 # 直接属性访问替代 getattr
@@ -429,17 +383,9 @@ class PipelineRunner:
                 type=sentence_type,
                 speaker=speaker,
                 emotion=emotion,
-                sfx=sentence_sfx,
-                entities=sentence_entities,
-                sentence_id=sentence_id,
-                quotation_type=quotation_type,
-                sentence_start=sentence_start,
-                sentence_end=sentence_end,
-                # Index-TTS 2 三层标注
                 emotion_class=emotion_class,
                 emotion_vector=emotion_vector,
-                emotion_text=emotion_text,
-                emotion_intensity=emotion_intensity,
+                entities=sentence_entities,
             ))
             
             # 更新上下文情感传递
@@ -450,7 +396,6 @@ class PipelineRunner:
             "total_sentences": sentence_id,
             "dialogue_count": dialogue_count,
             "narration_count": narration_count,
-            "sfx_count": sfx_count,
             "entity_count": len(linked_entities),
         }
         
@@ -460,10 +405,8 @@ class PipelineRunner:
         """
         冷启动触发逻辑：当累积字数达到阈值时，执行批量聚类。
         
-        此方法将当前所有 is_confirmed=0 的实体升级为 is_confirmed=1，
-        并执行一次完整的 EntityClusterer.cluster(write_back=True)。
-        
-        聚类完成后，用全文角色库回填前3000字内的未知说话人。
+        注意：entity_clusterer 已移入战略储备库，冷启动聚类功能暂不启用。
+        仅回填未知说话人。
         """
         if self._cold_start_done:
             return
@@ -471,38 +414,15 @@ class PipelineRunner:
         logger.info(f"冷启动触发：已处理 {self._total_processed_chars} 字，达到阈值 {COLD_START_CHARS_THRESHOLD}")
         
         try:
-            all_entities = []
+            backfill_count = 0
             for result in self._result_cache.get("default", []):
-                for sentence in result.sentences:
-                    for e_dict in sentence.entities:
-                        from pipeline.nlp_basics import Entity
-                        # 使用存储的位置信息重建 Entity（而非全部设为 0）
-                        entity = Entity(
-                            text=e_dict.get("text", ""),
-                            type=e_dict.get("type", "PER"),
-                            start=e_dict.get("start", 0),
-                            end=e_dict.get("end", len(e_dict.get("text", ""))),
-                            confidence=e_dict.get("confidence", 1.0),
-                        )
-                        if entity.type == "PER" and len(entity.text) >= 2:
-                            all_entities.append(entity)
+                count = self.speaker_matcher.backfill_unknown_speakers(result.sentences)
+                backfill_count += count
             
-            if all_entities:
-                self.entity_clusterer.cluster(entities=all_entities, text=self._full_text, write_back=True)
-                
-                # 冷启动聚类完成后，回填未知说话人
-                backfill_count = 0
-                for result in self._result_cache.get("default", []):
-                    count = self.speaker_matcher.backfill_unknown_speakers(result.sentences)
-                    backfill_count += count
-                
-                self._cold_start_done = True
-                logger.info(f"冷启动批量聚类完成：{len(all_entities)} 个实体参与聚类，回填 {backfill_count} 个未知说话人")
-            else:
-                logger.warning("冷启动触发但无有效实体，跳过聚类")
-                self._cold_start_done = True
+            self._cold_start_done = True
+            logger.info(f"冷启动完成：回填 {backfill_count} 个未知说话人")
         except Exception as e:
-            logger.error(f"冷启动聚类失败: {e}", exc_info=True)
+            logger.error(f"冷启动处理失败: {e}", exc_info=True)
     
     def _check_pause(self):
         """检查是否暂停"""
@@ -571,12 +491,9 @@ class PipelineRunner:
                         "type": s.type,
                         "speaker": s.speaker,
                         "emotion": s.emotion,
-                        "speed": s.speed,
-                        "tone": s.tone,
-                        "sfx": s.sfx,
+                        "emotion_class": s.emotion_class,
+                        "emotion_vector": s.emotion_vector,
                         "entities": s.entities,
-                        "sentence_id": s.sentence_id,
-                        "quotation_type": s.quotation_type,
                     }
                     for s in chapter.sentences
                 ],
@@ -586,23 +503,14 @@ class PipelineRunner:
         return json.dumps(data, ensure_ascii=False, indent=2 if pretty else None)
     
     def export_ssml(self, results: List[ChapterResult]) -> str:
-        """导出为 SSML 格式"""
+        """导出为 SSML 格式（MVP 简化版）"""
         ssml_parts = ['<?xml version="1.0" encoding="UTF-8"?>', '<speak version="1.0">']
         
         for chapter in results:
             ssml_parts.append(f'<p><!-- 第{chapter.chapter_id}章 {chapter.title} -->')
             
             for sentence in chapter.sentences:
-                prosody_attrs = []
-                if sentence.speed != 1.0:
-                    prosody_attrs.append(f'rate="{sentence.speed}"')
-                if sentence.tone != "normal":
-                    prosody_attrs.append(f'pitch="{sentence.tone}"')
-                
-                prosody = f'<prosody {" ".join(prosody_attrs)}>' if prosody_attrs else ''
-                prosody_close = '</prosody>' if prosody_attrs else ''
-                
-                ssml_parts.append(f'  <s>{prosody}{sentence.text}{prosody_close}</s>')
+                ssml_parts.append(f'  <s>{sentence.text}</s>')
             
             ssml_parts.append('</p>')
         

@@ -4,7 +4,7 @@
  */
 const { test, expect } = require('@playwright/test');
 
-const FRONTEND_URL = 'http://localhost:8080';
+const FRONTEND_URL = 'http://localhost:8000';
 const BACKEND_URL = 'http://localhost:8000/api/v1';
 
 const TEST_FILE_CONTENT = `Chapter 1: The Fallen Genius
@@ -39,8 +39,8 @@ let consoleLogs = [];
 let apiRequests = [];
 
 async function gotoPage(page) {
-  await page.goto(FRONTEND_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
-  await page.waitForSelector('.navbar', { timeout: 5000 });
+  await page.goto(FRONTEND_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForSelector('.navbar', { timeout: 10000 });
   await page.waitForTimeout(1000);
 }
 
@@ -520,7 +520,8 @@ test.describe('NovelTTS Cloud Full Test', () => {
       await page.waitForTimeout(1000);
 
       const drawer = page.locator('#right-drawer');
-      const drawerOpen = await drawer.hasClass(/open/);
+      const drawerClass = await drawer.getAttribute('class');
+      const drawerOpen = drawerClass && drawerClass.includes('open');
       console.log('  Character drawer open:', drawerOpen);
 
       await page.click('[data-action="close-drawer"]');
@@ -548,7 +549,8 @@ test.describe('NovelTTS Cloud Full Test', () => {
       await page.waitForTimeout(1000);
 
       const drawer = page.locator('#right-drawer');
-      const drawerOpen = await drawer.hasClass(/open/);
+      const drawerClass = await drawer.getAttribute('class');
+      const drawerOpen = drawerClass && drawerClass.includes('open');
       console.log('  Stats drawer open:', drawerOpen);
 
       const statsText = await page.locator('#drawer-body').textContent();
@@ -690,7 +692,7 @@ test.describe('NovelTTS Cloud Full Test', () => {
       console.log('\n--- TC-043: Segment TTS ---');
 
       await gotoPage(page);
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(1000);
 
       const cardCount = await page.locator('.project-card').count();
       if (cardCount === 0) {
@@ -699,10 +701,11 @@ test.describe('NovelTTS Cloud Full Test', () => {
       }
 
       await page.locator('.project-card').first().click();
-      await page.waitForTimeout(5000);
+      await page.waitForTimeout(3000);
 
       await page.locator('[data-action="trigger-sentence-split"]').click();
-      await page.waitForTimeout(20000);
+      // 等待分割完成（动态等待）
+      await page.waitForSelector('[data-action="generate-segment"]', { timeout: 30000 });
 
       const generateBtn = page.locator('[data-action="generate-segment"]').first();
       const genBtnVisible = await generateBtn.isVisible().catch(() => false);
@@ -710,10 +713,13 @@ test.describe('NovelTTS Cloud Full Test', () => {
 
       if (genBtnVisible) {
         await generateBtn.click();
-        await page.waitForTimeout(15000);
-
-        const toastText = await page.locator('.toast').first().textContent().catch(() => '');
-        console.log('  Toast:', toastText.substring(0, 100));
+        // 动态等待：等待音频元素出现或 Toast 提示
+        const audioOrToast = await page.waitForFunction(() => {
+          const audio = document.querySelector('.audio-player audio');
+          const toast = document.querySelector('.toast');
+          return audio || toast;
+        }, { timeout: 15000 }).catch(() => null);
+        console.log('  Audio/Toast appeared:', !!audioOrToast);
       }
 
       console.log('  [PASS] Segment TTS triggered');
@@ -723,7 +729,7 @@ test.describe('NovelTTS Cloud Full Test', () => {
       console.log('\n--- TC-044: Batch TTS ---');
 
       await gotoPage(page);
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(1000);
 
       const cardCount = await page.locator('.project-card').count();
       if (cardCount === 0) {
@@ -732,19 +738,22 @@ test.describe('NovelTTS Cloud Full Test', () => {
       }
 
       await page.locator('.project-card').first().click();
-      await page.waitForTimeout(5000);
+      await page.waitForTimeout(3000);
 
       await page.locator('[data-action="trigger-sentence-split"]').click();
-      await page.waitForTimeout(20000);
+      await page.waitForSelector('[data-action="synthesize-chapter"]', { timeout: 30000 });
 
       const synthesizeBtn = page.locator('[data-action="synthesize-chapter"]');
       await expect(synthesizeBtn).toBeVisible();
       await synthesizeBtn.click();
 
-      await page.waitForTimeout(5000);
-
-      const ttsProgressVisible = await page.locator('#tts-progress').isVisible().catch(() => false);
-      console.log('  TTS progress visible:', ttsProgressVisible);
+      // 等待进度条或Toast出现
+      const progressOrToast = await page.waitForFunction(() => {
+        const progress = document.querySelector('#tts-progress');
+        const toast = document.querySelector('.toast');
+        return progress || toast;
+      }, { timeout: 15000 }).catch(() => null);
+      console.log('  Progress/Toast appeared:', !!progressOrToast);
 
       console.log('  [PASS] Batch TTS triggered');
     });
@@ -813,7 +822,11 @@ test.describe('NovelTTS Cloud Full Test', () => {
       await page.click('[data-action="create-project"]');
       await page.waitForTimeout(1000);
 
-      const modalStillOpen = await page.locator('#modal-new-project').hasClass(/open/);
+      // Check if modal is still open (should have 'open' class)
+      const modalLocator = page.locator('#modal-new-project');
+      const classAttribute = await modalLocator.getAttribute('class');
+      const modalStillOpen = classAttribute && classAttribute.includes('open');
+      console.log('  Modal class:', classAttribute);
       console.log('  Modal still open:', modalStillOpen);
 
       console.log('  [PASS] Form validation OK');

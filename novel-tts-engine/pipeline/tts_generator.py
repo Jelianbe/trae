@@ -56,7 +56,6 @@ class AudioSegment:
     emotion: str
     audio_file: Path
     duration_ms: int = 0
-    quotation_type: str = "none"
     sentence_type: str = "narration"  # "narration" / "dialogue"
 
 
@@ -77,8 +76,8 @@ class TTSGenerator:
         engine: str = "indextts",
         indextts_url: str = "http://localhost:8300",
         indextts_audio_path: Optional[str] = None,
-        max_retries: int = 3,
-        retry_delay: float = 1.0,
+        max_retries: int = 2,
+        retry_delay: float = 0.5,
         fallback_to_kokoro: bool = True,
     ):
         """
@@ -132,9 +131,16 @@ class TTSGenerator:
     def _test_indextts_connection(self) -> bool:
         """测试 Index-TTS 服务连接"""
         try:
-            response = requests.get(f"{self._indextts_url}/", timeout=5)
-            return response.status_code == 200
-        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            # 健康检查：快速检测服务是否可达
+            response = requests.get(f"{self._indextts_url}/", timeout=3)
+            if response.status_code != 200:
+                logger.warning(f"Index-TTS health check returned status {response.status_code}")
+                return False
+            return True
+        except requests.exceptions.Timeout:
+            logger.warning(f"Index-TTS connection timed out (3s)")
+            return False
+        except requests.exceptions.ConnectionError:
             return False
     
     def _get_indextts(self) -> IndexTTSEngine:
@@ -197,6 +203,7 @@ class TTSGenerator:
         emotion: str = "neutral",
         output_file: Optional[Path] = None,
         sentence_type: str = "narration",
+        emotion_vector: Optional[List[float]] = None,
     ) -> Path:
         """异步生成音频
         
@@ -225,6 +232,7 @@ class TTSGenerator:
                         output_file=output_file,
                         audio_path=audio_path,
                         emotion=emotion if sentence_type == "dialogue" else None,
+                        emo_vector=emotion_vector if sentence_type == "dialogue" else None,
                     )
                     return output_file
             except Exception as e:
@@ -256,6 +264,7 @@ class TTSGenerator:
         emotion: str = "neutral",
         output_file: Optional[Path] = None,
         sentence_type: str = "narration",
+        emotion_vector: Optional[List[float]] = None,
     ) -> Path:
         """同步生成音频（包装器）"""
         if not text or not text.strip():
@@ -266,7 +275,7 @@ class TTSGenerator:
             asyncio.set_event_loop(loop)
             try:
                 return loop.run_until_complete(
-                    self.generate_audio_async(text, speaker, emotion, output_file, sentence_type)
+                    self.generate_audio_async(text, speaker, emotion, output_file, sentence_type, emotion_vector)
                 )
             finally:
                 loop.close()
@@ -288,12 +297,18 @@ class TTSGenerator:
         if sentence_type == "narration":
             emotion = NARRATOR_EMOTION
         
+        # 对话句优先使用情绪向量，旁白使用默认情绪
+        emotion_vector = getattr(sentence, 'emotion_vector', None)
+        if sentence_type == "narration":
+            emotion_vector = None
+        
         audio_file = self.generate_audio(
             text=sentence.text,
             speaker=sentence.speaker or "default",
             emotion=emotion,
             output_file=output_file,
             sentence_type=sentence_type,
+            emotion_vector=emotion_vector,
         )
         
         return AudioSegment(
@@ -301,7 +316,6 @@ class TTSGenerator:
             speaker=sentence.speaker or "narrator",
             emotion=emotion,
             audio_file=audio_file,
-            quotation_type=sentence.quotation_type,
             sentence_type=sentence_type,
         )
     

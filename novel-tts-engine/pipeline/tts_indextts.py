@@ -79,7 +79,7 @@ class IndexTTSEngine:
         Args:
             base_url: Index-TTS 服务地址
             default_audio_path: 默认参考音频路径
-            timeout: HTTP 请求超时时间（秒）
+            timeout: HTTP 请求超时时间（秒），默认 5 秒，超时后快速回退到 Kokoro
         """
         self.base_url = base_url.rstrip("/")
         self.default_audio_path = default_audio_path

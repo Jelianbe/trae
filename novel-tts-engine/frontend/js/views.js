@@ -82,77 +82,32 @@ export function renderChapterTree(chapters, currentIndex) {
   tree.innerHTML = progress + vols;
 }
 
-export function renderSegments(segments, selectedIndex, selectedFragIndex, splitMode, ttsCache, chapterIndex) {
+export function renderSegments(segments, selectedIndex, splitMode, ttsCache, chapterIndex) {
   if (!segments || segments.length === 0) {
     return '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>点击章节查看分析结果</p></div>';
   }
 
-  if (!splitMode) {
-    // 原文模式：不渲染句子拆分
-    const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)', onomatopoeia:'var(--type-onomatopoeia)' };
-    return '<div class="segments-stats"><span class="stat-segments"><i class="fa-solid fa-paragraph"></i> 段落 ' + segments.length + '</span></div>' +
-      segments.map((seg, i) => {
-        const sel = selectedIndex === i ? 'selected' : '';
-        const mainType = (seg.fragments && seg.fragments.length > 0) ? seg.fragments[0].type : 'narration';
-        return `<div class="segment-card ${sel}" data-index="${i}" data-action="select-segment">
-          <div class="segment-color-bar" style="background:${typeColors[mainType] || 'var(--border)'}"></div>
-          <div class="segment-header">
-            <div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>
-          </div>
-        </div>`;
-      }).join('');
-  }
+  const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)' };
+  const typeLabels = { narration:'旁白', dialogue:'对话' };
+  const typeIcons = { narration:'fa-book-open', dialogue:'fa-comment' };
 
-  // 记录片段统计
-  const mixedCount = segments.filter(s => (s.fragments || []).length > 1).length;
-  console.debug('[句子拆分] 段落=' + segments.length + ', 混合句=' + mixedCount);
-
-  const totalFrags = segments.reduce((sum, s) => sum + (s.fragments || []).length, 0);
+  const dc = segments.filter(s => s.type === 'dialogue').length;
+  const nc = segments.filter(s => s.type === 'narration').length;
   let statsHTML = `<div class="segments-stats"><span class="stat-segments"><i class="fa-solid fa-paragraph"></i> 段落 ${segments.length}</span>`;
-  if (mixedCount > 0) {
-    statsHTML += `<span class="stat-mixed"><i class="fa-solid fa-scissors"></i> 句子拆分 ${mixedCount} 句 / ${totalFrags} 段</span>`;
-  }
-  statsHTML += '</div>';
+  statsHTML += `<span class="stat-dialogue"><i class="fa-solid fa-comment"></i> 对话 ${dc}</span>`;
+  statsHTML += `<span class="stat-narration"><i class="fa-solid fa-book-open"></i> 旁白 ${nc}</span></div>`;
 
-  const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)', onomatopoeia:'var(--type-onomatopoeia)' };
-  const typeLabels = { narration:'旁白', dialogue:'对话', onomatopoeia:'拟声' };
-  const typeIcons = { narration:'fa-book-open', dialogue:'fa-comment', onomatopoeia:'fa-volume-high' };
   let html = '';
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
     const sel = selectedIndex === i ? 'selected' : '';
-    const frags = seg.fragments || [{ type: 'narration', text: seg.text, speaker: '' }];
+    const segType = seg.type || 'narration';
 
-    // 堆叠色条
-    let barHTML = '';
-    if (frags.length > 1) {
-      const totalLen = seg.text.length || 1;
-      barHTML = '<div class="seg-color-stack">';
-      for (const f of frags) {
-        const pct = Math.max(10, (f.text.length / totalLen) * 100);
-        barHTML += `<div class="seg-color-strip" style="height:${pct}%;background:${typeColors[f.type] || 'var(--border)'}" title="${typeLabels[f.type] || f.type}"></div>`;
-      }
-      barHTML += '</div>';
-    } else {
-      barHTML = `<div class="segment-color-bar" style="background:${typeColors[frags[0].type] || 'var(--border)'}"></div>`;
-    }
+    const colorBar = `<div class="segment-color-bar" style="background:${typeColors[segType] || 'var(--border)'}"></div>`;
 
-    // 原文 + 悬停方框（多 fragment 时包裹 span）
-    let textHTML = '';
-    if (frags.length > 1) {
-      for (let j = 0; j < frags.length; j++) {
-        const f = frags[j];
-        const isFragSel = selectedFragIndex != null && selectedFragIndex === j && selectedIndex === i;
-        textHTML += `<span class="frag-hover ${isFragSel ? 'frag-selected' : ''}" data-seg-index="${i}" data-frag-index="${j}" title="${typeLabels[f.type] || f.type}${f.speaker ? ' · ' + f.speaker : ''}">${escapeHtml(f.text)}</span>`;
-      }
-    } else {
-      textHTML = `<span class="seg-text">${escapeHtml(seg.text)}</span>`;
-    }
-
-    // 说话人标签 + 音频按钮
     let speakerHTML = '';
-    if (frags.length === 1 && frags[0].type === 'dialogue' && frags[0].speaker) {
-      speakerHTML = `<span class="seg-speaker" style="color:${frags[0].speakerColor || 'var(--text-secondary)'}">${escapeHtml(frags[0].speaker)}</span>`;
+    if (segType === 'dialogue' && seg.speaker) {
+      speakerHTML = `<span class="seg-speaker">${escapeHtml(seg.speaker)}</span>`;
     }
 
     const chKey = chapterIndex != null ? chapterIndex : '';
@@ -162,11 +117,12 @@ export function renderSegments(segments, selectedIndex, selectedFragIndex, split
       : `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="generate-segment" data-seg="${i}" title="生成音频"><i class="fa-solid fa-waveform-lines"></i> 生成</button>`;
 
     html += `<div class="segment-card ${sel}" data-index="${i}" data-action="select-segment">
-      ${barHTML}
+      ${colorBar}
       <div class="segment-header">
-        <div class="seg-text-wrapper">${textHTML}</div>
+        <div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>
       </div>
       <div class="segment-meta">
+        <span class="seg-type-badge"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i> ${typeLabels[segType] || segType}</span>
         ${speakerHTML}
         ${audioBtn}
       </div>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传测试 - 简单版</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: #1a1a1e; 
+            color: #e8e4df; 
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; }
+        input[type="file"] { 
+            padding: 10px; 
+            background: #2c2c33; 
+            border: 1px solid #3a3a44; 
+            border-radius: 8px; 
+            color: #e8e4df; 
+            width: 100%;
+            cursor: pointer;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c33;
+            border: 1px solid #3a3a44;
+            border-radius: 8px;
+            color: #e8e4df;
+            box-sizing: border-box;
+        }
+        textarea { min-height: 100px; }
+        button { 
+            padding: 12px 24px; 
+            background: #e8e4df; 
+            color: #1a1a1e; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        button:hover { background: #f5f2ed; }
+        .result { margin-top: 20px; padding: 16px; background: #2c2c33; border-radius: 8px; }
+        .success { color: #7ec89b; }
+        .error { color: #d4727a; }
+    </style>
+</head>
+<body>
+    <h1>上传测试</h1>
+    
+    <h2>方式一：上传文件</h2>
+    <div class="form-group">
+        <label for="file-input">选择 TXT 文件:</label>
+        <input type="file" id="file-input" accept=".txt">
+    </div>
+    <button onclick="uploadFile()">上传文件</button>
+    
+    <hr style="margin: 30px 0; border-color: #3a3a44;">
+    
+    <h2>方式二：手动输入</h2>
+    <div class="form-group">
+        <label for="title">书名:</label>
+        <input type="text" id="title" placeholder="请输入书名">
+    </div>
+    <div class="form-group">
+        <label for="content">内容:</label>
+        <textarea id="content" placeholder="请输入小说内容..."></textarea>
+    </div>
+    <button onclick="createProject()">创建项目</button>
+    
+    <div class="result" id="result" style="display:none"></div>
+
+    <script>
+        async function uploadFile() {
+            const input = document.getElementById('file-input');
+            const result = document.getElementById('result');
+            
+            if (!input.files || input.files.length === 0) {
+                result.textContent = '请选择文件';
+                result.className = 'result error';
+                result.style.display = 'block';
+                return;
+            }
+            
+            const file = input.files[0];
+            const fd = new FormData();
+            fd.append('file', file);
+            
+            try {
+                result.textContent = '上传中...';
+                result.className = 'result';
+                result.style.display = 'block';
+                
+                const response = await fetch('/api/v1/projects/upload', {
+                    method: 'POST',
+                    body: fd
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.textContent = '成功!\n' + JSON.stringify(data, null, 2);
+                    result.className = 'result success';
+                    input.value = '';
+                } else {
+                    result.textContent = '错误: ' + (data.detail || data.error || '未知错误');
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                result.textContent = '请求失败: ' + error.message;
+                result.className = 'result error';
+            }
+        }
+
+        async function createProject() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const result = document.getElementById('result');
+            
+            if (!title.trim()) {
+                result.textContent = '请输入书名';
+                result.className = 'result error';
+                result.style.display = 'block';
+                return;
+            }
+            
+            if (!content.trim()) {
+                result.textContent = '请输入内容';
+                result.className = 'result error';
+                result.style.display = 'block';
+                return;
+            }
+            
+            try {
+                result.textContent = '创建中...';
+                result.className = 'result';
+                result.style.display = 'block';
+                
+                const response = await fetch('/api/v1/projects/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content, author: '' })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.textContent = '成功!\n' + JSON.stringify(data, null, 2);
+                    result.className = 'result success';
+                    document.getElementById('title').value = '';
+                    document.getElementById('content').value = '';
+                } else {
+                    result.textContent = '错误: ' + (data.detail || data.error || '未知错误');
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                result.textContent = '请求失败: ' + error.message;
+                result.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

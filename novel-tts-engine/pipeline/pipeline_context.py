@@ -26,7 +26,6 @@ class SentenceData:
     speaker: Optional[str] = None
     emotion: str = "neutral"
     entities: List[dict] = field(default_factory=list)
-    sfx_words: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -40,7 +39,6 @@ class PipelineContext:
     chapters: List[ChapterData] = field(default_factory=list)
     entities_by_chapter: Dict[int, List] = field(default_factory=dict)
     linked_entities_by_chapter: Dict[int, List] = field(default_factory=dict)
-    sfx_by_chapter: Dict[int, List] = field(default_factory=dict)
     sentences_by_chapter: Dict[int, List[SentenceData]] = field(default_factory=dict)
     statistics: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)

@@ -71,10 +71,18 @@ export class ApiClient {
   async listVoices() { return this._fetch('/voices'); }
 
   async uploadProject(file) {
-    const fd = new FormData();
-    fd.append('file', file);
-    return this._fetch('/projects/upload', { method: 'POST', body: fd });
-  }
+        const fd = new FormData();
+        fd.append('file', file);
+        return this._fetch('/projects/upload', { method: 'POST', body: fd });
+    }
+
+    async createProject(title, content) {
+        return this._fetch('/projects/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, content, author: '' }),
+        });
+    }
 
   async getProject(id) { return this._fetch(`/projects/${encodeURIComponent(id)}`); }
 

@@ -47,43 +47,24 @@ class App {
   }
 
   async _preloadVoicePreviews(voices) {
-    const previewText = '你好，欢迎使用小说语音合成引擎。这是一段试听音频。';
+    // 使用预生成的静态音频文件，无需调用 TTS API
+    // 文件位置: /audio/previews/{voiceName}.wav
     const cache = { ...this.store.state.voicePreviewCache };
-    let needsPreload = false;
-    for (const v of voices) {
-      if (!cache[v.name]) {
-        needsPreload = true;
-        break;
-      }
-    }
-    if (!needsPreload) {
-      console.log('[App] 音色试听音频已全部缓存，跳过预加载');
-      return;
-    }
-    this.showToast('正在加载音色试听音频…', 'info');
+    let preloadCount = 0;
+    
     for (const v of voices) {
       if (cache[v.name]) continue;
-      try {
-        const result = await this.api.generateTTS({
-          text: previewText,
-          speaker: v.name,
-          emotion: 'neutral',
-          sentence_type: 'narration',
-        });
-        cache[v.name] = result.audio_url;
-      } catch (e) {
-        console.log('[App] 音色', v.name, '试听音频预加载失败:', e.message);
-      }
+      // 直接使用预生成的静态文件
+      const previewUrl = `/audio/previews/${encodeURIComponent(v.name)}.wav`;
+      cache[v.name] = previewUrl;
+      preloadCount++;
     }
-    const newCache = {};
-    for (const [k, v] of Object.entries(cache)) {
-      if (!this.store.state.voicePreviewCache[k]) {
-        newCache[k] = v;
-      }
-    }
-    if (Object.keys(newCache).length > 0) {
-      this.store.dispatch(s => ({ ...s, voicePreviewCache: { ...s.voicePreviewCache, ...newCache } }));
-      this.showToast('音色试听音频加载完成', 'success');
+    
+    if (preloadCount > 0) {
+      this.store.dispatch(s => ({ ...s, voicePreviewCache: { ...s.voicePreviewCache, ...cache } }));
+      console.log(`[App] 音色试听音频已加载: ${preloadCount} 个`);
+    } else {
+      console.log('[App] 音色试听音频已全部缓存，跳过预加载');
     }
   }
 
@@ -265,8 +246,44 @@ class App {
     })();
   }
 
-  _createProject() {
-    document.getElementById('file-input')?.click();
+  async _createProject() {
+    const title = document.getElementById('new-project-title')?.value || '';
+    const content = document.getElementById('new-project-content')?.value || '';
+    
+    if (title.trim() && content.trim()) {
+      // 使用手动输入方式创建项目
+      try {
+        const data = await this.api.createProject(title.trim(), content.trim());
+        const p = {
+          id: data.project_id,
+          project_id: data.project_id,
+          title: data.book_title,
+          author: '未知',
+          total_chapters: data.total_chapters,
+          chapters: data.total_chapters,
+          total_words: 0,
+          words: '--',
+          status: 'pending',
+          progress: 0,
+        };
+        this.store.dispatch(s => ({
+          ...s,
+          projects: [p, ...s.projects],
+        }));
+        this._closeModal('new-project');
+        // 清空输入框
+        const titleEl = document.getElementById('new-project-title');
+        if (titleEl) titleEl.value = '';
+        const contentEl = document.getElementById('new-project-content');
+        if (contentEl) contentEl.value = '';
+        this.showToast('创建成功: ' + data.book_title, 'success');
+      } catch (e) {
+        this.showToast('创建失败: ' + e.message, 'error');
+      }
+    } else {
+      // 使用文件上传方式
+      document.getElementById('file-input')?.click();
+    }
   }
 
   // ==================== Chapter Analysis ====================
@@ -315,41 +332,14 @@ class App {
   _applyAnalysis(data, index) {
     const segments = [];
     for (const sent of data.sentences) {
-      const seg = {
+      segments.push({
         text: sent.text,
-        fragments: [],
-        selectedFragment: null,
-      };
-
-      let hasMultiFragments = false;
-      let frags = [];
-
-      if (sent.fragments && sent.fragments.length > 1) {
-        hasMultiFragments = true;
-        for (const frag of sent.fragments) {
-          frags.push({
-            type: frag.type,
-            text: frag.text,
-            speaker: frag.speaker || '',
-            speakerColor: this.store.state.speakerColors[frag.speaker] || '',
-            emotion: sent.emotion || 'neutral',
-            emotion_class: sent.emotion_class || 'neutral',
-          });
-        }
-      } else {
-        frags.push({
-          type: sent.sentence_type === 'dialogue' ? 'dialogue' : sent.sentence_type === 'onomatopoeia' ? 'onomatopoeia' : 'narration',
-          text: sent.text,
-          speaker: sent.speaker || '',
-          speakerColor: this.store.state.speakerColors[sent.speaker] || '',
-          emotion: sent.emotion || 'neutral',
-          emotion_class: sent.emotion_class || 'neutral',
-        });
-      }
-
-      seg.fragments = frags;
-      seg.hasMultiFragments = hasMultiFragments;
-      segments.push(seg);
+        type: sent.sentence_type || 'narration',
+        speaker: sent.speaker || '',
+        emotion: sent.emotion || 'neutral',
+        emotion_class: sent.emotion_class || 'neutral',
+        emotion_vector: sent.emotion_vector || null,
+      });
     }
 
     this.store.dispatch(s => {
@@ -366,23 +356,9 @@ class App {
   // ==================== Segment Interaction ====================
 
   selectSegment(index, event) {
-    // 检查点击目标是否为 fragment span
-    const target = event?.target;
-    const fragSpan = target?.closest?.('.frag-hover');
-    if (fragSpan) {
-      const fragIndex = parseInt(fragSpan.dataset.fragIndex);
-      this.store.dispatch(s => ({
-        ...s,
-        selectedSegmentIndex: index,
-        selectedFragmentIndex: s.selectedSegmentIndex === index && s.selectedFragmentIndex === fragIndex ? null : fragIndex,
-      }));
-      return;
-    }
-    // 普通卡片点击：选中/取消
     this.store.dispatch(s => ({
       ...s,
       selectedSegmentIndex: s.selectedSegmentIndex === index ? null : index,
-      selectedFragmentIndex: null,
     }));
   }
 
@@ -500,12 +476,10 @@ class App {
       const total = segs.length;
       const dc = segs.filter(s => s.type === 'dialogue').length;
       const nc = segs.filter(s => s.type === 'narration').length;
-      const oc = segs.filter(s => s.type === 'onomatopoeia').length;
       if (body) body.innerHTML = `<div style="padding:16px 20px"><div class="stats-grid">
         <div class="stat-item"><div class="val">${total}</div><div class="lbl">总句数</div></div>
         <div class="stat-item"><div class="val">${dc}</div><div class="lbl">对话</div></div>
         <div class="stat-item"><div class="val">${nc}</div><div class="lbl">旁白</div></div>
-        <div class="stat-item"><div class="val">${oc}</div><div class="lbl">拟声</div></div>
       </div></div>`;
     }
     drawer.classList.add('open');
