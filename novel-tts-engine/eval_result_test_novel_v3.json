@@ -1,0 +1,16 @@
+{
+  "test_file": "tests\\test_novel.txt",
+  "scores": {
+    "chapter_splitting": 100,
+    "dialogue_classification": 100.0,
+    "sfx_detection": 80.8,
+    "ner": 100.0,
+    "speaker_matching": 72.5,
+    "average": 90.66,
+    "basic_structure": 100.0,
+    "speaker_role": 100.0,
+    "dialogue_role_match": 72.5,
+    "end_to_end": 72.5,
+    "new_composite": 81.1
+  }
+}

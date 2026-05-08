@@ -82,49 +82,65 @@ export function renderChapterTree(chapters, currentIndex) {
   tree.innerHTML = progress + vols;
 }
 
-export function renderSegments(segments, selectedIndex, splitMode, ttsCache, chapterIndex) {
+export function renderSegments(segments, selectedIndex, fragmentMode, ttsCache, chapterIndex) {
   if (!segments || segments.length === 0) {
     return '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>点击章节查看分析结果</p></div>';
   }
 
-  const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)' };
-  const typeLabels = { narration:'旁白', dialogue:'对话' };
-  const typeIcons = { narration:'fa-book-open', dialogue:'fa-comment' };
+  const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)', onomatopoeia:'var(--type-onomatopoeia)' };
+  const typeLabels = { narration:'旁白', dialogue:'对话', onomatopoeia:'拟声' };
+  const typeIcons = { narration:'fa-book-open', dialogue:'fa-comment', onomatopoeia:'fa-volume-high' };
+  const emotionLabels = { neutral:'普通', happy:'开心', sad:'悲伤', angry:'愤怒', surprise:'惊讶', fear:'恐惧', mixed:'混合' };
 
   const dc = segments.filter(s => s.type === 'dialogue').length;
   const nc = segments.filter(s => s.type === 'narration').length;
-  let statsHTML = `<div class="segments-stats"><span class="stat-segments"><i class="fa-solid fa-paragraph"></i> 段落 ${segments.length}</span>`;
-  statsHTML += `<span class="stat-dialogue"><i class="fa-solid fa-comment"></i> 对话 ${dc}</span>`;
-  statsHTML += `<span class="stat-narration"><i class="fa-solid fa-book-open"></i> 旁白 ${nc}</span></div>`;
+  const oc = segments.filter(s => s.type === 'onomatopoeia').length;
+  let statsHTML = `<div class="segments-stats">
+    <span><i class="fa-solid fa-paragraph"></i> 段落 ${segments.length}</span>
+    <span class="stat-dialogue"><i class="fa-solid fa-comment"></i> 对话 ${dc}</span>
+    <span class="stat-narration"><i class="fa-solid fa-book-open"></i> 旁白 ${nc}</span>`;
+  if (oc > 0) statsHTML += `<span class="stat-onomatopoeia"><i class="fa-solid fa-volume-high"></i> 拟声 ${oc}</span>`;
+  statsHTML += '</div>';
+
+  const chKey = chapterIndex != null ? chapterIndex : '';
+  const chTtsCache = (ttsCache && ttsCache[chKey]) || {};
 
   let html = '';
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
     const sel = selectedIndex === i ? 'selected' : '';
     const segType = seg.type || 'narration';
+    const segEmotion = seg.emotion || 'neutral';
+    const hasAudio = !!chTtsCache[i];
 
     const colorBar = `<div class="segment-color-bar" style="background:${typeColors[segType] || 'var(--border)'}"></div>`;
 
     let speakerHTML = '';
-    if (segType === 'dialogue' && seg.speaker) {
-      speakerHTML = `<span class="seg-speaker">${escapeHtml(seg.speaker)}</span>`;
+    if (seg.speaker) {
+      speakerHTML = `<span class="seg-speaker"><span class="speaker-dot" style="background:var(--accent-muted)"></span>${escapeHtml(seg.speaker)}</span>`;
     }
 
-    const chKey = chapterIndex != null ? chapterIndex : '';
-    const cacheForSeg = (ttsCache && ttsCache[chKey] && ttsCache[chKey][i]) ? ttsCache[chKey][i] : null;
-    const audioBtn = cacheForSeg
-      ? `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="play-segment" data-seg="${i}" title="试听"><i class="fa-solid fa-play"></i> 试听</button>`
-      : `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="generate-segment" data-seg="${i}" title="生成音频"><i class="fa-solid fa-waveform-lines"></i> 生成</button>`;
+    const emotionHTML = segEmotion !== 'neutral'
+      ? `<span class="seg-emotion-badge">${emotionLabels[segEmotion] || segEmotion}</span>`
+      : '';
 
-    html += `<div class="segment-card ${sel}" data-index="${i}" data-action="select-segment">
+    const audioBtn = hasAudio
+      ? `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="play-segment" data-seg="${i}" title="试听"><i class="fa-solid fa-play"></i></button>`
+      : `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="generate-segment" data-seg="${i}" title="生成音频"><i class="fa-solid fa-waveform-lines"></i></button>`;
+
+    html += `<div class="segment-card ${sel}" data-index="${i}" data-type="${segType}" data-action="select-segment">
       ${colorBar}
       <div class="segment-header">
+        <div class="seg-type-icon"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i></div>
         <div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>
+        <div class="seg-actions">
+          ${audioBtn}
+        </div>
       </div>
       <div class="segment-meta">
         <span class="seg-type-badge"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i> ${typeLabels[segType] || segType}</span>
         ${speakerHTML}
-        ${audioBtn}
+        ${emotionHTML}
       </div>
     </div>`;
   }

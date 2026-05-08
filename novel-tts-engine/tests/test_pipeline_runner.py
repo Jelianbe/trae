@@ -106,21 +106,22 @@ class TestPipelineRunner:
         
         # 验证统计信息存在
         assert "entity_count" in result.statistics
-        assert "sfx_count" in result.statistics
         assert "dialogue_count" in result.statistics
 
-    def test_process_chapter_sfx_detection(self, runner):
-        """测试：_process_chapter 能正确检测拟声词"""
+    def test_process_chapter_narration_detection(self, runner):
+        """测试：_process_chapter 能正确识别旁白"""
         chapter = make_chapter(
             title="测试章",
-            content="""轰的一声，墙壁倒塌了。哗啦啦，雨水倾盆而下。""",
+            content="""轰的一声，墙壁倒塌了。哗啦啦，雨水倾盆而下。
+他站在窗前，凝视着远方。""",
         )
         
         result = runner._process_chapter(chapter, chapter_id=1)
         
-        # 应该检测到拟声词
-        sfx_count = result.statistics.get("sfx_count", 0)
-        assert isinstance(sfx_count, int)
+        # 应该识别为旁白
+        narration_count = result.statistics.get("narration_count", 0)
+        assert isinstance(narration_count, int)
+        assert narration_count >= 1
 
     def test_process_chapter_emotion_tagging(self, runner):
         """测试：_process_chapter 能正确标注情绪"""

@@ -305,16 +305,48 @@ class App {
     const cached = this.store.state.analysisCache[cacheKey];
 
     if (cached) {
-      // 有缓存：按 splitChapters 状态决定渲染模式
+      // 有缓存：直接应用分析结果
       if (gen !== this._analysisGen) return;
+      this.store.dispatch(s => ({
+        ...s, splitChapters: { ...s.splitChapters, [index]: true },
+      }));
       this._applyAnalysis(cached, index);
       return;
     }
 
-    // 无缓存：渲染原文纯文本（不触发分析，等用户点"句子拆分"）
+    // 无缓存：先显示原文加载状态，然后自动触发分析
     if (gen === this._analysisGen) {
       const content = this.store.state.chapterContents[index] || '';
       if (content) {
+        // 显示"正在分析..."提示，然后自动分析
+        document.getElementById('content-body').innerHTML =
+          '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)">'
+          + '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;margin-bottom:16px"></i>'
+          + '<p>正在分析章节内容…</p></div>';
+
+        // 自动触发分析
+        this._autoAnalyzeChapter(pid, index, cacheKey, gen);
+      } else {
+        document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>暂无章节内容</p></div>';
+      }
+      this.store.dispatch(s => ({ ...s, segments: [] }));
+    }
+  }
+
+  async _autoAnalyzeChapter(pid, index, cacheKey, gen) {
+    try {
+      const data = await this.api.analyzeChapter(pid, index);
+      if (gen !== this._analysisGen) return;
+      this.store.dispatch(s => ({
+        ...s,
+        analysisCache: { ...s.analysisCache, [cacheKey]: data },
+        splitChapters: { ...s.splitChapters, [index]: true },
+      }));
+      this._applyAnalysis(data, index);
+    } catch (e) {
+      if (gen === this._analysisGen) {
+        // 分析失败：显示原文
+        const content = this.store.state.chapterContents[index] || '';
         const escaped = content
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -322,10 +354,8 @@ class App {
           .replace(/\n/g, '<br>');
         document.getElementById('content-body').innerHTML =
           '<div style="padding:24px;line-height:1.8;white-space:pre-wrap;color:var(--text-primary)">' + escaped + '</div>';
-      } else {
-        document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>暂无章节内容</p></div>';
+        console.warn('章节分析失败，已显示原文:', e.message);
       }
-      this.store.dispatch(s => ({ ...s, segments: [] }));
     }
   }
 
@@ -413,7 +443,7 @@ class App {
       const body = document.getElementById('content-body');
       if (body) {
         body.style.fontSize = state.fontSize + 'px';
-        body.innerHTML = V.renderSegments(state.segments, state.selectedSegmentIndex, state.selectedFragmentIndex, state.splitChapters[state.currentChapterIndex], state.ttsCache, state.currentChapterIndex);
+        body.innerHTML = V.renderSegments(state.segments, state.selectedSegmentIndex, state.selectedFragmentIndex, state.ttsCache, state.currentChapterIndex);
       }
       V.renderChapterTree(state.chapters, state.currentChapterIndex);
       this._renderAnalysisProgress(state);

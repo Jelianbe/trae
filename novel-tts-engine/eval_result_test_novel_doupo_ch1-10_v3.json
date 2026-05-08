@@ -1,0 +1,16 @@
+{
+  "test_file": "tests\\test_novel_doupo_ch1-10.txt",
+  "scores": {
+    "chapter_splitting": 100,
+    "dialogue_classification": 100.0,
+    "sfx_detection": 40.0,
+    "ner": 85.7,
+    "speaker_matching": 55.6,
+    "average": 76.26,
+    "basic_structure": 100.0,
+    "speaker_role": 85.7,
+    "dialogue_role_match": 55.6,
+    "end_to_end": 55.6,
+    "new_composite": 64.0
+  }
+}
