@@ -348,6 +348,13 @@ class VoiceInfo(BaseModel):
     bars: List[int] = []
 
 
+class SentenceFragment(BaseModel):
+    """句子片段数据"""
+    text: str
+    type: str = "narration"
+    speaker: str = ""
+
+
 class SentenceData(BaseModel):
     """句子级分析数据（MVP 7字段）"""
     text: str
@@ -357,6 +364,7 @@ class SentenceData(BaseModel):
     emotion_vector: Optional[List[float]] = None
     sentence_type: str = "narration"
     entities: List[dict] = []
+    fragments: List[SentenceFragment] = []
 
 
 class ChapterAnalysisResponse(BaseModel):
@@ -781,6 +789,9 @@ async def analyze_chapter(project_id: str, chapter_index: int):
 
     try:
         runner = get_runner()
+        # 注入 project_id 到 runner，使角色创建时关联到项目
+        runner._current_project_id = project_id
+
         results = runner.analyze_chapters(
             project["content"],
             start=chapter_index,
@@ -795,6 +806,13 @@ async def analyze_chapter(project_id: str, chapter_index: int):
 
         sentences = []
         for sent in chapter_result.sentences:
+            fragments = []
+            for frag in getattr(sent, "fragments", []):
+                fragments.append(SentenceFragment(
+                    text=frag.text,
+                    type=frag.type,
+                    speaker=frag.speaker,
+                ))
             sentences.append(SentenceData(
                 text=sent.text,
                 speaker=sent.speaker,
@@ -803,6 +821,7 @@ async def analyze_chapter(project_id: str, chapter_index: int):
                 emotion_vector=getattr(sent, "emotion_vector", None),
                 sentence_type=getattr(sent, "type", "narration"),
                 entities=getattr(sent, "entities", []),
+                fragments=fragments,
             ))
 
         response = ChapterAnalysisResponse(
@@ -835,7 +854,7 @@ async def get_project_characters(project_id: str):
 
     try:
         char_manager = get_char_manager()
-        characters = char_manager.get_all_characters()
+        characters = char_manager.get_all_characters(project_id)
 
         char_list = []
         # 旁白角色始终存在（锁定）

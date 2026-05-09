@@ -120,7 +120,6 @@ class App {
       'batch-change-type': (el) => this._batchChangeType(el.dataset.type),
       'batch-delete': () => this._batchDelete(),
       'insert-segment-after': () => this.showToast('请先进入编辑模式', 'info'),
-      'append-empty': () => this.showToast('请先进入编辑模式', 'info'),
       'trigger-sentence-split': () => this._triggerSentenceSplit(),
       'create-project': () => this._createProject(),
       'analyze-all': () => this._analyzeAll(),
@@ -210,9 +209,22 @@ class App {
       document.getElementById('detail-book-title').textContent = '《' + (project.book_title || '') + '》';
       document.getElementById('detail-tree-title').textContent = project.book_title || '';
 
-      // 默认选中第1章（显示原文，不分析）
+      // 预分析第1章，然后进入详情页
       if (chaptersData.length > 0) {
-        await this.selectChapter(chaptersData[0].index, chaptersData[0].title);
+        const ch0 = chaptersData[0];
+        const cacheKey = id + '-' + ch0.index;
+        this.showToast('正在分析第1章…', 'info');
+        try {
+          const data = await this.api.analyzeChapter(id, ch0.index);
+          this.store.dispatch(s => ({
+            ...s,
+            analysisCache: { ...s.analysisCache, [cacheKey]: data },
+            splitChapters: { ...s.splitChapters, [ch0.index]: true },
+          }));
+        } catch (e) {
+          console.warn('第1章预分析失败，显示原文:', e.message);
+        }
+        await this.selectChapter(ch0.index, ch0.title);
       }
     } catch (e) {
       this.store.dispatch(s => ({ ...s, loading: false }));
@@ -314,39 +326,10 @@ class App {
       return;
     }
 
-    // 无缓存：先显示原文加载状态，然后自动触发分析
+    // 无缓存：显示原文，等待用户点"句子拆分"
     if (gen === this._analysisGen) {
       const content = this.store.state.chapterContents[index] || '';
       if (content) {
-        // 显示"正在分析..."提示，然后自动分析
-        document.getElementById('content-body').innerHTML =
-          '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)">'
-          + '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;margin-bottom:16px"></i>'
-          + '<p>正在分析章节内容…</p></div>';
-
-        // 自动触发分析
-        this._autoAnalyzeChapter(pid, index, cacheKey, gen);
-      } else {
-        document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>暂无章节内容</p></div>';
-      }
-      this.store.dispatch(s => ({ ...s, segments: [] }));
-    }
-  }
-
-  async _autoAnalyzeChapter(pid, index, cacheKey, gen) {
-    try {
-      const data = await this.api.analyzeChapter(pid, index);
-      if (gen !== this._analysisGen) return;
-      this.store.dispatch(s => ({
-        ...s,
-        analysisCache: { ...s.analysisCache, [cacheKey]: data },
-        splitChapters: { ...s.splitChapters, [index]: true },
-      }));
-      this._applyAnalysis(data, index);
-    } catch (e) {
-      if (gen === this._analysisGen) {
-        // 分析失败：显示原文
-        const content = this.store.state.chapterContents[index] || '';
         const escaped = content
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -354,8 +337,10 @@ class App {
           .replace(/\n/g, '<br>');
         document.getElementById('content-body').innerHTML =
           '<div style="padding:24px;line-height:1.8;white-space:pre-wrap;color:var(--text-primary)">' + escaped + '</div>';
-        console.warn('章节分析失败，已显示原文:', e.message);
+      } else {
+        document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>暂无章节内容</p></div>';
       }
+      this.store.dispatch(s => ({ ...s, segments: [] }));
     }
   }
 
@@ -369,6 +354,8 @@ class App {
         emotion: sent.emotion || 'neutral',
         emotion_class: sent.emotion_class || 'neutral',
         emotion_vector: sent.emotion_vector || null,
+        entities: sent.entities || [],
+        fragments: sent.fragments || [],
       });
     }
 

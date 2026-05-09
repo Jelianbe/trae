@@ -112,11 +112,38 @@ export function renderSegments(segments, selectedIndex, fragmentMode, ttsCache, 
     const segType = seg.type || 'narration';
     const segEmotion = seg.emotion || 'neutral';
     const hasAudio = !!chTtsCache[i];
+    const frags = seg.fragments || [];
+    const isMixed = frags.length > 1;
 
-    const colorBar = `<div class="segment-color-bar" style="background:${typeColors[segType] || 'var(--border)'}"></div>`;
+    let colorBar;
+    if (isMixed) {
+      const bars = frags.map(f =>
+        `<div class="segment-color-bar" style="background:${typeColors[f.type] || 'var(--border)'}"></div>`
+      ).join('');
+      colorBar = `<div class="stacked-color-bars">${bars}</div>`;
+    } else {
+      colorBar = `<div class="segment-color-bar" style="background:${typeColors[segType] || 'var(--border)'}"></div>`;
+    }
+
+    let textHTML;
+    if (isMixed) {
+      const fragSpans = frags.map((f, fi) =>
+        `<span class="frag-span" data-frag="${fi}" data-type="${f.type}" data-speaker="${f.speaker || ''}">${escapeHtml(f.text)}</span>`
+      ).join('');
+      textHTML = `<div class="seg-text-wrapper"><span class="seg-text">${fragSpans}</span></div>`;
+    } else {
+      textHTML = `<div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>`;
+    }
 
     let speakerHTML = '';
-    if (seg.speaker) {
+    if (isMixed) {
+      const speakers = [...new Set(frags.filter(f => f.speaker).map(f => f.speaker))];
+      if (speakers.length > 0) {
+        speakerHTML = speakers.map(s =>
+          `<span class="seg-speaker"><span class="speaker-dot" style="background:var(--accent-muted)"></span>${escapeHtml(s)}</span>`
+        ).join('');
+      }
+    } else if (seg.speaker) {
       speakerHTML = `<span class="seg-speaker"><span class="speaker-dot" style="background:var(--accent-muted)"></span>${escapeHtml(seg.speaker)}</span>`;
     }
 
@@ -128,17 +155,21 @@ export function renderSegments(segments, selectedIndex, fragmentMode, ttsCache, 
       ? `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="play-segment" data-seg="${i}" title="试听"><i class="fa-solid fa-play"></i></button>`
       : `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="generate-segment" data-seg="${i}" title="生成音频"><i class="fa-solid fa-waveform-lines"></i></button>`;
 
-    html += `<div class="segment-card ${sel}" data-index="${i}" data-type="${segType}" data-action="select-segment">
+    const mixedBadge = isMixed
+      ? `<span class="seg-type-badge seg-type-badge-mixed"><i class="fa-solid fa-layer-group"></i> 混合句 (${frags.length} 片段)</span>`
+      : `<span class="seg-type-badge"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i> ${typeLabels[segType] || segType}</span>`;
+
+    html += `<div class="segment-card ${sel} ${isMixed ? 'mixed-segment' : ''}" data-index="${i}" data-type="${segType}" data-action="select-segment">
       ${colorBar}
       <div class="segment-header">
         <div class="seg-type-icon"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i></div>
-        <div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>
+        ${textHTML}
         <div class="seg-actions">
           ${audioBtn}
         </div>
       </div>
       <div class="segment-meta">
-        <span class="seg-type-badge"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i> ${typeLabels[segType] || segType}</span>
+        ${mixedBadge}
         ${speakerHTML}
         ${emotionHTML}
       </div>

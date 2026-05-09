@@ -88,6 +88,7 @@ class SpeakerMatcher:
         self._recent_mentions: List[str] = []
         self._mention_counter = 0
         self._current_chapter_id: Optional[int] = None
+        self._current_project_id: str = ''
         self.semantic_ranker = semantic_ranker or get_semantic_ranker()
         self.l2_threshold = l2_threshold
         self._character_dialogues: Dict[str, List[str]] = defaultdict(list)
@@ -134,6 +135,7 @@ class SpeakerMatcher:
             gender = self._infer_gender_from_context(name, context)
             char = self.char_manager.add_character(
                 name=name,
+                project_id=self._current_project_id,
                 aliases=set(),
                 gender=gender
             )
@@ -496,7 +498,7 @@ class SpeakerMatcher:
                         confidence=confidence,
                         match_type=f'context_reasoning:{reason}'
                     )
-                char = self.char_manager.get_character_by_name(name)
+                char = self.char_manager.get_character_by_name(name, self._current_project_id)
                 if char:
                     return MatchResult(
                         character=char,
@@ -521,6 +523,19 @@ class SpeakerMatcher:
                 result = self.match_by_title(context.speaker_hint)
                 if result:
                     return result
+
+                # 如果 speaker_hint 存在但匹配不到角色，创建新角色
+                hint_char = self.char_manager.find_or_create(
+                    context.speaker_hint,
+                    project_id=self._current_project_id,
+                    context=context.text
+                )
+                if hint_char:
+                    return MatchResult(
+                        character=hint_char,
+                        confidence=0.85,
+                        match_type='speaker_hint_created'
+                    )
 
         mentioned = context.mentioned_characters or []
         if mentioned:

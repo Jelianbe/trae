@@ -119,17 +119,26 @@ class CharacterManager:
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS characters (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL UNIQUE,
+                    project_id TEXT NOT NULL DEFAULT '',
+                    name TEXT NOT NULL,
                     aliases TEXT,
                     gender TEXT DEFAULT 'unknown' CHECK(gender IN ('male', 'female', 'unknown')),
                     first_appearance INTEGER,
                     vector BLOB,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(project_id, name)
                 )
             """)
+            # 为已有数据库添加 project_id 字段（数据迁移）
+            try:
+                cursor.execute("ALTER TABLE characters ADD COLUMN project_id TEXT NOT NULL DEFAULT ''")
+                conn.commit()
+                logger.info("已为 characters 表添加 project_id 字段")
+            except sqlite3.OperationalError:
+                pass  # 字段已存在
     
-    def add_character(self, name: str, aliases: Set[str] = None, 
+    def add_character(self, name: str, project_id: str = '', aliases: Set[str] = None, 
                       gender: str = "unknown", first_appearance: int = None) -> Character:
         if aliases is None:
             aliases = set()
@@ -139,9 +148,9 @@ class CharacterManager:
             
             try:
                 cursor.execute(
-                    """INSERT INTO characters (name, aliases, gender, first_appearance) 
-                       VALUES (?, ?, ?, ?)""",
-                    (name, json.dumps(list(aliases), ensure_ascii=False), gender, first_appearance)
+                    """INSERT INTO characters (project_id, name, aliases, gender, first_appearance) 
+                       VALUES (?, ?, ?, ?, ?)""",
+                    (project_id, name, json.dumps(list(aliases), ensure_ascii=False), gender, first_appearance)
                 )
                 conn.commit()
                 char_id = cursor.lastrowid
@@ -154,7 +163,7 @@ class CharacterManager:
                 )
             except sqlite3.IntegrityError:
                 conn.rollback()
-                return self.get_character_by_name(name)
+                return self.get_character_by_name(name, project_id)
     
     def get_character_by_id(self, char_id: int) -> Optional[Character]:
         with self._get_connection() as conn:
@@ -172,10 +181,10 @@ class CharacterManager:
                 )
             return None
     
-    def get_character_by_name(self, name: str) -> Optional[Character]:
+    def get_character_by_name(self, name: str, project_id: str = '') -> Optional[Character]:
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, name, aliases, gender, first_appearance FROM characters WHERE name = ?", (name,))
+            cursor.execute("SELECT id, name, aliases, gender, first_appearance FROM characters WHERE project_id = ? AND name = ?", (project_id, name))
             row = cursor.fetchone()
             
             if row:
@@ -197,13 +206,13 @@ class CharacterManager:
         """
         return pattern.replace('\\', r'\\').replace('%', r'\%').replace('_', r'\_')
     
-    def get_character_by_alias(self, alias: str) -> Optional[Character]:
+    def get_character_by_alias(self, alias: str, project_id: str = '') -> Optional[Character]:
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            # 首先尝试精确匹配 name
+            # 首先尝试精确匹配 name（按项目过滤）
             cursor.execute(
-                "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE name = ?",
-                (alias,)
+                "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE project_id = ? AND name = ?",
+                (project_id, alias)
             )
             row = cursor.fetchone()
             if row:
@@ -219,8 +228,8 @@ class CharacterManager:
             # 对特殊字符进行转义，防止SQL注入
             escaped_alias = self._escape_like_pattern(alias)
             cursor.execute(
-                "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE aliases LIKE '%' || ? || '%' ESCAPE '\\'",
-                (escaped_alias,)
+                "SELECT id, name, aliases, gender, first_appearance FROM characters WHERE project_id = ? AND aliases LIKE '%' || ? || '%' ESCAPE '\\'",
+                (project_id, escaped_alias,)
             )
             row = cursor.fetchone()
             
@@ -236,10 +245,10 @@ class CharacterManager:
                     )
             return None
     
-    def get_all_characters(self) -> List[Character]:
+    def get_all_characters(self, project_id: str = '') -> List[Character]:
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT id, name, aliases, gender, first_appearance FROM characters")
+            cursor.execute("SELECT id, name, aliases, gender, first_appearance FROM characters WHERE project_id = ?", (project_id,))
             rows = cursor.fetchall()
             
             characters = []
@@ -364,20 +373,20 @@ class CharacterManager:
             )
             return True
     
-    def find_or_create(self, name: str, context: str = None, 
+    def find_or_create(self, name: str, project_id: str = '', context: str = None, 
                        chapter_id: int = None, min_confidence: float = None) -> Character:
         if min_confidence is None:
             min_confidence = CHARACTER_MIN_CONFIDENCE
-        char = self.get_character_by_name(name)
+        char = self.get_character_by_name(name, project_id)
         if char:
             return char
         
-        char = self.get_character_by_alias(name)
+        char = self.get_character_by_alias(name, project_id)
         if char:
             return char
         
         gender = self.infer_gender(name, context)
-        return self.add_character(name, gender=gender, first_appearance=chapter_id)
+        return self.add_character(name, project_id, gender=gender, first_appearance=chapter_id)
     
     def get_characters_by_chapter(self, chapter_id: int) -> List[Character]:
         with self._get_connection() as conn:
@@ -401,10 +410,10 @@ class CharacterManager:
                 ))
             return characters
     
-    def get_character_count(self) -> int:
+    def get_character_count(self, project_id: str = '') -> int:
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM characters")
+            cursor.execute("SELECT COUNT(*) FROM characters WHERE project_id = ?", (project_id,))
             return cursor.fetchone()[0]
 
 

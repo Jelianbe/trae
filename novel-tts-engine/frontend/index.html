@@ -86,7 +86,7 @@
         </div>
         <div class="chapter-tree" id="chapter-tree"></div>
         <div class="chapter-tree-footer">
-          <button class="btn btn-ghost" data-action="analyze-all"><i class="fa-solid fa-play"></i> 开始分析</button>
+          <button class="btn btn-ghost" data-action="open-analysis-config"><i class="fa-solid fa-play"></i> 开始分析</button>
         </div>
         <div class="analysis-progress" id="analysis-progress" style="display:none">
           <div class="analysis-progress-bar"><div class="fill"></div></div>
@@ -111,8 +111,7 @@
             <div class="toolbar-divider"></div>
             <!-- Insert / Split -->
             <button class="btn-icon" id="btn-insert" data-action="insert-segment-after" title="在下方插入"><i class="fa-solid fa-plus"></i></button>
-            <button class="btn-icon" id="btn-sentence-split" data-action="trigger-sentence-split" title="分析当前章节并拆分对话/旁白"><i class="fa-solid fa-scissors"></i> 句子拆分</button>
-            <button class="btn-icon" id="btn-newline" data-action="append-empty" title="在末尾添加空段落"><i class="fa-solid fa-paragraph"></i></button>
+            <button class="btn btn-ghost btn-sm" id="btn-sentence-split" data-action="trigger-sentence-split" title="分析当前章节并拆分对话/旁白"><i class="fa-solid fa-scissors"></i> 句子拆分</button>
             <div class="toolbar-divider"></div>
             <!-- Batch mode toggle -->
             <button class="btn-icon" id="btn-batch" data-action="toggle-batch" title="批量选择"><i class="fa-solid fa-list-check"></i></button>
@@ -328,9 +327,37 @@
   </div>
 </div>
 
+<!-- Analysis Config -->
+<div class="modal-overlay" id="modal-analysis-config">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header"><h2>分析设置</h2><button class="modal-close" data-action="close-modal" data-modal="analysis-config"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>分析范围</label>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="analysis-range" value="all" checked> 全部章节
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+            <input type="radio" name="analysis-range" value="select"> 选择章节
+          </label>
+        </div>
+      </div>
+      <div class="form-group" id="analysis-chapter-select" style="display:none">
+        <label>选择要分析的章节</label>
+        <div id="analysis-chapter-list" style="max-height:240px;overflow-y:auto;margin-top:8px;border:1px solid var(--border);border-radius:var(--radius);padding:8px"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-action="close-modal" data-modal="analysis-config">取消</button>
+      <button class="btn btn-primary" data-action="start-analysis">开始分析</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
-<script type="module" src="js/app.js?v=4"></script>
+<script type="module" src="js/app.js?v=5"></script>
 </body>
 </html>

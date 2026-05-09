@@ -62,6 +62,14 @@ class ProgressInfo:
 
 
 @dataclass
+class FragmentData:
+    """句子片段数据（对话/旁白/拟声）"""
+    text: str
+    type: str  # "dialogue" / "narration" / "onomatopoeia"
+    speaker: str = ""
+
+
+@dataclass
 class SentenceData:
     """单句处理结果（MVP 7字段）"""
     text: str
@@ -71,6 +79,7 @@ class SentenceData:
     emotion_class: str
     emotion_vector: Optional[List[float]]
     entities: List[dict] = field(default_factory=list)
+    fragments: List[FragmentData] = field(default_factory=list)
 
 
 @dataclass
@@ -272,11 +281,19 @@ class PipelineRunner:
         
         # 第五步：说话人匹配
         self._set_progress("说话人匹配", result.chapter_id, result.chapter_id + 1, 5, "正在匹配说话人...")
+        
+        # 设置 project_id 到 speaker_matcher，使角色创建时关联到当前项目
+        project_id = getattr(self, '_current_project_id', '')
+        self.speaker_matcher._current_project_id = project_id
+        
         dialogue_results = self.speaker_matcher.analyze_dialogue(content, chapter_id=chapter_id)
         
-        # 构建对话映射
+        # 构建对话映射（使用 project_id 关联角色）
         dialogue_map: Dict[str, str] = {}
         for dialogue_text, speaker in dialogue_results:
+            # 确保角色已创建并关联到当前项目
+            if speaker:
+                self.char_manager.find_or_create(speaker.name, project_id=project_id)
             dialogue_map[dialogue_text.strip()] = speaker.name if speaker else ""
         
         # 第六步：情绪标注
@@ -378,6 +395,9 @@ class PipelineRunner:
                     entity_dict["is_linked"] = e_is_linked
                     sentence_entities.append(entity_dict)
             
+            # 提取 fragments（对话/旁白拆分）
+            fragments = PipelineRunner._extract_fragments(sentence, dialogue_map)
+            
             result.sentences.append(SentenceData(
                 text=sentence,
                 type=sentence_type,
@@ -386,6 +406,7 @@ class PipelineRunner:
                 emotion_class=emotion_class,
                 emotion_vector=emotion_vector,
                 entities=sentence_entities,
+                fragments=fragments,
             ))
             
             # 更新上下文情感传递
@@ -427,6 +448,87 @@ class PipelineRunner:
     def _check_pause(self):
         """检查是否暂停"""
         self._pause_event.wait()
+
+    @staticmethod
+    def _extract_fragments(sentence: str, dialogue_map: Dict[str, str]) -> List[FragmentData]:
+        """
+        将句子拆分为 fragments（对话/旁白片段）。
+
+        核心逻辑：
+        - 识别句子中所有引号内的对话文本
+        - 按原文顺序交替提取旁白和对话片段
+        - 每个 fragment 标记类型和说话人
+
+        Args:
+            sentence: 完整句子文本
+            dialogue_map: 对话文本到说话人的映射
+
+        Returns:
+            FragmentData 列表
+        """
+        if not sentence:
+            return []
+
+        # 对话引号模式：「...」、"..."、"..."、『...』
+        quote_patterns = [
+            ('「', '」'),
+            ('"', '"'),
+            ('\u201c', '\u201d'),
+            ('『', '』'),
+        ]
+
+        # 收集所有引号内的对话片段及其位置
+        dialogue_positions = []  # [(start, end, text, speaker)]
+
+        for open_q, close_q in quote_patterns:
+            start = 0
+            while True:
+                open_pos = sentence.find(open_q, start)
+                if open_pos == -1:
+                    break
+                close_pos = sentence.find(close_q, open_pos + 1)
+                if close_pos == -1:
+                    break
+                dialogue_text = sentence[open_pos:close_pos + 1]
+                # 查找匹配的说话人
+                speaker = ""
+                for d_text, d_speaker in dialogue_map.items():
+                    if d_text in dialogue_text:
+                        speaker = d_speaker
+                        break
+                dialogue_positions.append((open_pos, close_pos + 1, dialogue_text, speaker))
+                start = close_pos + 1
+
+        # 如果没有对话，整个句子就是单个旁白 fragment
+        if not dialogue_positions:
+            return [FragmentData(text=sentence, type="narration", speaker="")]
+
+        # 按位置排序
+        dialogue_positions.sort(key=lambda x: x[0])
+
+        # 交替提取旁白和对话片段
+        fragments = []
+        pos = 0
+
+        for d_start, d_end, d_text, d_speaker in dialogue_positions:
+            # 提取对话前的旁白
+            if d_start > pos:
+                narration_text = sentence[pos:d_start].strip()
+                if narration_text:
+                    fragments.append(FragmentData(text=narration_text, type="narration", speaker=""))
+            # 提取对话
+            fragments.append(FragmentData(text=d_text, type="dialogue", speaker=d_speaker))
+            pos = d_end
+
+        # 提取最后的旁白
+        if pos < len(sentence):
+            narration_text = sentence[pos:].strip()
+            if narration_text:
+                fragments.append(FragmentData(text=narration_text, type="narration", speaker=""))
+
+        # 如果只有一个 fragment，返回它
+        # 如果有多个 fragments，返回完整列表
+        return fragments if len(fragments) > 1 else [FragmentData(text=sentence, type="narration", speaker="")]
 
     @staticmethod
     def _entity_in_sentence(entity_text: str, entity_start: int, entity_end: int, sentence: str) -> bool:
