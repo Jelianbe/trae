@@ -39,6 +39,15 @@ class ContextDiversityValidator:
     - 共现对象为高置信度实体（白名单/高频实体）→ 额外加分
     """
     
+    # BOUNDARY_PATTERNS
+    #
+    # 用途：说话人归属边界模式，用于从文本中提取人名+说话动作的结构
+    # 来源：中文网文常见说话模式——人名(1-4字)+说话动词/动作
+    # 边界：
+    #   - 仅包含高频说话/动作模式
+    #   - 使用.{1,4}作为人名长度上限（覆盖绝大多数中文人名）
+    # 更新日期：2026-05-02
+    # 维护者：项目规则
     BOUNDARY_PATTERNS = [
         re.compile(r'(?P<name>.{1,4})说道'),
         re.compile(r'(?P<name>.{1,4})问道'),
@@ -68,6 +77,16 @@ class ContextDiversityValidator:
         re.compile(r'(?P<name>.{1,4})老师'),
     ]
     
+    # POSTFIX_PATTERNS_CANDIDATES
+    #
+    # 用途：人名后缀候选集合，用于发现网文中的高频人名后缀模式
+    # 来源：中文网文/仙侠小说常见人名后缀——尊称类、贵族类、身份类
+    # 边界：
+    #   - 仅包含能作为人名结尾的单字或双字词
+    #   - 包含网文高频虚构后缀（尊者/天尊/真人等）
+    #   - 不应往里加通用名词（如"东西"、"东西"）
+    # 更新日期：2026-05-02
+    # 维护者：项目规则
     POSTFIX_PATTERNS_CANDIDATES = [
         '尊', '皇', '帝', '主', '者', '王', '侯', '公', '伯', '将',
         '尊者', '道人', '圣人', '之主', '大帝', '天尊', '真人',
@@ -175,7 +194,14 @@ class ContextDiversityValidator:
         - 萧炎冷(右邻字=3，但100%是对话词) → 误合并 ✓
         - 纳兰肃(右邻字=2，但0%是对话词) → 保留 ✓
         """
-        # 对话引导词集合（用于检测误合并）
+        # DIALOGUE_WORDS
+        #
+        # 用途：对话引导词集合，用于检测实体是否被误合并（如"萧炎冷"→"萧炎"+"冷"）
+        # 来源：中文网文高频说话/表情动词统计
+        # 边界：仅包含能跟在人名后表示说话/表情的单字词
+        #       例如："道"、"说"、"笑"、"冷"（冷冷道）
+        # 更新日期：2026-05-02
+        # 维护者：项目规则
         DIALOGUE_WORDS = {
             '道', '说', '问', '喊', '叫', '喝', '笑', '叹', '答', '应',
             '吼', '骂', '泣', '怒', '冷', '斥', '责', '嘲', '讽', '讥',
@@ -433,7 +459,13 @@ class ContextDiversityValidator:
         # 收集现有实体文本
         existing_texts = set(e.text for e in existing_entities)
         
-        # 边界词列表（只保留词，不需要捕获组）
+        # BOUNDARY_WORDS
+        #
+        # 用途：说话边界词列表，用于从文本中提取人名候选
+        # 来源：中文网文高频说话/动作模式词汇
+        # 边界：仅包含人名后紧跟的说话/动作词，用于反向提取人名
+        # 更新日期：2026-05-02
+        # 维护者：项目规则
         BOUNDARY_WORDS = [
             '说道', '问道', '喊道', '笑道', '淡淡道', '沉声道', '冷声道',
             '轻声道', '低声道', '道', '来到', '走出', '看着',
@@ -553,7 +585,13 @@ class ContextDiversityValidator:
         if not single_char_pers:
             return []
         
-        # 边界词列表
+        # BOUNDARY_WORDS
+        #
+        # 用途：说话边界词列表（扩展版），用于从文本中提取单字PER+单字PER的组合实体
+        # 来源：中文网文高频说话/动作模式词汇（扩展版，包含更多变体）
+        # 边界：仅包含人名后紧跟的说话/动作词，用于反向提取人名组合
+        # 更新日期：2026-05-02
+        # 维护者：项目规则
         BOUNDARY_WORDS = [
             '说道', '问道', '喊道', '笑道', '淡淡道', '沉声道', '冷声道',
             '轻声道', '低声道', '道', '来到', '走出', '看着',
@@ -562,19 +600,7 @@ class ContextDiversityValidator:
             '赞叹道', '怪笑道', '冷笑道', '喃喃道', '怪声道',
         ]
         
-        # 非姓氏排除列表（高频代词、指示词、常见动词等）
-        NON_SURNAME_CHARS = {
-            '我', '你', '他', '她', '它', '们', '这', '那', '哪', '谁',
-            '什', '么', '怎', '为', '什', '如', '果', '但', '是', '而',
-            '且', '或', '又', '也', '还', '更', '最', '非', '不', '没',
-            '已', '经', '正', '在', '将', '会', '能', '可', '应', '该',
-            '只', '是', '就', '才', '都', '全', '每', '各', '另', '某',
-            '有', '无', '多', '少', '大', '小', '高', '低', '好', '坏',
-            '的', '了', '着', '过', '吗', '呢', '吧', '啊', '呀', '哦',
-            '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-            '百', '千', '万', '亿', '第', '上', '下', '前', '后', '左',
-            '右', '中', '内', '外', '旁', '边', '面', '里', '间',
-        }
+        from pipeline.nlp_basics import SINGLE_CHAR_SURNAMES
         
         # 方向A：字符紧密度统计（基于全文）
         # 对于每个单字PER，统计其在全文中后面紧跟的字符分布
@@ -583,7 +609,8 @@ class ContextDiversityValidator:
         char_total_full = Counter()  # char -> total_following_chars_count_in_full_text
         
         for char in single_char_pers:
-            if char in NON_SURNAME_CHARS:
+            # 使用正向匹配：只有字符在姓氏表中才处理
+            if char not in SINGLE_CHAR_SURNAMES:
                 continue
             
             start = 0
@@ -607,8 +634,8 @@ class ContextDiversityValidator:
         combo_positions = defaultdict(list)
         
         for char in single_char_pers:
-            # 跳过明显非姓氏字符
-            if char in NON_SURNAME_CHARS:
+            # 使用正向匹配：只有字符在姓氏表中才处理
+            if char not in SINGLE_CHAR_SURNAMES:
                 continue
             
             start = 0
@@ -714,20 +741,6 @@ class ContextDiversityValidator:
             '说道', '问道', '喊道', '笑道', '道', '来到', '走出', '看着',
         }
         
-        # 非姓氏排除列表
-        NON_SURNAME_CHARS = {
-            '我', '你', '他', '她', '它', '们', '这', '那', '哪', '谁',
-            '什', '么', '怎', '为', '什', '如', '果', '但', '是', '而',
-            '且', '或', '又', '也', '还', '更', '最', '非', '不', '没',
-            '已', '经', '正', '在', '将', '会', '能', '可', '应', '该',
-            '只', '是', '就', '才', '都', '全', '每', '各', '另', '某',
-            '有', '无', '多', '少', '大', '小', '高', '低', '好', '坏',
-            '的', '了', '着', '过', '吗', '呢', '吧', '啊', '呀', '哦',
-            '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-            '百', '千', '万', '亿', '第', '上', '下', '前', '后', '左',
-            '右', '中', '内', '外', '旁', '边', '面', '里', '间',
-        }
-        
         # 统计每个单字在称谓词前面出现的次数
         char_before_title_counter = Counter()
         
@@ -741,16 +754,18 @@ class ContextDiversityValidator:
                 # 提取称谓词前面的单字
                 if pos >= 1:
                     char = full_text[pos - 1]
-                    # 跳过标点和非姓氏字符
-                    if char not in NON_SURNAME_CHARS and char not in '，。！？；：""''（）【】《》\n\r\t 、…':
+                    # 跳过标点（不再使用穷举排除列表，改为正向姓氏匹配）
+                    if char not in '，。！？；：""''（）【】《》\n\r\t 、…':
                         char_before_title_counter[char] += 1
                 
                 start = pos + 1
         
-        # 过滤：出现≥3次的单字认为是姓氏候选
+        # 过滤：出现≥3次的单字，且在姓氏表中，认为是姓氏候选
+        from pipeline.nlp_basics import SINGLE_CHAR_SURNAMES
+        
         discovered_surnames = set()
         for char, count in char_before_title_counter.items():
-            if count >= 3:
+            if count >= 3 and char in SINGLE_CHAR_SURNAMES:
                 discovered_surnames.add(char)
         
         logger.debug(f"[discover_surnames] found {len(discovered_surnames)} surnames: {discovered_surnames}")

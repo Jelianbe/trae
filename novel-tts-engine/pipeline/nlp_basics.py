@@ -49,6 +49,16 @@ class NLPResult:
     raw_text: str
 
 
+# TITLE_WORDS
+#
+# 用途：用于识别称呼+姓名的复合结构（如"陈管家"、"林少爷"）
+# 来源：中文社会称谓体系——社交称谓中的职衔类、职业类、身份类
+# 边界：
+#   - 仅包含能独立作为说话人提示的身份词
+#   - 排除关系称呼（师尊/徒儿等）因为它们是关系称谓而非独立身份
+#   - FO-08: 玄幻类称谓扩展（2026-05-02 修正方案）
+# 更新日期：2026-05-02
+# 维护者：项目规则
 TITLE_WORDS = {
     '管家', '老爷', '夫人', '少爷', '小姐', '公子', '姑娘',
     '掌柜', '老板', '掌门', '长老', '堂主', '舵主',
@@ -60,14 +70,26 @@ TITLE_WORDS = {
     '导师', '学长', '执事',
 }
 
-# 职业称呼后缀（可作为人名识别）
-# PROFESSION_TITLES 是 TITLE_WORDS 的子集，专门用于职业相关的称呼
+# PROFESSION_TITLES
+#
+# 用途：专门用于职业相关的称呼识别（可作为人名识别的前缀）
+# 来源：TITLE_WORDS 的子集，基于现代职业体系分类
+# 边界：仅包含现代社会可验证的职业称呼
+# 更新日期：2026-05-02
 PROFESSION_TITLES = {
     '博士', '教授', '医生', '护士', '律师', '记者',
     '经理', '总裁', '总监', '部长', '局长', '队长',
 }
 
-# 传统称呼后缀（身份相关的称呼）
+# TRADITIONAL_TITLES
+#
+# 用途：传统/古代称呼识别，用于识别"陈管家"、"林少爷"等结构
+# 来源：中文社会称谓体系——传统身份类
+# 边界：
+#   - 仅保留能独立作为说话人提示的身份词
+#   - 排除关系称呼（师尊/徒儿等）
+#   - FO-08: 玄幻类称谓扩展（2026-05-02 修正方案）
+# 更新日期：2026-05-02
 TRADITIONAL_TITLES = {
     '管家', '老爷', '夫人', '少爷', '小姐', '公子', '姑娘',
     '掌柜', '老板', '掌门', '长老', '堂主', '舵主',
@@ -81,7 +103,13 @@ TRADITIONAL_TITLES = {
 # 验证: TITLE_WORDS == PROFESSION_TITLES | TRADITIONAL_TITLES
 assert TITLE_WORDS == (PROFESSION_TITLES | TRADITIONAL_TITLES), "TITLE_WORDS 应该等于 PROFESSION_TITLES 和 TRADITIONAL_TITLES 的并集"
 
-# 职位称呼后缀（X总/X哥/X姐/X叔/X伯）
+# POSITION_SUFFIXES
+#
+# 用途：用于识别"X总"、"X哥"、"X姐"、"X叔"等职位/亲属称呼后缀
+# 来源：中文社会称谓体系——姓氏+职位/亲属后缀构词模式
+# 边界：仅包含常见单字职位/亲属后缀，不应往里加多字词
+# 更新日期：2026-05-02
+# 维护者：项目规则
 POSITION_SUFFIXES = {
     '总', '哥', '姐', '叔', '伯', '姨', '婶', '爷', '公', '婆',
 }
@@ -90,14 +118,30 @@ PREFIX_TITLES = {'老', '小', '大'}
 
 ORG_SUFFIXES = {'会', '帮', '社', '团', '协会', '联盟', '组织', '集团', '公司', '企业', '商会', '公会', '教派', '宗门'}
 
-# 家族后缀（2026-05-02 扩展）
+# FAMILY_SUFFIXES
+#
+# 用途：家族/府邸/庄园等后缀识别（当前不用于说话角色识别管道）
+# 来源：中文地理/建筑称谓体系——家族/居所类
+# 边界：仅包含表示家族/居所的单字或双字后缀
+#       注意：此词表当前已不再用于说话角色识别管道
+#       被保留是为了保持向后兼容
+# 更新日期：2026-05-02
+# 维护者：项目规则
 FAMILY_SUFFIXES = {
     '家', '府', '族', '宅', '院', '堡', '庄', '邸', '第', '舍',
     '庐', '亭', '堂', '斋', '轩', '阁', '楼', '台', '苑', '园',
     '山庄',
 }
 
-# 地点后缀（2026-05-02 扩展）
+# LOCATION_SUFFIXES
+#
+# 用途：地理位置/自然地貌后缀识别（当前不用于说话角色识别管道）
+# 来源：中文地理名词分类体系——自然地理/人文地理类
+# 边界：仅包含表示地理位置/地貌的单字或双字后缀
+#       注意：此词表当前已不再用于说话角色识别管道
+#       被保留是为了保持向后兼容
+# 更新日期：2026-05-02
+# 维护者：项目规则
 LOCATION_SUFFIXES = {
     '城', '镇', '村', '山', '河', '湖', '海', '岛', '谷', '峰',
     '岭', '原', '川', '泽', '林', '森', '漠', '殿', '宫', '哨站',
@@ -110,32 +154,41 @@ LOCATION_SUFFIXES = {
 # 中不再使用它们来创建 ORG/LOC 实体（参见 2026-05-02 修正方案）。
 # 如果将来需要重新启用组织/地点识别，可以从版本控制历史恢复相关逻辑。
 
-# 西方奇幻/翻译体特有名字模式
-WESTERN_NAME_PREFIXES = {
-    # 常见西方人名前缀（翻译体）
-    '艾德温', '伊莉雅', '加尔文', '莫洛克', '雷纳德', '托马斯',
-    '亚瑟', '兰斯洛特', '梅林', '盖文', '崔斯坦', '珀西瓦尔',
-    '阿拉贡', '莱戈拉斯', '金雳', '佛罗多', '甘道夫', '萨鲁曼',
-    '阿尔萨斯', '吉安娜', '希尔瓦娜', '安杜因', '瓦里安',
-    '凯尔', '莉亚', '雷诺', '雷诺兹', '泰兰德', '玛法里奥',
-    '伊利丹', '玛维', '卡德加', '麦迪文', '克尔苏加德',
-    '乌瑟尔', '提里奥', '佛丁', '图拉扬', '奥蕾莉亚',
-    '安娜', '艾琳', '艾米', '奥利维亚', '伊丽莎白',
-    '威廉', '亨利', '理查', '罗伯特', '爱德华', '查理',
-    '亚历山大', '尼古拉', '维克多', '弗拉基米尔',
-}
+# 西方名字检测规则（基于词性+句法结构）
+#
+# 用途：识别西方译名/奇幻名字（如"亚瑟·潘德拉贡"、"艾德温"）
+# 来源：中文语法结构（分隔符/连续NR/词性特征）
+# 边界：
+#   - 模式1: 包含"·"分隔符的NR词 → 西方名字
+#   - 模式2: 连续2+个NR词，中间有"·"或空格 → 西方名字
+#   - 模式3: 非中文姓氏的NR词 + 西方头衔 → 西方名字+头衔
+# 更新日期：2026-05-09
+# 维护者：项目规则
 
-# 西方奇幻常见称呼/头衔（翻译体）
+# WESTERN_TITLES
+#
+# 用途：西方奇幻/翻译体常见头衔识别（辅助信号，非唯一判断依据）
+# 来源：西方奇幻文学/翻译体常见称谓体系——职业类、贵族类、军事类
+# 边界：仅包含西方语境中可独立作为身份的词，不应往里加中文特有头衔
+# 更新日期：2026-05-09
+# 维护者：项目规则
 WESTERN_TITLES = {
     '骑士', '法师', '牧师', '圣骑士', '游侠', '德鲁伊',
-    '术士', '战士', '盗贼', '猎人', '牧师', '主教',
+    '术士', '战士', '盗贼', '猎人', '主教',
     '团长', '副团长', '队长', '副官', '指挥官',
     '国王', '女王', '王子', '公主', '公爵', '伯爵', '侯爵',
     '陛下', '阁下', '大人', '爵士', '殿下',
     '信使', '哨兵', '斥候', '物资官', '书记员',
 }
 
-# ORG后缀检测的前缀黑名单（这些词后面跟"会/组织"等不应识别为ORG）
+# ORG_PREFIX_BLACKLIST
+#
+# 用途：ORG后缀检测的前缀黑名单，过滤不应识别为ORG的词
+# 来源：HanLP ORG 误识别统计分析（基于网文文本）
+# 边界：仅包含常与ORG后缀（会/组织/集团等）组合但非组织名的词
+#       例如："我们会"不是组织名，"炎魔会"是虚构群体
+# 更新日期：2026-05-02
+# 维护者：项目规则
 ORG_PREFIX_BLACKLIST = {
     # 常见代词/指示词
     '我们', '你们', '他们', '大家', '所有',
@@ -149,7 +202,13 @@ ORG_PREFIX_BLACKLIST = {
     '黑暗法师', '光明法师', '黑袍人', '白袍人',
 }
 
-# ORG实体完整文本黑名单（HanLP直接误识别的完整ORG实体）
+# ORG_TEXT_BLACKLIST
+#
+# 用途：ORG实体完整文本黑名单，过滤HanLP直接误识别的完整ORG实体
+# 来源：HanLP ORG 误识别统计分析（基于网文文本）
+# 边界：仅包含被HanLP直接误识别为ORG的完整文本
+# 更新日期：2026-05-02
+# 维护者：项目规则
 ORG_TEXT_BLACKLIST = {
     '我们会', '你们会', '他们会', '大家会',
     '炎魔会', '恶魔会',
@@ -157,7 +216,18 @@ ORG_TEXT_BLACKLIST = {
     '黑暗法师', '光明法师',
 }
 
-# PER实体类型过滤黑名单（不应被识别为PER的常见词）
+# PER_BLACKLIST
+#
+# 用途：PER实体类型过滤黑名单，过滤不应被识别为PER的常见词
+# 来源：HanLP PER 误识别统计分析（基于网文文本）
+# 边界：
+#   - 地点词：常被误识别为PER的地理位置词
+#   - 组织/群体词：表示群体而非个体的词
+#   - 怪物/生物：虚构生物/泛化角色
+#   - 抽象概念：非实体的抽象名词
+#   - 物品：武器/道具等
+# 更新日期：2026-05-02
+# 维护者：项目规则
 PER_BLACKLIST = {
     # 地点词
     '王都', '都城', '首都', '皇城', '京城', '城池',
@@ -173,7 +243,15 @@ PER_BLACKLIST = {
     '剑', '盾', '法杖', '武器', '药水',
 }
 
-# 西方奇幻地名前缀模式（用于LOC增强）
+# WESTERN_LOC_PREFIXES
+#
+# 用途：西方奇幻地名前缀模式，用于LOC增强识别（如"灰石哨站"）
+# 来源：西方奇幻文学常见地名构词模式——修饰词+地理后缀
+# 边界：
+#   - 包含常见西方奇幻修饰词（颜色/材质/自然元素）
+#   - 包含HanLP分词可能拆开的单字（需要在raw_text层面匹配）
+# 更新日期：2026-05-02
+# 维护者：项目规则
 WESTERN_LOC_PREFIXES = {
     '灰石', '白银', '黄金', '黑铁', '暗影', '风暴',
     '冰霜', '火焰', '雷霆', '月光', '日光', '星辰',
@@ -184,9 +262,14 @@ WESTERN_LOC_PREFIXES = {
 }
 
 
-# 单字姓氏库（2026-05-02 修正方案）
-# 策略：保留真实高频姓氏 + 网文虚构姓氏，不穷举百家姓
-# 穷举会导致噪声（如'武'、'容'被误识别为姓氏）
+# 单字姓氏库
+#
+# 用途：判断单字实体是否可能是人名（姓氏），用于 NER 后处理
+# 来源：
+#   - 中国前100大姓氏：国家统计局第六次人口普查数据，覆盖约85%人口
+#   - 网文高频虚构姓氏：基于斗破苍穹、凡人修仙传、遮天等统计
+# 边界：不穷举百家姓（穷举会导致噪声，如'武'、'容'被误识别为姓氏）
+#       不应往里加：非姓氏的常见单字（如'天'、'地'、'风'、'云'）
 SINGLE_CHAR_SURNAMES = {
     # === 中国前100大姓氏（覆盖约85%人口）===
     '王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴',
@@ -560,11 +643,12 @@ class NLPBasics:
     def _merge_foreign_names(self, tokens: List[str], pos_tags: List[str]) -> Tuple[List[Entity], set, set]:
         """合并西方名字（如 "亚瑟·潘德拉贡"）。
 
-        改进：
-        1. 支持 "名·中间名·姓" 格式（如 "亚瑟·潘德拉贡"）
-        2. 支持缩写格式 "A·P·潘德拉贡"
-        3. 支持以西方名字前缀开头的独立NR词
-        4. 优化边界检测，避免跨句子合并
+        使用词性+句法结构检测，替代原有的静态名字前缀映射表。
+
+        规则：
+        1. 包含"·"分隔符的NR词序列 → 西方名字
+        2. 连续2+个NR词，中间有"·"或空格 → 西方名字
+        3. 非中文姓氏的NR词 + 西方头衔 → 西方名字+头衔（辅助信号）
 
         Returns:
             (entities, covered_indices, entity_texts) 三元组
@@ -576,7 +660,19 @@ class NLPBasics:
         i = 0
         while i < len(tokens):
             pos = pos_tags[i] if i < len(pos_tags) else 'X'
-            if pos not in ('NR', 'nr') and tokens[i] not in WESTERN_NAME_PREFIXES:
+            # 只处理NR词性标签（名词-人名）
+            if pos not in ('NR', 'nr'):
+                i += 1
+                continue
+
+            # 检查当前NR词是否可能是西方名字：
+            # 1. 不在中文姓氏库中
+            # 2. 或者包含"·"分隔符特征
+            is_chinese_surname = (
+                tokens[i] in SINGLE_CHAR_SURNAMES or
+                tokens[i] in MULTI_CHAR_SURNAMES
+            )
+            if is_chinese_surname:
                 i += 1
                 continue
 
@@ -590,8 +686,16 @@ class NLPBasics:
                 next_token = tokens[j]
 
                 if next_pos in ('NR', 'nr'):
-                    parts.append(next_token)
-                    j += 1
+                    # 连续的NR词，检查是否是非中文姓氏
+                    is_next_chinese = (
+                        next_token in SINGLE_CHAR_SURNAMES or
+                        next_token in MULTI_CHAR_SURNAMES
+                    )
+                    if not is_next_chinese:
+                        parts.append(next_token)
+                        j += 1
+                    else:
+                        break
                 elif next_token in ('·', '-', '.', '/') and j + 1 < len(tokens):
                     check_pos = pos_tags[j + 1] if j + 1 < len(pos_tags) else 'X'
                     if check_pos in ('NR', 'nr'):
@@ -599,8 +703,21 @@ class NLPBasics:
                         j += 1
                     else:
                         break
-                elif next_token in WESTERN_NAME_PREFIXES:
-                    # 连续出现的西方名字（无分隔符，如 "艾德温 伊莉雅"）
+                elif next_token == ' ' and j + 1 < len(tokens):
+                    # 空格分隔的西方名字（如 "Arthur Pendragon"）
+                    check_pos = pos_tags[j + 1] if j + 1 < len(pos_tags) else 'X'
+                    check_token = tokens[j + 1]
+                    is_next_chinese = (
+                        check_token in SINGLE_CHAR_SURNAMES or
+                        check_token in MULTI_CHAR_SURNAMES
+                    )
+                    if check_pos in ('NR', 'nr') and not is_next_chinese:
+                        separators.append((len(parts) - 1, next_token))
+                        j += 1
+                    else:
+                        break
+                elif next_token in WESTERN_TITLES:
+                    # 西方头衔辅助信号（非唯一依据）
                     parts.append(next_token)
                     j += 1
                 elif next_token in ('和', '与', '及'):
@@ -608,14 +725,19 @@ class NLPBasics:
                     if j + 1 < len(tokens):
                         check_pos = pos_tags[j + 1] if j + 1 < len(pos_tags) else 'X'
                         check_token = tokens[j + 1]
-                        if check_pos in ('NR', 'nr') or check_token in WESTERN_NAME_PREFIXES:
+                        is_next_chinese = (
+                            check_token in SINGLE_CHAR_SURNAMES or
+                            check_token in MULTI_CHAR_SURNAMES
+                        )
+                        if check_pos in ('NR', 'nr') and not is_next_chinese:
                             j += 1  # 跳过连接词
                             continue
                     break
                 else:
                     break
 
-            if len(parts) > 1:
+            # 至少需要2个部分（或包含分隔符）才合并
+            if len(parts) > 1 or any(sep in ''.join(parts) for sep in ('·', '-', '.')):
                 merged_parts = []
                 for idx, part in enumerate(parts):
                     merged_parts.append(part)
@@ -879,6 +1001,13 @@ class NLPBasics:
             '宫', '堡', '寨', '岛', '城', '国', '界', '域'
         ]
         # 常见非人名词（网文高频但非人名）
+        # 非人名词过滤表
+        #
+        # 用途：过滤 NER 误识别为 PER 的非人名实体
+        # 来源：网文高频抽象概念（基于斗破苍穹等统计），这些词常被 NER 误标为 PER
+        # 边界：仅包含网文场景中常见的误识别词，通用文本不需要这么多
+        #       【特定文体过拟合风险】"天道"、"大道"等词在非修仙文体中可能不是高频误识别
+        # 注意：此表是穷举排除法，后续应改为"姓氏表+已知人名"白名单模式
         false_person_words = [
             '天道', '大道', '世界', '空间', '时间', '天地', '万物', '虚空',
             '宇宙', '星辰', '天命', '命运', '轮回', '因果', '境界', '修炼',

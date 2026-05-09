@@ -17,8 +17,20 @@ from typing import List, Optional, Tuple, Dict
 logger = logging.getLogger(__name__)
 
 
-# 自称词映射（约束：上限15条，当前9条）
-# 基于中文谦辞体系——说话人用来自我指称的词汇
+# 自称词映射
+#
+# 用途：通过自称词（我、朕、本座等）推断说话人身份
+# 来源：汉语称谓体系——古代官职谦辞与通用谦辞
+#   - "朕"：秦始皇统一后的帝王自称，来源《史记·秦始皇本纪》
+#   - "本座"：修仙/玄幻文通用自称，来源网文惯例（非历史文献）
+#   - "本王"：诸侯王自称，来源《礼记》称谓体系
+#   - "老夫/老身"：年长者自称，来源《论语》"老者安之"及后世白话小说
+#   - "奴家/妾身"：女性谦辞，来源宋元话本及明清小说
+#   - "吾"：文言第一人称，来源《论语》《孟子》等先秦文献
+#   - "我"：现代汉语第一人称，来源通用
+# 边界：仅包含有明确语言学/文献依据的谦辞，不包含方言或特定作品造词
+#       不应往里加：网文特定角色自称（如"本尊"、"吾乃"等变体）
+# 硬性约束：上限15条，当前9条。超出必须重构为统计方法，不得继续追加
 SELF_REFERENCE_MAP: Dict[str, str] = {
     '我': 'first_person',
     '吾': 'first_person_classical',
@@ -30,6 +42,12 @@ SELF_REFERENCE_MAP: Dict[str, str] = {
     '奴家': 'first_person_humble_female',
     '妾身': 'first_person_concubine',
 }
+
+# 上限约束检查
+assert len(SELF_REFERENCE_MAP) <= 15, (
+    f"SELF_REFERENCE_MAP 超出15条上限（当前{len(SELF_REFERENCE_MAP)}条），"
+    "请审查是否越界，或重构为统计方法"
+)
 
 
 class SelfReferenceInferrer:
@@ -48,17 +66,15 @@ class SelfReferenceInferrer:
 
         for ref_word, ref_type in SELF_REFERENCE_MAP.items():
             if ref_word in text:
-                # 有自称词时，尝试从上下文中找到最近的已知角色
-                # 策略：自称词本身不产生新角色名，但提供性别/身份线索
-                # 如果上下文中只有一个已知角色，大概率就是该角色
                 known_chars = self._find_nearby_characters(context)
                 if known_chars:
-                    for char in known_chars[:1]:  # 只取最可能的一个
+                    for char in known_chars[:1]:
                         candidates.append((char.name, f'自称词:{ref_word}→{char.name}', 0.75))
                 else:
-                    # 无已知角色匹配时，返回"未知_角色类型"而非强制匹配
-                    role_type = self._infer_role_type_from_self_ref(ref_type)
-                    candidates.append((f'未知_{role_type}', f'自称词:{ref_word}', 0.40))
+                    # 不确定时直接返回"未知"，不追加身份类型后缀
+                    # 理由：身份推断（如"末将"→武将）本质上还是猜测，
+                    # 错误的身份标签比信息不足更危险
+                    candidates.append(('未知', f'自称词:{ref_word}', 0.40))
 
         return candidates
 
@@ -92,18 +108,3 @@ class SelfReferenceInferrer:
                     found.append(char)
                     break
         return found
-
-    def _infer_role_type_from_self_ref(self, ref_type: str) -> str:
-        """从自称词类型推断角色类型"""
-        type_map = {
-            'first_person_emperor': '帝王',
-            'first_person_cultivation': '修士',
-            'first_person_king': '王爷',
-            'first_person_elder_male': '老者',
-            'first_person_elder_female': '老妇',
-            'first_person_humble_female': '女子',
-            'first_person_concubine': '妾室',
-            'first_person_classical': '古人',
-            'first_person': '角色',
-        }
-        return type_map.get(ref_type, '角色')

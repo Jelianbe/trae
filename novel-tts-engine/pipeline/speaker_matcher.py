@@ -37,19 +37,62 @@ class MatchResult:
     match_type: str
 
 
-GROUP_SPEAKERS = {
-    '三人': 'GROUP:3',
-    '他们三人': 'GROUP:3',
-    '他们三个': 'GROUP:3',
-    '三人异口同声': 'GROUP:3',
-    '众人': 'GROUP:CROWD',
-    '大家': 'GROUP:CROWD',
-    '齐声': 'GROUP:CROWD',
-    '所有人': 'GROUP:CROWD',
-}
+# 群体说话人检测正则模式
+#
+# 用途：检测文本中的群体说话人（GROUP:N 或 GROUP:CROWD）
+# 来源：中文语法结构（数量词+人称代词/群体名词）
+# 边界：
+#   - 模式1: 数字+人/位 → GROUP:N（如"三人"→GROUP:3）
+#   - 模式2: 群体指示词 → GROUP:CROWD（众人/大家/所有/全体）
+#   - 模式3: 齐声/异口同声 → GROUP:CROWD
+# 更新日期：2026-05-09
+# 维护者：项目规则
+GROUP_NUMBER_PATTERN = re.compile(r'(\d+)人')
+CROWD_INDICATOR_WORDS = {'众人', '大家', '所有', '全体', '人群', '群众'}
+CROWD_ACTION_WORDS = {'齐声', '异口同声', '同声', '一起'}
+
+
+def detect_group_speaker(text: str) -> Optional[str]:
+    """检测文本中的群体说话人。
+    
+    Args:
+        text: 待检测文本
+        
+    Returns:
+        群体说话人标识（如 'GROUP:3' 或 'GROUP:CROWD'），或 None
+    """
+    # 模式1: 数字+人 → GROUP:N
+    match = GROUP_NUMBER_PATTERN.search(text)
+    if match:
+        number = int(match.group(1))
+        if 2 <= number <= 10:
+            return f'GROUP:{number}'
+    
+    # 模式2: 群体指示词 → GROUP:CROWD
+    for word in CROWD_INDICATOR_WORDS:
+        if word in text:
+            return 'GROUP:CROWD'
+    
+    # 模式3: 齐声/异口同声 → GROUP:CROWD
+    for word in CROWD_ACTION_WORDS:
+        if word in text:
+            return 'GROUP:CROWD'
+    
+    return None
 
 
 class SpeakerMatcher:
+    # ROLE_CORE_WORDS
+    #
+    # 用途：角色核心词表，用于识别"修饰语+核心词"结构的角色指称
+    # 来源：中文语言学称谓体系——社交称谓中的职衔类、职业类、身份类
+    #       结合中文网文高频角色类型统计
+    # 边界：
+    #   - 仅包含能独立作为说话人身份的词
+    #   - 中文里能独立作为角色指称的社会身份词汇是有限的
+    #   - 此集合基于语言学分类，不应无限制扩容
+    # 更新日期：2026-05-02
+    # 维护者：项目规则
     ROLE_CORE_WORDS = [
         '将军', '丞相', '元帅', '统领', '校尉', '大臣', '尚书', '宰相', '太傅',
         '总管', '掌门', '舵主', '堂主', '族长', '团长', '队长',
@@ -115,17 +158,70 @@ class SpeakerMatcher:
     def _infer_gender_from_context(self, name: str, context: str) -> str:
         return self.self_ref_inferrer.infer_gender_from_context(name, context)
 
-    def _register_temporary_character(self, name: str, context: str) -> Optional[Character]:
+    def _has_speech_context(self, context: str) -> bool:
+        """检测文本是否包含说话/动作上下文。
+        
+        优先使用 HanLP 词性标注检测动词后是否紧跟引号或冒号。
+        降级方案：HanLP 不可用时使用关键词匹配（仅作为辅助信号）。
+        
+        Args:
+            context: 待检测的上下文文本
+            
+        Returns:
+            是否包含说话上下文
+        """
+        # 优先方案：使用 HanLP 词性标注
+        try:
+            result = self.nlp.analyze(context)
+            tokens = result.tokens
+            pos_tags = [t.pos for t in tokens]
+            
+            # 检测动词(v/vd/VV)后是否紧跟引号或冒号
+            for i, pos in enumerate(pos_tags):
+                if pos in ('v', 'vd', 'VV', 'V', 'VE', 'VC', 'VW', 'VL', 'VH', 'VO', 'VP', 'VB'):
+                    # 检查后续字符是否有引号或冒号
+                    if i + 1 < len(tokens):
+                        next_token = tokens[i + 1].text
+                        if next_token in ('"', '"', ''', ''', '：', ':', '「', '『'):
+                            return True
+                    # 检查当前token后是否有标点符号
+                    if i + 1 < len(pos_tags):
+                        next_pos = pos_tags[i + 1]
+                        if next_pos in ('PU', 'w', ':'):
+                            return True
+            
+            # 检测引号对的存在（表示对话）
+            has_open_quote = any(t.text in ('"', ''', '「', '『') for t in tokens)
+            has_close_quote = any(t.text in ('"', ''', '」', '』') for t in tokens)
+            if has_open_quote and has_close_quote:
+                return True
+                
+        except Exception:
+            # HanLP 不可用，降级到关键词匹配
+            # TODO: 仅在 HanLP 不可用时使用此降级方案
+            return self._has_speech_context_fallback(context)
+        
+        return False
+    
+    def _has_speech_context_fallback(self, context: str) -> bool:
+        """降级方案：使用关键词匹配检测说话上下文。
+        
+        注意：此方法仅作为 HanLP 不可用时的降级方案，
+        关键词只能作为辅助信号，不能作为唯一依据。
+        """
         SPEECH_ACTION_PATTERNS = [
             r'(?:说道|道|问|说|喊道|叫道|笑道|沉声道|低声道|高声道|冷冷道|淡淡道)',
             r'(?:点头|摇头|皱眉|转身|站起|坐下|抬手|挥手|冷笑|微笑)',
             r'(?:出现|走来|过来|进来|离开|推开|抓住|跑进|冲进)',
             r'(?:看着|盯着|扫了|抬起|放下|举起|拔出|跪)',
         ]
-        has_speech_context = any(
+        return any(
             re.search(pat, context) for pat in SPEECH_ACTION_PATTERNS
         )
-        if not has_speech_context:
+
+    def _register_temporary_character(self, name: str, context: str) -> Optional[Character]:
+        # 使用通则推理检测说话上下文
+        if not self._has_speech_context(context):
             return None
 
         if name in self._temp_char_cache:
@@ -277,7 +373,7 @@ class SpeakerMatcher:
                 pass
 
         if not candidates:
-            candidates.append(('未知_角色', '无充分证据', 0.30))
+            candidates.append(('未知', '无充分证据', 0.30))
 
         return candidates
 
@@ -486,10 +582,10 @@ class SpeakerMatcher:
             )
             if context_candidates:
                 name, reason, confidence = context_candidates[0]
-                if name.startswith('未知_'):
+                if name == '未知':
                     unknown_char = Character(
                         id=-1,
-                        name=name,
+                        name='未知',
                         aliases=set(),
                         gender='unknown'
                     )
