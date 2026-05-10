@@ -19,8 +19,7 @@ from pipeline.entity_linker import get_entity_linker, EntityLinker
 from pipeline.character_manager import CharacterManager, get_character_manager
 from pipeline.speaker_matcher import SpeakerMatcher
 from pipeline.semantic_ranker import get_semantic_ranker, SemanticRanker
-from pipeline._emotion_tagger_legacy import EmotionTagger, get_emotion_tagger
-from pipeline.emotion_extractor import get_emotion_extractor  # 方案B：独立情绪提取模块
+from pipeline.emotion_extractor import get_emotion_extractor  # 统一情绪管道
 from utils.text_utils import split_sentences_smart
 
 logger = logging.getLogger(__name__)
@@ -111,7 +110,6 @@ class PipelineRunner:
         self.char_manager = get_character_manager()
         self.speaker_matcher = SpeakerMatcher(self.char_manager)
         self.semantic_ranker = get_semantic_ranker()
-        self.emotion_tagger = get_emotion_tagger()
         self.context_validator = get_context_validator()
         self.speaker_role_filter = get_speaker_role_filter()
         self.entity_linker = get_entity_linker(self.char_manager)
@@ -354,14 +352,7 @@ class PipelineRunner:
                 for d_text, d_speaker in dialogue_map.items():
                     if d_text in sentence:
                         speaker = d_speaker
-                        if emotion_conf >= DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD:
-                            emotion = emotion_result.emotion_label
-                        else:
-                            rule_emotion = self.emotion_tagger.tag(sentence, speaker)
-                            if rule_emotion != 'neutral':
-                                emotion = rule_emotion
-                            else:
-                                emotion = emotion_result.emotion_label
+                        emotion = emotion_result.emotion_label
                         dialogue_count += 1
                         break
             else:

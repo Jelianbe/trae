@@ -69,6 +69,7 @@ TITLE_WORDS = {
     # FO-08: 玄幻类称谓扩展（2026-05-02 修正方案）
     '导师', '学长', '执事',
 }
+assert len(TITLE_WORDS) <= 40, f"TITLE_WORDS 超出40条上限（当前{len(TITLE_WORDS)}条）"
 
 # PROFESSION_TITLES
 #
@@ -80,6 +81,7 @@ PROFESSION_TITLES = {
     '博士', '教授', '医生', '护士', '律师', '记者',
     '经理', '总裁', '总监', '部长', '局长', '队长',
 }
+assert len(PROFESSION_TITLES) <= 20, f"PROFESSION_TITLES 超出20条上限（当前{len(PROFESSION_TITLES)}条）"
 
 # TRADITIONAL_TITLES
 #
@@ -99,6 +101,7 @@ TRADITIONAL_TITLES = {
     # 仅保留能独立作为说话人提示的身份词，排除关系称呼（师尊/徒儿等）
     '导师', '学长', '执事',
 }
+assert len(TRADITIONAL_TITLES) <= 30, f"TRADITIONAL_TITLES 超出30条上限（当前{len(TRADITIONAL_TITLES)}条）"
 
 # 验证: TITLE_WORDS == PROFESSION_TITLES | TRADITIONAL_TITLES
 assert TITLE_WORDS == (PROFESSION_TITLES | TRADITIONAL_TITLES), "TITLE_WORDS 应该等于 PROFESSION_TITLES 和 TRADITIONAL_TITLES 的并集"
@@ -113,10 +116,13 @@ assert TITLE_WORDS == (PROFESSION_TITLES | TRADITIONAL_TITLES), "TITLE_WORDS 应
 POSITION_SUFFIXES = {
     '总', '哥', '姐', '叔', '伯', '姨', '婶', '爷', '公', '婆',
 }
+assert len(POSITION_SUFFIXES) <= 15, f"POSITION_SUFFIXES 超出15条上限（当前{len(POSITION_SUFFIXES)}条）"
 
 PREFIX_TITLES = {'老', '小', '大'}
+assert len(PREFIX_TITLES) <= 5, f"PREFIX_TITLES 超出5条上限（当前{len(PREFIX_TITLES)}条）"
 
 ORG_SUFFIXES = {'会', '帮', '社', '团', '协会', '联盟', '组织', '集团', '公司', '企业', '商会', '公会', '教派', '宗门'}
+assert len(ORG_SUFFIXES) <= 20, f"ORG_SUFFIXES 超出20条上限（当前{len(ORG_SUFFIXES)}条）"
 
 # FAMILY_SUFFIXES
 #
@@ -132,6 +138,7 @@ FAMILY_SUFFIXES = {
     '庐', '亭', '堂', '斋', '轩', '阁', '楼', '台', '苑', '园',
     '山庄',
 }
+assert len(FAMILY_SUFFIXES) <= 25, f"FAMILY_SUFFIXES 超出25条上限（当前{len(FAMILY_SUFFIXES)}条）"
 
 # LOCATION_SUFFIXES
 #
@@ -148,6 +155,7 @@ LOCATION_SUFFIXES = {
     '要塞', '堡垒', '营地', '关', '隘', '渡', '津', '桥', '崖',
     '渊', '潭', '泉', '溪', '涧', '洞', '窟', '峡', '坪',
 }
+assert len(LOCATION_SUFFIXES) <= 40, f"LOCATION_SUFFIXES 超出40条上限（当前{len(LOCATION_SUFFIXES)}条）"
 
 # 注意：FAMILY_SUFFIXES 和 LOCATION_SUFFIXES 当前已不再用于说话角色识别管道。
 # 它们被保留在代码中是为了保持向后兼容，但 _detect_surname_based_entities

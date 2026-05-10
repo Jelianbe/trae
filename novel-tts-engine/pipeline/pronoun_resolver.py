@@ -8,7 +8,7 @@
 
 import re
 import logging
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 logger = logging.getLogger(__name__)
 

@@ -123,7 +123,32 @@ class SpeakerHintMatcher:
                         if self.name_validator.is_valid_speaker_candidate(name):
                             return name, 'prefix_hint'
 
+        # 模式3：检测代词（他/她）- T-007 代词消解强化
+        pronoun = self.extract_pronoun_from_text(text)
+        if pronoun:
+            return pronoun, 'pronoun_hint'
+
         return None, 'none'
+
+    def extract_pronoun_from_text(self, text: str) -> Optional[str]:
+        """从文本中提取代词（他/她）
+        
+        用途：当没有显式说话人提示时，检测文本中是否有代词
+        来源：中文人称代词封闭集合（PRONOUNS）
+        边界：仅返回第一个匹配的代词
+        
+        Returns:
+            代词字符（'他'/'她'）或 None
+        """
+        if not text:
+            return None
+        
+        # 按顺序检测代词（他/她）
+        for pronoun in ['他', '她']:
+            if pronoun in text:
+                return pronoun
+        
+        return None
 
     def extract_speech_patterns(self, text: str) -> List[Tuple[str, str]]:
         """从文本中提取所有说话人模式

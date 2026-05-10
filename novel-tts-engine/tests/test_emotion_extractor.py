@@ -131,7 +131,7 @@ class TestEmotionExtractor:
         # L1 粗分类
         assert result.emotion_class in ('neutral', 'excited', 'subdued')
         # L2 细分类
-        assert result.emotion_label in ('joy', 'anger', 'sadness', 'surprise', 'fear', 'neutral')
+        assert result.emotion_label in ('joy', 'anger', 'sadness', 'surprise', 'fear', 'neutral', 'unknown')
         # L3 8维向量
         assert len(result.emotion_vector) == 8
         assert all(0.0 <= v <= 1.0 for v in result.emotion_vector)

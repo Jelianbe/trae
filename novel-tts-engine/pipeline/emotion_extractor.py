@@ -17,6 +17,7 @@
 """
 
 import re
+import threading
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -26,8 +27,14 @@ from typing import Dict, List, Optional, Tuple
 # L1 粗分类（3类）
 EMOTION_CLASS_L1 = ['neutral', 'excited', 'subdued']
 
-# L2 细分类（6类）
-EMOTION_LABEL_L2 = ['joy', 'anger', 'sadness', 'surprise', 'fear', 'neutral']
+# L2 细分类（7类，含 unknown）
+EMOTION_LABEL_L2 = ['joy', 'anger', 'sadness', 'surprise', 'fear', 'neutral', 'unknown']
+
+# unknown 判定阈值：所有情绪得分 <= 此值时归为 unknown
+UNKNOWN_SCORE_THRESHOLD = 0.25
+
+# unknown 判定最小文本长度：文本长度 < 此值时归为 unknown
+UNKNOWN_MIN_TEXT_LENGTH = 5
 
 # L3 8维情感向量维度名称（Index-TTS 2）
 EMOTION_VECTOR_DIMS = ['happiness', 'anger', 'sadness', 'fear', 'disgust', 'melancholy', 'surprise', 'calm']
@@ -68,6 +75,9 @@ def map_l2_to_l1(emotion_label: str, intensity: float) -> str:
     if emotion_label == 'neutral':
         return 'neutral'
     
+    if emotion_label == 'unknown':
+        return 'neutral'
+    
     if emotion_label in ('sadness', 'fear'):
         return 'subdued'
     
@@ -92,33 +102,37 @@ def map_l2_to_vector(emotion_label: str, confidence: float, intensity: float) ->
     
     Args:
         emotion_label: L2 细分类
-        confidence: 置信度（影响主维度值）
-        intensity: 情绪强度（影响向量值）
+        confidence: 置信度（影响主维度值），范围 0.0~1.0
+        intensity: 情绪强度（影响向量值），范围 0.0~1.0
     
     Returns:
-        8维情感向量
+        8维情感向量，每个元素在 0.0~1.0 范围内
     """
-    # 基础向量（全零）
+    confidence = max(0.0, min(1.0, confidence))
+    intensity = max(0.0, min(1.0, intensity))
+    
     vector = [0.0] * 8
     
-    # 主维度值 = confidence * intensity
     primary_value = min(confidence * intensity, 1.0)
     
-    # 根据 L2 设置主维度
     if emotion_label == 'joy':
-        vector[0] = primary_value  # happiness
+        vector[0] = primary_value
     elif emotion_label == 'anger':
-        vector[1] = primary_value  # anger
+        vector[1] = primary_value
     elif emotion_label == 'sadness':
-        vector[2] = primary_value  # sadness
-        vector[5] = primary_value * 0.3  # melancholy（悲伤常伴随忧郁）
+        vector[2] = min(primary_value, 1.0)
+        vector[5] = min(primary_value * 0.3, 1.0)
     elif emotion_label == 'fear':
-        vector[3] = primary_value  # fear
-        vector[2] = primary_value * 0.2  # sadness（恐惧常伴随悲伤）
+        vector[3] = min(primary_value, 1.0)
+        vector[2] = min(primary_value * 0.2, 1.0)
     elif emotion_label == 'surprise':
-        vector[6] = primary_value  # surprise
+        vector[6] = primary_value
     elif emotion_label == 'neutral':
-        vector[7] = 1.0  # calm
+        vector[7] = 1.0
+    elif emotion_label == 'unknown':
+        vector[7] = 1.0
+    
+    vector = [max(0.0, min(v, 1.0)) for v in vector]
     
     return vector
 
@@ -142,6 +156,7 @@ def generate_emotion_text(emotion_label: str, intensity: float) -> str:
         'surprise': f"{intensity_desc}的惊讶",
         'fear': f"{intensity_desc}的恐惧",
         'neutral': "平静",
+        'unknown': "平静",
     }
     
     return emotion_desc_map.get(emotion_label, "平静")
@@ -294,6 +309,28 @@ EXCLAMATORY_PATTERNS = [
     r'^[哇啊哦唉哼嘿][！!]{1,3}',
 ]
 
+# 引导词提取模式（从 EmotionTagger 迁移）
+#
+# 用途：提取紧邻引号的动词短语（如"冷笑道"、"急切的道"），作为情绪判断的强信号
+# 来源：网文对话引导词高频模式（基于 GT 数据统计）
+# 边界：仅匹配引号前 5 字内的引导词，不匹配远距离描写
+GUIDE_PHRASE_PATTERN = re.compile(
+    r'([\u4e00-\u9fa5]{0,5}?(?:道|说|问|喊|叫|骂|笑|叹|答|应|怒|喝|哼|嚷)[：:，。！!]?)'
+)
+
+QUOTE_START_PATTERN = re.compile(r'[""]')
+
+# 特殊笑类映射（从 EmotionTagger 迁移）
+# 冷笑 → anger，苦笑 → sadness
+SPECIAL_LAUGHTER_MAP = {
+    '冷笑': 'anger',
+    '苦笑': 'sadness',
+}
+
+# 程度副词（从 EmotionTagger 迁移，用于情绪强度检测）
+DEGREE_ADVERBS_STRONG = ["非常", "极其", "极度", "十分", "格外", "分外", "异常", "太", "极为", "无比"]
+DEGREE_ADVERBS_MILD = ["有点", "略微", "微微", "稍稍", "稍微", "略有", "稍显"]
+
 
 class EmotionExtractor:
     """独立情绪提取器 —— 不依赖角色管道，直接从原始文本提取情绪特征"""
@@ -371,6 +408,71 @@ class EmotionExtractor:
         features.is_imperative = any(r.search(text) for r in self._imperative_res)
         
         return features
+    
+    def _extract_guide_phrase(self, text: str) -> str:
+        """精确引导词提取：只提取紧邻引号的动词短语
+        
+        策略：
+        1. 找到左引号位置
+        2. 在引号前 10 字内搜索动词短语（道/说/问/笑/叹/怒等）
+        3. 如果找到，返回引导词；否则返回空字符串
+        
+        Returns:
+            str: 引导词（如"冷笑道"、"急切的道"），未找到返回空字符串
+        """
+        quote_match = QUOTE_START_PATTERN.search(text)
+        if not quote_match:
+            return ""
+        
+        quote_pos = quote_match.start()
+        prefix = text[max(0, quote_pos - 10):quote_pos]
+        
+        match = GUIDE_PHRASE_PATTERN.search(prefix)
+        if match:
+            return match.group(1)
+        
+        return ""
+    
+    def _check_special_laughter(self, text: str) -> Optional[str]:
+        """特殊笑类关键词检查（优先级：冷笑 > 苦笑）
+        
+        Returns:
+            情绪标签（anger/sadness），未匹配返回 None
+        """
+        if '冷笑' in text:
+            return 'anger'
+        if '苦笑' in text:
+            return 'sadness'
+        return None
+    
+    def _apply_guide_phrase_bonus(self, text: str, scores: Dict[str, float]) -> None:
+        """引导词情绪加分：基于引导词内容给对应情绪加分
+        
+        引导词是紧邻对话引号的动词短语，通常是作者直接给出的情绪提示，
+        应作为强信号（加分幅度高于普通关键词匹配）。
+        """
+        guide_phrase = self._extract_guide_phrase(text)
+        if not guide_phrase:
+            return
+        
+        special = self._check_special_laughter(guide_phrase)
+        if special:
+            scores[special] += 0.5
+            return
+        
+        if '怒' in guide_phrase or '骂' in guide_phrase or '吼' in guide_phrase:
+            scores['anger'] += 0.4
+        elif '哭' in guide_phrase or '叹' in guide_phrase or '泣' in guide_phrase:
+            scores['sadness'] += 0.4
+        elif '笑' in guide_phrase:
+            if '微' in guide_phrase or '轻' in guide_phrase:
+                scores['neutral'] += 0.2
+            else:
+                scores['joy'] += 0.3
+        elif '喊' in guide_phrase or '叫' in guide_phrase or '嚷' in guide_phrase:
+            scores['surprise'] += 0.3
+        elif '问' in guide_phrase:
+            scores['surprise'] += 0.2
     
     def classify(self, text: str, context_hint: Optional[str] = None, context_confidence: float = 0.0) -> EmotionResult:
         """基于情绪特征分类
@@ -630,6 +732,9 @@ class EmotionExtractor:
         neutral_score = min(neutral_score, 0.25)
         scores['neutral'] = neutral_score
         
+        # === 引导词情绪加分（从 EmotionTagger 迁移）===
+        self._apply_guide_phrase_bonus(text, scores)
+        
         # === 上下文干预 ===
         # 置信度门控：仅当前句最高分<=0.25且前句置信度>=0.3时，才继承前句情绪
         # 门控阈值从 0.5 降到 0.3，因为很多情绪句的置信度在 0.3-0.5 之间
@@ -645,10 +750,18 @@ class EmotionExtractor:
         best_emotion = max(scores, key=scores.get)
         best_score = scores[best_emotion]
         
-        # 如果最高分 <= 0.25，归为 neutral
-        if best_score <= 0.25:
+        # unknown 判定：所有情绪得分 <= 阈值 且无引导词加分
+        # unknown 表示"无法判断情绪类型"，不等于"中性"
+        # 如果 best_emotion 已经是 neutral（有正向特征支持），保持 neutral
+        if len(text) == 0:
             best_emotion = 'neutral'
             best_score = 0.3
+        elif best_score <= UNKNOWN_SCORE_THRESHOLD and len(text) >= UNKNOWN_MIN_TEXT_LENGTH:
+            # 只在 best_emotion 不是 neutral 时才判定为 unknown
+            # neutral 本身就是一种明确的情绪判断，不需要转为 unknown
+            if best_emotion != 'neutral':
+                best_emotion = 'unknown'
+                best_score = 0.3
         
         # 归一化置信度
         confidence = min(best_score, 0.95)
@@ -688,11 +801,21 @@ class EmotionExtractor:
         return [self.classify(t) for t in texts]
 
 
-# 全局单例
+# 全局单例（双重检查锁，线程安全）
 _extractor: Optional[EmotionExtractor] = None
+_extractor_lock = threading.Lock()
+
 
 def get_emotion_extractor() -> EmotionExtractor:
     global _extractor
     if _extractor is None:
-        _extractor = EmotionExtractor()
+        with _extractor_lock:
+            if _extractor is None:
+                _extractor = EmotionExtractor()
     return _extractor
+
+
+def reset_emotion_extractor() -> None:
+    global _extractor
+    with _extractor_lock:
+        _extractor = None

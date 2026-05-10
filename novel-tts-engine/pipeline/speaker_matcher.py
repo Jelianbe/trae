@@ -196,9 +196,9 @@ class SpeakerMatcher:
             if has_open_quote and has_close_quote:
                 return True
                 
-        except Exception:
-            # HanLP 不可用，降级到关键词匹配
-            # TODO: 仅在 HanLP 不可用时使用此降级方案
+        except (RuntimeError, ValueError, KeyError, AttributeError) as e:
+            # HanLP 分析失败（模型不可用或输入格式异常），降级到关键词匹配
+            logger.debug(f"HanLP 说话上下文检测失败，降级到关键词匹配: {e}")
             return self._has_speech_context_fallback(context)
         
         return False
@@ -528,7 +528,12 @@ class SpeakerMatcher:
         if not gender:
             return None
 
-        local_result = self.pronoun_resolver.resolve_in_local_window(gender, self._recent_speakers)
+        # 使用新的窗口和活跃度权重（T-007）
+        local_result = self.pronoun_resolver.resolve_in_local_window(
+            gender, 
+            self._recent_speakers,
+            character_activity=self._character_activity
+        )
         if local_result:
             return local_result
 
