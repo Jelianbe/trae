@@ -76,11 +76,11 @@ export class ApiClient {
         return this._fetch('/projects/upload', { method: 'POST', body: fd });
     }
 
-    async createProject(title, content) {
+    async createProject(title, author, content) {
         return this._fetch('/projects/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, content, author: '' }),
+            body: JSON.stringify({ title, content, author: author || '' }),
         });
     }
 

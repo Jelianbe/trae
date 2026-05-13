@@ -38,7 +38,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 # Pipeline 模块导入（全局单例，不修改现有代码）
-from pipeline.chapter_splitter import ChapterSplitter
+from pipeline.chapter_splitter import ChapterSplitter, NovelStructure, Chapter
 from pipeline.pipeline_runner import get_pipeline_runner, PipelineRunner
 from pipeline.character_manager import get_character_manager, CharacterManager
 from pipeline.tts_generator import get_tts_generator, TTSGenerator
@@ -105,7 +105,7 @@ def _start_indextts_service():
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
         )
         
-        # 等待服务启动
+        # 等待服务启动并加载模型
         time.sleep(10)
         
         # 检查进程是否还在运行
@@ -115,6 +115,27 @@ def _start_indextts_service():
             logger.error(f"stderr: {stderr.decode('utf-8', errors='ignore')}")
             _indextts_process = None
             return
+        
+        # 额外等待模型加载（Index-TTS 模型加载通常需要 10-20 秒）
+        logger.info("Waiting for Index-TTS model to load...")
+        time.sleep(20)
+        
+        # 验证模型是否已加载
+        import requests
+        max_retries = 3
+        for i in range(max_retries):
+            try:
+                resp = requests.get(f"http://127.0.0.1:{_indextts_port}/v2/synthesize", timeout=5)
+                # 503 表示模型未加载，200 或其他表示服务就绪
+                if resp.status_code != 503:
+                    logger.info(f"Index-TTS model loaded and ready")
+                    break
+                else:
+                    logger.info(f"Index-TTS model not loaded yet, retry {i+1}/{max_retries}")
+                    time.sleep(5)
+            except Exception:
+                logger.info(f"Index-TTS not responding, retry {i+1}/{max_retries}")
+                time.sleep(5)
         
         logger.info(f"Index-TTS service started successfully (PID: {_indextts_process.pid})")
         _indextts_ready = True
@@ -378,10 +399,12 @@ class ChapterAnalysisResponse(BaseModel):
 
 class CharacterInfo(BaseModel):
     """角色信息"""
+    id: Optional[int] = None
     name: str
     gender: str = "unknown"
     aliases: List[str] = []
     first_appearance: Optional[int] = None
+    is_locked: bool = False
 
 
 class CharactersResponse(BaseModel):
@@ -618,37 +641,56 @@ async def create_project(request: CreateProjectRequest):
     手动创建项目（通过输入内容方式）。
 
     - 接收书名、作者和小说内容
-    - 调用 ChapterSplitter.split_with_volumes() 分章
+    - 如果内容为空，创建一个空白项目（包含一个默认空章节）
+    - 如果有内容，调用 ChapterSplitter.split_with_volumes() 分章
     - 返回项目 ID、书名、章节列表
     """
-    if not request.content or not request.content.strip():
-        raise HTTPException(status_code=400, detail="内容不能为空")
-
     if not request.title or not request.title.strip():
         raise HTTPException(status_code=400, detail="书名不能为空")
 
     project_id = str(uuid.uuid4())[:8]
     book_title = request.title.strip()
 
-    try:
-        splitter = get_splitter()
-        novel_structure = splitter.split_with_volumes(request.content)
-    except Exception as e:
-        logger.error(f"分章失败: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"分章处理失败: {str(e)}")
+    content = request.content or ""
+    content = content.strip()
 
-    chapters = [
-        ChapterInfo(
-            index=ch.index,
-            title=ch.title,
-            word_count=len(ch.content),
-            volume_index=ch.volume_index,
-            volume_title=ch.volume_title,
+    if not content:
+        # 空白项目：创建一个默认章节
+        chapters = [
+            ChapterInfo(
+                index=0,
+                title="第1章",
+                word_count=0,
+                volume_index=0,
+                volume_title="",
+            )
+        ]
+        total_words = 0
+        novel_structure = NovelStructure(
+            total_chapters=1,
+            total_volumes=0,
+            chapters=[],
         )
-        for ch in novel_structure.chapters
-    ]
+    else:
+        try:
+            splitter = get_splitter()
+            novel_structure = splitter.split_with_volumes(request.content)
+        except Exception as e:
+            logger.error(f"分章失败: {e}", exc_info=True)
+            raise HTTPException(status_code=500, detail=f"分章处理失败: {str(e)}")
 
-    total_words = sum(len(ch.content) for ch in novel_structure.chapters)
+        chapters = [
+            ChapterInfo(
+                index=ch.index,
+                title=ch.title,
+                word_count=len(ch.content),
+                volume_index=ch.volume_index,
+                volume_title=ch.volume_title,
+            )
+            for ch in novel_structure.chapters
+        ]
+
+        total_words = sum(len(ch.content) for ch in novel_structure.chapters)
 
     projects_store[project_id] = {
         "project_id": project_id,
@@ -859,17 +901,21 @@ async def get_project_characters(project_id: str):
         char_list = []
         # 旁白角色始终存在（锁定）
         char_list.append(CharacterInfo(
+            id=-1,
             name="旁白",
             gender="neutral",
             aliases=["narrator", "叙述"],
             first_appearance=None,
+            is_locked=True,
         ))
         for char in characters:
             char_list.append(CharacterInfo(
+                id=getattr(char, "id", None),
                 name=char.name,
                 gender=getattr(char, "gender", "unknown"),
                 aliases=list(getattr(char, "aliases", [])),
                 first_appearance=getattr(char, "first_appearance", None),
+                is_locked=getattr(char, "is_locked", False),
             ))
 
         return CharactersResponse(
@@ -880,6 +926,40 @@ async def get_project_characters(project_id: str):
     except Exception as e:
         logger.error(f"获取角色列表失败: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"获取角色列表失败: {str(e)}")
+
+
+@app.post("/api/v1/projects/{project_id}/characters/{char_id}/lock", tags=["角色"])
+async def lock_character(project_id: str, char_id: int):
+    """锁定角色，锁定后在旁白匹配中获得最高优先级"""
+    if project_id not in projects_store:
+        raise HTTPException(status_code=404, detail=f"项目 {project_id} 不存在")
+
+    try:
+        char_manager = get_char_manager()
+        success = char_manager.lock_character(char_id, project_id)
+        if not success:
+            raise HTTPException(status_code=404, detail=f"角色 {char_id} 不存在或不属于该项目")
+        return {"status": "ok", "message": f"角色 {char_id} 已锁定"}
+    except Exception as e:
+        logger.error(f"锁定角色失败: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"锁定角色失败: {str(e)}")
+
+
+@app.post("/api/v1/projects/{project_id}/characters/{char_id}/unlock", tags=["角色"])
+async def unlock_character(project_id: str, char_id: int):
+    """解锁角色，恢复正常匹配"""
+    if project_id not in projects_store:
+        raise HTTPException(status_code=404, detail=f"项目 {project_id} 不存在")
+
+    try:
+        char_manager = get_char_manager()
+        success = char_manager.unlock_character(char_id, project_id)
+        if not success:
+            raise HTTPException(status_code=404, detail=f"角色 {char_id} 不存在或不属于该项目")
+        return {"status": "ok", "message": f"角色 {char_id} 已解锁"}
+    except Exception as e:
+        logger.error(f"解锁角色失败: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"解锁角色失败: {str(e)}")
 
 
 @app.post("/api/v1/tts/generate", response_model=TTSResponse, tags=["TTS"])

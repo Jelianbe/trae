@@ -108,8 +108,8 @@ class PipelineRunner:
         self.chapter_splitter = ChapterSplitter()
         self.nlp = get_nlp()
         self.char_manager = get_character_manager()
-        self.speaker_matcher = SpeakerMatcher(self.char_manager)
         self.semantic_ranker = get_semantic_ranker()
+        self.speaker_matcher = SpeakerMatcher(self.char_manager, semantic_ranker=self.semantic_ranker)
         self.context_validator = get_context_validator()
         self.speaker_role_filter = get_speaker_role_filter()
         self.entity_linker = get_entity_linker(self.char_manager)
@@ -477,9 +477,31 @@ class PipelineRunner:
                 open_pos = sentence.find(open_q, start)
                 if open_pos == -1:
                     break
-                close_pos = sentence.find(close_q, open_pos + 1)
-                if close_pos == -1:
-                    break
+                
+                # 当左右引号相同时（如英文双引号），需要特殊处理
+                if open_q == close_q:
+                    # 查找配对的结束引号，跳过转义的引号
+                    depth = 1
+                    pos = open_pos + 1
+                    while pos < len(sentence) and depth > 0:
+                        if sentence[pos] == '\\' and pos + 1 < len(sentence):
+                            # 跳过转义字符
+                            pos += 2
+                            continue
+                        if sentence[pos] == close_q:
+                            depth -= 1
+                            if depth == 0:
+                                close_pos = pos
+                                break
+                        pos += 1
+                    else:
+                        # 没有找到匹配的结束引号
+                        break
+                else:
+                    close_pos = sentence.find(close_q, open_pos + 1)
+                    if close_pos == -1:
+                        break
+                
                 dialogue_text = sentence[open_pos:close_pos + 1]
                 # 查找匹配的说话人
                 speaker = ""

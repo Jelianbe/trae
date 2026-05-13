@@ -137,6 +137,14 @@ class CharacterManager:
                 logger.info("已为 characters 表添加 project_id 字段")
             except sqlite3.OperationalError:
                 pass  # 字段已存在
+            
+            # 为已有数据库添加 is_locked 字段（数据迁移）
+            try:
+                cursor.execute("ALTER TABLE characters ADD COLUMN is_locked INTEGER DEFAULT 0")
+                conn.commit()
+                logger.info("已为 characters 表添加 is_locked 字段")
+            except sqlite3.OperationalError:
+                pass  # 字段已存在
     
     def add_character(self, name: str, project_id: str = '', aliases: Set[str] = None, 
                       gender: str = "unknown", first_appearance: int = None) -> Character:
@@ -415,6 +423,76 @@ class CharacterManager:
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM characters WHERE project_id = ?", (project_id,))
             return cursor.fetchone()[0]
+    
+    def lock_character(self, char_id: int, project_id: str = '') -> bool:
+        """锁定角色
+        
+        用途：用户手动锁定关键角色，锁定后在旁白匹配中获得最高优先级
+        来源：说话人识别改进方案 P1
+        边界：
+          - 只有属于指定项目的角色才能被锁定
+          - 锁定状态存储在 is_locked 字段
+        更新日期：2026-05-09
+        维护者：说话人识别改进方案
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE characters SET is_locked = 1, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND project_id = ?",
+                (char_id, project_id)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def unlock_character(self, char_id: int, project_id: str = '') -> bool:
+        """解锁角色
+        
+        用途：取消角色的锁定状态
+        来源：说话人识别改进方案 P1
+        边界：
+          - 只有属于指定项目的角色才能被解锁
+        更新日期：2026-05-09
+        维护者：说话人识别改进方案
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE characters SET is_locked = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND project_id = ?",
+                (char_id, project_id)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def get_locked_characters(self, project_id: str = '') -> List[Character]:
+        """获取所有锁定角色
+        
+        用途：返回当前项目所有锁定角色列表
+        来源：说话人识别改进方案 P1
+        边界：
+          - 只返回 is_locked=1 的角色
+          - 按项目过滤
+        更新日期：2026-05-09
+        维护者：说话人识别改进方案
+        """
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, name, aliases, gender, first_appearance FROM characters "
+                "WHERE project_id = ? AND is_locked = 1",
+                (project_id,)
+            )
+            rows = cursor.fetchall()
+            
+            characters = []
+            for row in rows:
+                characters.append(Character(
+                    id=row[0],
+                    name=row[1],
+                    aliases=set(json.loads(row[2])) if row[2] else set(),
+                    gender=row[3] or "unknown",
+                    first_appearance=row[4]
+                ))
+            return characters
 
 
 _character_manager: Optional[CharacterManager] = None

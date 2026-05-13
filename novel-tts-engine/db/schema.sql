@@ -5,13 +5,16 @@
 
 CREATE TABLE IF NOT EXISTS characters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    aliases TEXT,
+    project_id TEXT NOT NULL DEFAULT '',
+    name TEXT NOT NULL,
+    aliases TEXT NOT NULL DEFAULT '[]',
     gender TEXT DEFAULT 'unknown' CHECK(gender IN ('male', 'female', 'unknown')),
     first_appearance INTEGER,
     vector BLOB,
+    is_locked INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(project_id, name)
 );
 
 CREATE TABLE IF NOT EXISTS chapters (

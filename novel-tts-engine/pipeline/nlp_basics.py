@@ -513,6 +513,11 @@ class NLPBasics:
         # "萧炎冷笑道" → HanLP识别为"萧炎冷"(人名)
         # "萧炎承喏道" → HanLP识别为"萧炎承"(人名)
         combined = self._filter_false_persons(combined)
+        
+        # 2026-05-12 修复：实体完整性修复
+        # HanLP分词可能将双字角色名拆开（如"药老"→"药"+"老"）
+        # 在此处扩展单字NER实体为完整角色名
+        combined = self._expand_single_char_entities(combined, raw_text or '')
 
         # 非西方文体也尝试检测西方LOC（如'灰石哨站'），使用独立覆盖集
         loc_covered = set()
@@ -528,10 +533,18 @@ class NLPBasics:
         text = raw_text or ''
         if '·' in text:
             return True
-        # 检查是否包含大量非中文姓氏的NR词
+        # 检查是否包含大量非中文姓氏的NR词（需要至少2个连续NR都不在姓氏表中）
+        consecutive_non_surname_nr = 0
         for t, pos in zip(tokens, pos_tags[:len(tokens)]):
-            if pos in ('NR', 'nr') and t not in SINGLE_CHAR_SURNAMES and t not in MULTI_CHAR_SURNAMES:
-                return True
+            if pos in ('NR', 'nr'):
+                if t not in SINGLE_CHAR_SURNAMES and t not in MULTI_CHAR_SURNAMES:
+                    consecutive_non_surname_nr += 1
+                    if consecutive_non_surname_nr >= 2:
+                        return True
+                else:
+                    consecutive_non_surname_nr = 0
+            else:
+                consecutive_non_surname_nr = 0
         return False
 
     def _apply_entity_blacklist(self, entities: List[Entity]) -> List[Entity]:
@@ -1071,6 +1084,39 @@ class NLPBasics:
             filtered.append(ent)
 
         return filtered
+
+    def _expand_single_char_entities(self, entities: List[Entity], raw_text: str) -> List[Entity]:
+        """实体完整性修复：扩展单字NER实体为完整角色名。
+        
+        通用规则（不依赖特定角色名）：
+        1. 检测单字PER实体（在SINGLE_CHAR_SURNAMES中）
+        2. 在raw_text中取该单字后一个字符
+        3. 若后字符是中文字符，则组合为新实体
+        4. 下游speaker_matcher会做角色库匹配验证
+        
+        注意：不在这里查角色库（因为NER阶段角色库可能未初始化）
+        而是做通用拼接，让下游过滤无效组合。
+        """
+        expanded = []
+        for ent in entities:
+            if len(ent.text) == 1 and ent.type == 'PER' and ent.text in SINGLE_CHAR_SURNAMES:
+                char_pos = raw_text.find(ent.text)
+                if char_pos != -1 and char_pos + 1 < len(raw_text):
+                    next_char = raw_text[char_pos + 1]
+                    # 只拼接中文字符（排除标点符号）
+                    if '\u4e00' <= next_char <= '\u9fff':
+                        combined_name = ent.text + next_char
+                        expanded.append(Entity(
+                            text=combined_name,
+                            type='PER',
+                            start=ent.start,
+                            end=ent.end,
+                            confidence=0.85
+                        ))
+                        continue
+            expanded.append(ent)
+        
+        return expanded
 
     def tokenize(self, text: str) -> List[str]:
         result = self.analyze(text)

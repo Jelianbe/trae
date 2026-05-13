@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>角色锁定 UI 演示</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 40px;
+    display: flex;
+    gap: 40px;
+    min-height: 100vh;
+    align-items: flex-start;
+  }
+
+  .panel {
+    background: #16213e;
+    border-radius: 12px;
+    padding: 20px;
+    width: 320px;
+  }
+
+  .panel-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8892b0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1e2a4a;
+  }
+
+  .character-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #1a2744;
+    margin-bottom: 6px;
+    transition: background 0.2s;
+  }
+  .character-card:hover { background: #1f2d50; }
+
+  .char-color {
+    width: 4px;
+    height: 36px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .char-info { flex: 1; min-width: 0; }
+  .char-info .name { font-size: 0.9rem; font-weight: 500; }
+  .char-info .count { font-size: 0.75rem; color: #8892b0; margin-top: 2px; }
+
+  /* 锁定按钮 */
+  .lock-btn {
+    background: none;
+    border: 1px solid transparent;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    color: #8892b0;
+  }
+  .lock-btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .lock-btn.locked {
+    color: #f1c40f;
+    background: rgba(241,196,15,0.12);
+    border-color: rgba(241,196,15,0.25);
+  }
+  .lock-btn.locked:hover {
+    background: rgba(241,196,15,0.2);
+  }
+
+  .locked-badge {
+    font-size: 0.6rem;
+    background: rgba(241,196,15,0.15);
+    color: #f1c40f;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .voice-tag {
+    font-size: 0.65rem;
+    color: #64ffda;
+    margin-left: 4px;
+  }
+
+  .annotation {
+    background: #0f3460;
+    border-left: 3px solid #e94560;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-top: 20px;
+    color: #a8b2d1;
+  }
+  .annotation strong { color: #e94560; }
+  .annotation .highlight { color: #f1c40f; }
+
+  .arrow {
+    align-self: center;
+    font-size: 2rem;
+    color: #e94560;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+  <!-- 当前状态：没有锁定按钮 -->
+  <div class="panel">
+    <div class="panel-title">🔄 当前角色列表（无锁定功能）</div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#6e6a65"></div>
+      <div class="char-info">
+        <div class="name">旁白 <span style="font-size:0.6rem;color:#8892b0;font-weight:400">(固定)</span></div>
+        <div class="count">neutral · 默认音色</div>
+      </div>
+    </div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#6b7b8d"></div>
+      <div class="char-info">
+        <div class="name">林轩</div>
+        <div class="count">male</div>
+      </div>
+    </div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#d4a574"></div>
+      <div class="char-info">
+        <div class="name">小翠</div>
+        <div class="count">female</div>
+      </div>
+    </div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#8b6b9d"></div>
+      <div class="char-info">
+        <div class="name">药老</div>
+        <div class="count">male</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow">→</div>
+
+  <!-- 改造后状态：有锁定按钮 -->
+  <div class="panel">
+    <div class="panel-title">🔒 改造后角色列表（有锁定按钮）</div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#6e6a65"></div>
+      <div class="char-info">
+        <div class="name">旁白 <span style="font-size:0.6rem;color:#8892b0;font-weight:400">(固定)</span></div>
+        <div class="count">neutral · 默认音色</div>
+      </div>
+      <button class="lock-btn locked" disabled title="旁白固定锁定">
+        <i class="fa-solid fa-lock"></i>
+      </button>
+    </div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#6b7b8d"></div>
+      <div class="char-info">
+        <div class="name">林轩</div>
+        <div class="count">male <span class="voice-tag"><i class="fa-solid fa-microphone"></i> 云深</span></div>
+      </div>
+      <button class="lock-btn" title="点击锁定角色" onclick="this.classList.toggle('locked'); this.querySelector('i').className=this.classList.contains('locked')?'fa-solid fa-lock':'fa-regular fa-lock-open'">
+        <i class="fa-regular fa-lock-open"></i>
+      </button>
+    </div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#d4a574"></div>
+      <div class="char-info">
+        <div class="name">小翠</div>
+        <div class="count">female <span class="voice-tag"><i class="fa-solid fa-microphone"></i> 若水</span></div>
+      </div>
+      <button class="lock-btn locked" title="已锁定 · 点击解锁" onclick="this.classList.toggle('locked'); this.querySelector('i').className=this.classList.contains('locked')?'fa-solid fa-lock':'fa-regular fa-lock-open'">
+        <i class="fa-solid fa-lock"></i>
+      </button>
+    </div>
+
+    <div class="character-card">
+      <div class="char-color" style="background:#8b6b9d"></div>
+      <div class="char-info">
+        <div class="name">药老 <span class="locked-badge"><i class="fa-solid fa-lock"></i> 已锁定</span></div>
+        <div class="count">male</div>
+      </div>
+      <button class="lock-btn locked" title="已锁定 · 点击解锁" onclick="this.classList.toggle('locked'); this.querySelector('i').className=this.classList.contains('locked')?'fa-solid fa-lock':'fa-regular fa-lock-open'">
+        <i class="fa-solid fa-lock"></i>
+      </button>
+    </div>
+
+    <div class="annotation">
+      <strong>📌 锁定规则</strong><br>
+      · 点击 <span class="highlight">🔓 锁图标</span> → 锁定角色，分析时获得 <strong>最高优先级（0.95）</strong><br>
+      · 点击 <span class="highlight">🔒 锁图标</span> → 解锁角色，恢复正常匹配<br>
+      · 锁定角色在旁白中出现时优先匹配，<strong>对话内容中不强行匹配</strong><br>
+      · 旁白角色固定锁定，不可解锁
+    </div>
+  </div>
+
+</body>
+</html>

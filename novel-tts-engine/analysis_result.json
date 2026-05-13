@@ -1,0 +1,342 @@
+{
+  "chapter_index": 0,
+  "chapter_title": "第一章 测试",
+  "total_sentences": 8,
+  "sentences": [
+    {
+      "text": "\"终于到了。\"林轩抬头望着门匾。",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.3125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 1,
+          "end": 2,
+          "standard_name": "林轩",
+          "is_linked": true
+        },
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 1,
+          "end": 2,
+          "standard_name": "林轩",
+          "is_linked": true
+        },
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 3,
+          "end": 4,
+          "standard_name": "林轩",
+          "is_linked": true
+        }
+      ],
+      "fragments": [
+        {
+          "text": "\"终于到了。\"",
+          "type": "dialogue",
+          "speaker": ""
+        },
+        {
+          "text": "林轩抬头望着门匾。",
+          "type": "narration",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "\"欢迎各位。\"纳兰导师朗声说道。",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.3125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [],
+      "fragments": [
+        {
+          "text": "\"欢迎各位。\"",
+          "type": "dialogue",
+          "speaker": ""
+        },
+        {
+          "text": "纳兰导师朗声说道。",
+          "type": "narration",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "\"你紧张吗？\"身旁的年轻人低声问道。",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [],
+      "fragments": [
+        {
+          "text": "\"你紧张吗？\"",
+          "type": "dialogue",
+          "speaker": ""
+        },
+        {
+          "text": "身旁的年轻人低声问道。",
+          "type": "narration",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "\"有一点。\"林轩老实回答。",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.4500000000000001,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 1,
+          "end": 2,
+          "standard_name": "林轩",
+          "is_linked": true
+        },
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 1,
+          "end": 2,
+          "standard_name": "林轩",
+          "is_linked": true
+        },
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 3,
+          "end": 4,
+          "standard_name": "林轩",
+          "is_linked": true
+        }
+      ],
+      "fragments": [
+        {
+          "text": "\"有一点。\"",
+          "type": "dialogue",
+          "speaker": ""
+        },
+        {
+          "text": "林轩老实回答。",
+          "type": "narration",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "年轻人笑了笑：\"我叫小翠。\"",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.4500000000000001,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [
+        {
+          "text": "小翠",
+          "type": "PER",
+          "confidence": 0.6,
+          "start": 8,
+          "end": 9,
+          "standard_name": "小翠笑了",
+          "is_linked": true
+        }
+      ],
+      "fragments": [
+        {
+          "text": "年轻人笑了笑：",
+          "type": "narration",
+          "speaker": ""
+        },
+        {
+          "text": "\"我叫小翠。\"",
+          "type": "dialogue",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "\"我叫林轩。\"",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.3125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 1,
+          "end": 2,
+          "standard_name": "林轩",
+          "is_linked": true
+        },
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 1,
+          "end": 2,
+          "standard_name": "林轩",
+          "is_linked": true
+        },
+        {
+          "text": "林轩",
+          "type": "PER",
+          "confidence": 1.0,
+          "start": 3,
+          "end": 4,
+          "standard_name": "林轩",
+          "is_linked": true
+        }
+      ],
+      "fragments": [
+        {
+          "text": "\"我叫林轩。\"",
+          "type": "narration",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "纳兰导师拍了拍手：\"准备好了吗？\"",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.3125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [],
+      "fragments": [
+        {
+          "text": "纳兰导师拍了拍手：",
+          "type": "narration",
+          "speaker": ""
+        },
+        {
+          "text": "\"准备好了吗？\"",
+          "type": "dialogue",
+          "speaker": ""
+        }
+      ]
+    },
+    {
+      "text": "\"准备好了！\"众人齐声回答。",
+      "speaker": "",
+      "emotion": "joy",
+      "emotion_class": "excited",
+      "emotion_vector": [
+        0.2,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "sentence_type": "dialogue",
+      "entities": [],
+      "fragments": [
+        {
+          "text": "\"准备好了！\"",
+          "type": "dialogue",
+          "speaker": ""
+        },
+        {
+          "text": "众人齐声回答。",
+          "type": "narration",
+          "speaker": ""
+        }
+      ]
+    }
+  ],
+  "statistics": {
+    "total_sentences": 8,
+    "dialogue_count": 8,
+    "narration_count": 0,
+    "entity_count": 4
+  }
+}

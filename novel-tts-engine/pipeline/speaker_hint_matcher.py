@@ -14,11 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 # 说话提示词集合（约30条）
-#
-# 用途：匹配"XX道"、"XX说"等显式说话人提示模式
-# 来源：中文标点规范 GB/T 15834-2011 + 网文常见说话动词（基于斗破苍穹、凡人修仙传等统计）
-# 边界：仅包含"说话"语义的动词，不包含"思考"、"感受"类动词
-#       不应往里加：想、觉得、认为、知道、明白（这些不是说话动词）
+# 来源：中文标点规范 + 网文常见说话动词
 SPEAKER_HINTS = [
     '道', '说', '问', '喊', '叫', '答', '应', '笑', '叹', '怒',
     '喝', '哼', '嚷', '骂', '嘟', '喃', '吟', '斥', '骂道', '说道',
@@ -37,61 +33,54 @@ _RIGHT_QUOTES = '"」』'
 
 
 def _build_quote_patterns():
-    """构建引号对话匹配正则"""
+    """构建引号对话匹配正则
+    
+    仅捕获引号内的对话内容，不捕获引号前的前缀。
+    前缀信息通过后续的位置计算获得。
+    
+    改进：对于英文双引号（左右相同），使用成对匹配逻辑，避免交错引号问题
+    """
     patterns = []
-    for lq, rq in zip(_LEFT_QUOTES, _RIGHT_QUOTES):
+    
+    # 中文引号：左右不同，可以直接匹配
+    for lq, rq in [('「', '」'), ('『', '』'), ('“', '”')]:
         patterns.append(re.compile(
-            rf'(?:^|[\n。！？；：,，\s])'
-            rf'[^{re.escape(lq)}]*?'
             rf'{re.escape(lq)}'
-            rf'([^ {re.escape(rq)}]+?)'
+            rf'([^{re.escape(rq)}]+?)'
             rf'{re.escape(rq)}'
         ))
+    
+    # 英文双引号：左右相同，需要特殊处理
+    # 使用非贪婪匹配，确保正确处理连续引号对
+    patterns.append(re.compile(r'"([^"]*?)"'))
+    
     return patterns
 
 
 DIALOGUE_PATTERNS = _build_quote_patterns()
 
 # 说话人模式：匹配"XX道"、"XX说"等格式
-# 关键：复合动词必须在单字动词之前匹配，避免"沉声道"被拆分为"沉声"+ "道"
+# 关键：使用贪婪匹配 + 限定名字长度，确保"秦羽问道"提取为"秦羽"
 #
 # 用途：从"秦羽问道"等文本中提取说话人名字"秦羽"
 # 来源：中文句法结构（主语+谓语+引语），网文常见说话模式统计
 # 边界：仅匹配"说话"类动词，不匹配"思考"类动词
 #       名字长度限制1-6字，覆盖绝大多数中文人名
-_VERB_SUFFIXES = set('道说问喊叫答应笑叹怒喝哼嚷骂')
-
 SPEAKER_PATTERNS = [
-    # 模式1：XX+三字复合动词（冷冷道/淡淡道）
-    re.compile(r'([\u4e00-\u9fa5]{1,5})\s*(?:冷冷道|淡淡道)[：:，,。\s]'),
-    # 模式2：XX+三字复合动词（沉声道/低声道/高声道）
-    re.compile(r'([\u4e00-\u9fa5]{1,5})\s*(?:沉声道|低声道|高声道)[：:，,。\s]'),
-    # 模式3：XX+双字动词+道（说道/问道/答道/笑道/叹道/怒道/喝道/哼道/嚷道/骂道）
-    re.compile(r'([\u4e00-\u9fa5]{1,5})\s*(?:说道|问道|答道|笑道|叹道|怒道|喝道|哼道|嚷道|骂道)[：:，,。\s]'),
-    # 模式4：XX+单字动词（道/说/问/喊/叫/答/哼/笑/叹/怒/喝/嚷/骂）
+    # 模式1：XX+复合动词（沉声道/低声道/高声道/冷冷道/淡淡道）
+    re.compile(r'([\u4e00-\u9fa5]{1,6})\s*(?:沉声道|低声道|高声道|冷冷道|淡淡道)[：:，,。\s]'),
+    # 模式2：XX+单字动词（道/说/问/喊/叫/答/哼/笑/叹/怒/喝/嚷/骂）
+    # 使用贪婪匹配 {1,6}，确保名字部分尽可能长，避免动词前的字被包含
     re.compile(r'([\u4e00-\u9fa5]{1,6})\s*(?:道|说|问|喊|叫|答|应|笑|叹|怒|喝|哼|嚷|骂)[：:，,。\s]'),
 ]
-
-
-def _clean_speaker_name(name: str) -> str:
-    """清理角色名末尾的动词字符
-    
-    例如：
-    - "秦羽问" → "秦羽"（"问道"被拆分为名字+道）
-    - "小医仙笑" → "小医仙"（"笑道"被拆分为名字+道）
-    """
-    if not name:
-        return name
-    while len(name) > 1 and name[-1] in _VERB_SUFFIXES:
-        name = name[:-1]
-    return name
 
 
 class SpeakerHintMatcher:
     """说话人提示词匹配器"""
 
-    def __init__(self, name_validator):
+    def __init__(self, name_validator, nlp=None):
         self.name_validator = name_validator
+        self.nlp = nlp
 
     def extract_speaker_hint(self, text: str) -> Tuple[Optional[str], str]:
         """从文本中提取说话人提示词
@@ -106,7 +95,7 @@ class SpeakerHintMatcher:
         for pattern in SPEAKER_PATTERNS:
             match = pattern.search(text)
             if match:
-                name = _clean_speaker_name(match.group(1).strip())
+                name = _clean_speaker_name(match.group(1).strip(), self.nlp)
                 if self.name_validator.is_valid_speaker_candidate(name):
                     return name, 'explicit_hint'
 
@@ -119,36 +108,11 @@ class SpeakerHintMatcher:
                 for sp in SPEAKER_PATTERNS:
                     pm = sp.search(prefix)
                     if pm:
-                        name = _clean_speaker_name(pm.group(1).strip())
+                        name = _clean_speaker_name(pm.group(1).strip(), self.nlp)
                         if self.name_validator.is_valid_speaker_candidate(name):
                             return name, 'prefix_hint'
 
-        # 模式3：检测代词（他/她）- T-007 代词消解强化
-        pronoun = self.extract_pronoun_from_text(text)
-        if pronoun:
-            return pronoun, 'pronoun_hint'
-
         return None, 'none'
-
-    def extract_pronoun_from_text(self, text: str) -> Optional[str]:
-        """从文本中提取代词（他/她）
-        
-        用途：当没有显式说话人提示时，检测文本中是否有代词
-        来源：中文人称代词封闭集合（PRONOUNS）
-        边界：仅返回第一个匹配的代词
-        
-        Returns:
-            代词字符（'他'/'她'）或 None
-        """
-        if not text:
-            return None
-        
-        # 按顺序检测代词（他/她）
-        for pronoun in ['他', '她']:
-            if pronoun in text:
-                return pronoun
-        
-        return None
 
     def extract_speech_patterns(self, text: str) -> List[Tuple[str, str]]:
         """从文本中提取所有说话人模式
@@ -162,7 +126,7 @@ class SpeakerHintMatcher:
         results = []
         for pattern in SPEAKER_PATTERNS:
             for match in pattern.finditer(text):
-                name = _clean_speaker_name(match.group(1).strip())
+                name = _clean_speaker_name(match.group(1).strip(), self.nlp)
                 hint = match.group(0).strip()
                 if self.name_validator.is_valid_speaker_candidate(name):
                     results.append((name, hint))
@@ -177,7 +141,7 @@ class SpeakerHintMatcher:
         for pattern in SPEAKER_PATTERNS:
             match = pattern.search(suffix[:50])  # 只看后50字
             if match:
-                name = _clean_speaker_name(match.group(1).strip())
+                name = _clean_speaker_name(match.group(1).strip(), self.nlp)
                 if self.name_validator.is_valid_speaker_candidate(name):
                     return name
 
@@ -202,3 +166,53 @@ class SpeakerHintMatcher:
                     return True
 
         return False
+
+
+def _clean_speaker_name(name: str, nlp=None) -> str:
+    """清理说话人名称，提取真正的人名。
+    
+    设计原则：
+    1. 优先使用 HanLP 词性标注，提取 NR(人名) 标记的 token
+    2. 当 HanLP 不可用时，使用最小后缀清理（仅移除说话动词）
+    3. 不再使用硬编码的 PREFIXES/FILTER_WORDS 列表
+    
+    来源：基于编码规则"优先使用句法、词性、标点等通用语言特征做判断"
+    边界：仅处理说话动词后缀，不处理方向性前缀（由后续角色库匹配处理）
+    """
+    if not name:
+        return name
+    
+    # 方法1：使用 HanLP 词性标注（优先）
+    if nlp:
+        try:
+            result = nlp.analyze(name)
+            # 提取 NR(人名) 标记的 token
+            nr_tokens = [t.text for t in result.tokens if t.pos in ('NR', 'nr')]
+            if nr_tokens:
+                return ''.join(nr_tokens)
+            
+            # 如果没有 NR token，但有名词 token，尝试提取名词
+            nn_tokens = [t.text for t in result.tokens if t.pos in ('NN', 'nn')]
+            if nn_tokens:
+                return ''.join(nn_tokens)
+        except Exception:
+            pass
+    
+    # 方法2：最小后缀清理（回退方案）
+    # 来源：中文说话动词有限集合，基于中文标点规范和网文常见说话模式
+    # 边界：仅包含明确的说话/回应类动词，不扩展至动作/表情类动词
+    SPEECH_VERBS = [
+        '冷冷道', '淡淡道', '沉声道', '低声道', '高声道',
+        '说道', '问道', '答道', '笑道', '叹道', '怒道', '喝道', '哼道', '嚷道',
+        '骂道', '回应道', '回答道', '接道', '续道',
+        '轻声道', '低声说', '轻声说', '沉声说', '厉声道', '笑着道', '大叫道',
+        '道', '说', '问', '喊', '叫', '答', '应', '笑', '叹', '怒',
+        '喝', '哼', '嚷', '骂', '回',
+    ]
+    
+    for verb in sorted(SPEECH_VERBS, key=len, reverse=True):
+        if name.endswith(verb) and len(name) > len(verb):
+            name = name[:-len(verb)]
+            break
+    
+    return name

@@ -1,19 +1,6 @@
 ---
-name: "git-commit-message"
-description: "自定义 AI 生成提交信息的风格。适用于 git commit、代码提交、版本控制等场景。"
-alwaysApply: true
-priority: "normal"
-trigger:
-  - "git commit"
-  - "代码提交"
-  - "版本控制"
+alwaysApply: false
 scene: "git_message"
-checkLogic:
-  - "提交信息是否符合格式"
-  - "是否包含类型前缀"
-  - "是否有简洁的描述"
-  - "是否有详细的正文（如果需要）"
-enforcement: "不符合格式时提示修改"
 ---
 # Git Commit Message 规范
 

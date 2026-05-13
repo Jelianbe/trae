@@ -47,24 +47,43 @@ class App {
   }
 
   async _preloadVoicePreviews(voices) {
-    // 使用预生成的静态音频文件，无需调用 TTS API
-    // 文件位置: /audio/previews/{voiceName}.wav
+    const previewText = '你好，欢迎使用小说语音合成引擎。这是一段试听音频。';
     const cache = { ...this.store.state.voicePreviewCache };
-    let preloadCount = 0;
-    
+    let needsPreload = false;
+    for (const v of voices) {
+      if (!cache[v.name]) {
+        needsPreload = true;
+        break;
+      }
+    }
+    if (!needsPreload) {
+      console.log('[App] 音色试听音频已全部缓存，跳过预加载');
+      return;
+    }
+    this.showToast('正在加载音色试听音频…', 'info');
     for (const v of voices) {
       if (cache[v.name]) continue;
-      // 直接使用预生成的静态文件
-      const previewUrl = `/audio/previews/${encodeURIComponent(v.name)}.wav`;
-      cache[v.name] = previewUrl;
-      preloadCount++;
+      try {
+        const result = await this.api.generateTTS({
+          text: previewText,
+          speaker: v.name,
+          emotion: 'neutral',
+          sentence_type: 'narration',
+        });
+        cache[v.name] = result.audio_url;
+      } catch (e) {
+        console.log('[App] 音色', v.name, '试听音频预加载失败:', e.message);
+      }
     }
-    
-    if (preloadCount > 0) {
-      this.store.dispatch(s => ({ ...s, voicePreviewCache: { ...s.voicePreviewCache, ...cache } }));
-      console.log(`[App] 音色试听音频已加载: ${preloadCount} 个`);
-    } else {
-      console.log('[App] 音色试听音频已全部缓存，跳过预加载');
+    const newCache = {};
+    for (const [k, v] of Object.entries(cache)) {
+      if (!this.store.state.voicePreviewCache[k]) {
+        newCache[k] = v;
+      }
+    }
+    if (Object.keys(newCache).length > 0) {
+      this.store.dispatch(s => ({ ...s, voicePreviewCache: { ...s.voicePreviewCache, ...newCache } }));
+      this.showToast('音色试听音频加载完成', 'success');
     }
   }
 
@@ -86,11 +105,40 @@ class App {
         this.uploadProject(el.files[0]);
         el.value = '';
       }
+      if (el.dataset && el.dataset.action) {
+        const handler = this._actionHandlers[el.dataset.action];
+        if (handler) handler.call(this, el, e);
+      }
+    });
+
+    document.body.addEventListener('input', e => {
+      const el = e.target;
+      if (el.dataset && el.dataset.action === 'set-speed') {
+        const valEl = el.parentElement.querySelector('.speed-val');
+        if (valEl) valEl.textContent = parseFloat(el.value).toFixed(1) + 'x';
+        this._setSegmentField('speed', parseFloat(el.value));
+      }
     });
 
     document.body.addEventListener('click', e => {
       const bar = e.target.closest('#player-bar');
       if (bar) this._seekPlayer(e);
+    });
+
+    // 文本输入区键盘事件
+    document.body.addEventListener('keydown', e => {
+      const textarea = document.getElementById('chapter-text-input');
+      if (!textarea) return;
+      // Enter 键提交内容（Shift+Enter 换行）
+      if (e.key === 'Enter' && !e.shiftKey && document.activeElement === textarea) {
+        e.preventDefault();
+        this._commitTextInput();
+      }
+      // Ctrl+Enter 插入空行
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && document.activeElement === textarea) {
+        e.preventDefault();
+        this._insertEmptyLine();
+      }
     });
   }
 
@@ -103,7 +151,10 @@ class App {
       'delete-project': (el) => this._confirmDelete(el.dataset.pid),
       'confirm-delete': () => this._deleteProject(),
       'select-chapter': (el) => this.selectChapter(parseInt(el.dataset.index), el.dataset.title),
+      'add-chapter': () => this._addChapter(),
       'select-segment': (el, e) => this.selectSegment(parseInt(el.dataset.index), e),
+      'commit-text-input': () => this._commitTextInput(),
+      'insert-empty-line': () => this._insertEmptyLine(),
       'toggle-edit-mode': () => this.toggleEditMode(),
       'change-font-size': (el) => this.changeFontSize(parseInt(el.dataset.delta)),
       'filter-chapters': (el) => this._filterChapters(el),
@@ -120,8 +171,11 @@ class App {
       'batch-change-type': (el) => this._batchChangeType(el.dataset.type),
       'batch-delete': () => this._batchDelete(),
       'insert-segment-after': () => this.showToast('请先进入编辑模式', 'info'),
+      'append-empty': () => this.showToast('请先进入编辑模式', 'info'),
       'trigger-sentence-split': () => this._triggerSentenceSplit(),
       'create-project': () => this._createProject(),
+      'open-analysis-config': () => this._openAnalysisConfig(),
+      'start-analysis': () => this._startAnalysis(),
       'analyze-all': () => this._analyzeAll(),
       'synthesize-chapter': () => this._synthesizeChapter(),
       'export-data': () => this.showToast('数据导出成功', 'success'),
@@ -131,6 +185,12 @@ class App {
       'play-audio-segment': (el) => this._playAudioSegment(el),
       'play-segment': (el) => this._playOneSegment(el),
       'generate-segment': (el) => this._generateOneSegment(el),
+      'play-segment-editor': (el) => this._playOneSegment(el),
+      'generate-segment-editor': (el) => this._generateOneSegment(el),
+      'set-emotion': (el) => this._setSegmentFieldByIndex(el.dataset.seg ? parseInt(el.dataset.seg) : null, 'emotion', el.dataset.emotion),
+      'set-speed': (el) => this._setSegmentFieldByIndex(el.dataset.seg ? parseInt(el.dataset.seg) : null, 'speed', parseFloat(el.target.value)),
+      'set-tone': (el) => this._setSegmentFieldByIndex(el.dataset.seg ? parseInt(el.dataset.seg) : null, 'tone', el.target.value),
+      'set-type': (el) => this._setSegmentFieldByIndex(el.dataset.seg ? parseInt(el.dataset.seg) : null, 'type', el.target.value),
       'toggle-active': (el) => el.classList.toggle('active'),
       'toggle-fullscreen': () => {
         if (!document.fullscreenElement) document.documentElement.requestFullscreen();
@@ -209,22 +269,14 @@ class App {
       document.getElementById('detail-book-title').textContent = '《' + (project.book_title || '') + '》';
       document.getElementById('detail-tree-title').textContent = project.book_title || '';
 
-      // 预分析第1章，然后进入详情页
+      // 默认选中第1章
       if (chaptersData.length > 0) {
-        const ch0 = chaptersData[0];
-        const cacheKey = id + '-' + ch0.index;
-        this.showToast('正在分析第1章…', 'info');
-        try {
-          const data = await this.api.analyzeChapter(id, ch0.index);
-          this.store.dispatch(s => ({
-            ...s,
-            analysisCache: { ...s.analysisCache, [cacheKey]: data },
-            splitChapters: { ...s.splitChapters, [ch0.index]: true },
-          }));
-        } catch (e) {
-          console.warn('第1章预分析失败，显示原文:', e.message);
+        await this.selectChapter(chaptersData[0].index, chaptersData[0].title);
+        // 第一章始终自动完成句子拆分
+        const cacheKey = id + '-' + chaptersData[0].index;
+        if (!this.store.state.analysisCache[cacheKey]) {
+          this._analyzeChapterSilent(id, chaptersData[0].index);
         }
-        await this.selectChapter(ch0.index, ch0.title);
       }
     } catch (e) {
       this.store.dispatch(s => ({ ...s, loading: false }));
@@ -259,22 +311,23 @@ class App {
   }
 
   async _createProject() {
-    const title = document.getElementById('new-project-title')?.value || '';
-    const content = document.getElementById('new-project-content')?.value || '';
-    
-    if (title.trim() && content.trim()) {
-      // 使用手动输入方式创建项目
+    const title = document.getElementById('new-project-title')?.value?.trim();
+    const author = document.getElementById('new-project-author')?.value?.trim();
+    const content = document.getElementById('new-project-content')?.value?.trim();
+
+    if (title || content) {
       try {
-        const data = await this.api.createProject(title.trim(), content.trim());
+        const data = await this.api.createProject(title || '未命名项目', author || '未知', content || '');
+        const projectId = data.project_id;
         const p = {
-          id: data.project_id,
-          project_id: data.project_id,
+          id: projectId,
+          project_id: projectId,
           title: data.book_title,
-          author: '未知',
-          total_chapters: data.total_chapters,
-          chapters: data.total_chapters,
-          total_words: 0,
-          words: '--',
+          author: author || '未知',
+          total_chapters: data.total_chapters || 0,
+          chapters: data.total_chapters || 0,
+          total_words: data.total_words || 0,
+          words: data.total_words || 0,
           status: 'pending',
           progress: 0,
         };
@@ -282,20 +335,21 @@ class App {
           ...s,
           projects: [p, ...s.projects],
         }));
+        document.getElementById('new-project-title').value = '';
+        document.getElementById('new-project-author').value = '';
+        document.getElementById('new-project-content').value = '';
+        this.showToast('项目创建成功: ' + data.book_title, 'success');
+        await this.openProject(projectId);
         this._closeModal('new-project');
-        // 清空输入框
-        const titleEl = document.getElementById('new-project-title');
-        if (titleEl) titleEl.value = '';
-        const contentEl = document.getElementById('new-project-content');
-        if (contentEl) contentEl.value = '';
-        this.showToast('创建成功: ' + data.book_title, 'success');
       } catch (e) {
+        console.error('[App] 创建项目失败:', e);
+        this._closeModal('new-project');
         this.showToast('创建失败: ' + e.message, 'error');
       }
-    } else {
-      // 使用文件上传方式
-      document.getElementById('file-input')?.click();
+      return;
     }
+
+    document.getElementById('file-input')?.click();
   }
 
   // ==================== Chapter Analysis ====================
@@ -315,9 +369,24 @@ class App {
     if (!pid) return;
     const cacheKey = pid + '-' + index;
     const cached = this.store.state.analysisCache[cacheKey];
+    const draftKey = pid + '-' + index;
+    const draftSegments = this.store.state.chapterDrafts?.[draftKey];
+
+    // 优先显示创作模式草稿
+    if (draftSegments && draftSegments.length > 0) {
+      if (gen !== this._analysisGen) return;
+      const body = document.getElementById('content-body');
+      if (body) {
+        body.style.fontSize = this.store.state.fontSize + 'px';
+        body.innerHTML = V.renderSegments(draftSegments, null, null, true, this.store.state.ttsCache, index, true, true);
+      }
+      this.store.dispatch(s => ({ ...s, segments: draftSegments, sentenceSplitMode: true }));
+      this._focusInputAfterRender();
+      return;
+    }
 
     if (cached) {
-      // 有缓存：直接应用分析结果
+      // 有缓存：显示拆分渲染视图
       if (gen !== this._analysisGen) return;
       this.store.dispatch(s => ({
         ...s, splitChapters: { ...s.splitChapters, [index]: true },
@@ -326,10 +395,11 @@ class App {
       return;
     }
 
-    // 无缓存：显示原文，等待用户点"句子拆分"
-    if (gen === this._analysisGen) {
-      const content = this.store.state.chapterContents[index] || '';
-      if (content) {
+    // 无缓存：检查是否有原始内容
+    const content = this.store.state.chapterContents[index] || '';
+    if (content) {
+      // 有原始内容：渲染原文纯文本（等用户点"句子拆分"或第一章自动分析）
+      if (gen === this._analysisGen) {
         const escaped = content
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
@@ -337,26 +407,66 @@ class App {
           .replace(/\n/g, '<br>');
         document.getElementById('content-body').innerHTML =
           '<div style="padding:24px;line-height:1.8;white-space:pre-wrap;color:var(--text-primary)">' + escaped + '</div>';
-      } else {
-        document.getElementById('content-body').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>暂无章节内容</p></div>';
+        this.store.dispatch(s => ({ ...s, segments: [] }));
       }
-      this.store.dispatch(s => ({ ...s, segments: [] }));
+    } else {
+      // 没有内容也没有缓存：显示创作模式空状态
+      if (gen === this._analysisGen) {
+        const body = document.getElementById('content-body');
+        if (body) {
+          body.style.fontSize = this.store.state.fontSize + 'px';
+          body.innerHTML = V.renderSegments([], null, null, true, this.store.state.ttsCache, index, true, true);
+        }
+        this._focusInputAfterRender();
+      }
     }
+  }
+
+  _focusInputAfterRender() {
+    setTimeout(() => {
+      const textarea = document.getElementById('chapter-text-input');
+      if (textarea) textarea.focus();
+    }, 100);
   }
 
   _applyAnalysis(data, index) {
     const segments = [];
     for (const sent of data.sentences) {
-      segments.push({
+      const seg = {
         text: sent.text,
-        type: sent.sentence_type || 'narration',
-        speaker: sent.speaker || '',
-        emotion: sent.emotion || 'neutral',
-        emotion_class: sent.emotion_class || 'neutral',
-        emotion_vector: sent.emotion_vector || null,
-        entities: sent.entities || [],
-        fragments: sent.fragments || [],
-      });
+        fragments: [],
+        selectedFragment: null,
+      };
+
+      let hasMultiFragments = false;
+      let frags = [];
+
+      if (sent.fragments && sent.fragments.length > 1) {
+        hasMultiFragments = true;
+        for (const frag of sent.fragments) {
+          frags.push({
+            type: frag.type,
+            text: frag.text,
+            speaker: frag.speaker || '',
+            speakerColor: this.store.state.speakerColors[frag.speaker] || '',
+            emotion: sent.emotion || 'neutral',
+            emotion_class: sent.emotion_class || 'neutral',
+          });
+        }
+      } else {
+        frags.push({
+          type: sent.sentence_type === 'dialogue' ? 'dialogue' : sent.sentence_type === 'onomatopoeia' ? 'onomatopoeia' : 'narration',
+          text: sent.text,
+          speaker: sent.speaker || '',
+          speakerColor: this.store.state.speakerColors[sent.speaker] || '',
+          emotion: sent.emotion || 'neutral',
+          emotion_class: sent.emotion_class || 'neutral',
+        });
+      }
+
+      seg.fragments = frags;
+      seg.hasMultiFragments = hasMultiFragments;
+      segments.push(seg);
     }
 
     this.store.dispatch(s => {
@@ -373,9 +483,23 @@ class App {
   // ==================== Segment Interaction ====================
 
   selectSegment(index, event) {
+    // 检查点击目标是否为 fragment span
+    const target = event?.target;
+    const fragSpan = target?.closest?.('.frag-hover');
+    if (fragSpan) {
+      const fragIndex = parseInt(fragSpan.dataset.fragIndex);
+      this.store.dispatch(s => ({
+        ...s,
+        selectedSegmentIndex: index,
+        selectedFragmentIndex: s.selectedSegmentIndex === index && s.selectedFragmentIndex === fragIndex ? null : fragIndex,
+      }));
+      return;
+    }
+    // 普通卡片点击：选中/取消
     this.store.dispatch(s => ({
       ...s,
       selectedSegmentIndex: s.selectedSegmentIndex === index ? null : index,
+      selectedFragmentIndex: null,
     }));
   }
 
@@ -383,8 +507,105 @@ class App {
     this.store.dispatch(s => ({ ...s, editMode: !s.editMode }));
   }
 
+  _addChapter() {
+    const pid = this.store.state.currentProjectId;
+    if (!pid) return;
+    const chapters = this.store.state.chapters;
+    const newIndex = chapters.length > 0 ? Math.max(...chapters.map(c => c.id)) + 1 : 0;
+    const title = `第${newIndex + 1}章`;
+    const newChapter = { id: newIndex, title: title, content: '', status: 'pending' };
+    const newChapters = [...chapters, newChapter];
+    this.store.dispatch(s => ({ ...s, chapters: newChapters }));
+    this.selectChapter(newIndex, title);
+  }
+
+  _commitTextInput() {
+    const textarea = document.getElementById('chapter-text-input');
+    if (!textarea) return;
+    const text = textarea.value.trim();
+    if (!text) return;
+
+    const segs = [...this.store.state.segments];
+    const newSeg = {
+      text: text,
+      type: 'narration',
+      emotion: 'neutral',
+      speed: 1.0,
+      tone: 'normal',
+      speaker: '',
+      fragments: [{ type: 'narration', text: text, speaker: '' }],
+    };
+    segs.push(newSeg);
+
+    const pid = this.store.state.currentProjectId;
+    const chIdx = this.store.state.currentChapterIndex;
+    const drafts = { ...this.store.state.chapterDrafts };
+    if (pid && chIdx != null) {
+      drafts[pid + '-' + chIdx] = segs;
+    }
+
+    this.store.dispatch(s => ({ ...s, segments: segs, chapterDrafts: drafts }));
+    textarea.value = '';
+    textarea.focus();
+  }
+
+  _insertEmptyLine() {
+    const textarea = document.getElementById('chapter-text-input');
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const before = textarea.value.substring(0, start);
+      const after = textarea.value.substring(end);
+      textarea.value = before + '\n\n' + after;
+      textarea.selectionStart = textarea.selectionEnd = start + 2;
+      textarea.focus();
+      return;
+    }
+
+    const segs = [...this.store.state.segments];
+    const selectedIdx = this.store.state.selectedSegmentIndex;
+    const insertIdx = selectedIdx != null ? selectedIdx + 1 : segs.length;
+    const emptySeg = {
+      text: '',
+      type: 'empty',
+      emotion: 'neutral',
+      speed: 1.0,
+      tone: 'normal',
+      speaker: '',
+      fragments: [{ type: 'empty', text: '', speaker: '' }],
+    };
+    segs.splice(insertIdx, 0, emptySeg);
+
+    const pid = this.store.state.currentProjectId;
+    const chIdx = this.store.state.currentChapterIndex;
+    const drafts = { ...this.store.state.chapterDrafts };
+    if (pid && chIdx != null) {
+      drafts[pid + '-' + chIdx] = segs;
+    }
+
+    this.store.dispatch(s => ({ ...s, segments: segs, chapterDrafts: drafts }));
+  }
+
   changeFontSize(delta) {
     this.store.dispatch(s => ({ ...s, fontSize: Math.max(12, Math.min(24, s.fontSize + delta)) }));
+  }
+
+  _setSegmentField(field, value) {
+    const idx = this.store.state.selectedSegmentIndex;
+    if (idx == null) return;
+    const segs = [...this.store.state.segments];
+    segs[idx] = { ...segs[idx], [field]: value };
+    this.store.dispatch(s => ({ ...s, segments: segs }));
+    this._renderContent(this.store.state);
+  }
+
+  _setSegmentFieldByIndex(index, field, value) {
+    const idx = index != null && !isNaN(index) ? index : this.store.state.selectedSegmentIndex;
+    if (idx == null) return;
+    const segs = [...this.store.state.segments];
+    segs[idx] = { ...segs[idx], [field]: value };
+    this.store.dispatch(s => ({ ...s, segments: segs }));
+    this._renderContent(this.store.state);
   }
 
   // ==================== Rendering ====================
@@ -427,12 +648,18 @@ class App {
     } else if (state.page === 'projects') {
       V.renderProjectsList(state.projects);
     } else if (state.page === 'detail') {
+      const pid = state.currentProjectId;
+      const chIdx = state.currentChapterIndex;
+      const hasOriginalContent = state.chapterContents[chIdx];
+      const hasAnalysisCache = pid && chIdx != null && state.analysisCache[pid + '-' + chIdx];
+      const isCreationMode = !hasOriginalContent && !hasAnalysisCache;
+
       const body = document.getElementById('content-body');
       if (body) {
         body.style.fontSize = state.fontSize + 'px';
-        body.innerHTML = V.renderSegments(state.segments, state.selectedSegmentIndex, state.selectedFragmentIndex, state.ttsCache, state.currentChapterIndex);
+        body.innerHTML = V.renderSegments(state.segments, state.selectedSegmentIndex, state.selectedFragmentIndex, state.splitChapters[state.currentChapterIndex], state.ttsCache, state.currentChapterIndex, state.editMode, isCreationMode);
       }
-      V.renderChapterTree(state.chapters, state.currentChapterIndex);
+      V.renderChapterTree(state.chapters, state.currentChapterIndex, isCreationMode);
       this._renderAnalysisProgress(state);
       this._initWaveform();
     } else if (state.page === 'voices') {
@@ -493,10 +720,12 @@ class App {
       const total = segs.length;
       const dc = segs.filter(s => s.type === 'dialogue').length;
       const nc = segs.filter(s => s.type === 'narration').length;
+      const oc = segs.filter(s => s.type === 'onomatopoeia').length;
       if (body) body.innerHTML = `<div style="padding:16px 20px"><div class="stats-grid">
         <div class="stat-item"><div class="val">${total}</div><div class="lbl">总句数</div></div>
         <div class="stat-item"><div class="val">${dc}</div><div class="lbl">对话</div></div>
         <div class="stat-item"><div class="val">${nc}</div><div class="lbl">旁白</div></div>
+        <div class="stat-item"><div class="val">${oc}</div><div class="lbl">拟声</div></div>
       </div></div>`;
     }
     drawer.classList.add('open');
@@ -636,6 +865,64 @@ class App {
         this.showToast('分析完成: ' + pending.length + ' 章', 'success');
       }
     })();
+  }
+
+  _analyzeChapterSilent(pid, index) {
+    (async () => {
+      const gen = ++this._analysisGen;
+      try {
+        const data = await this.api.analyzeChapter(pid, index);
+        if (gen !== this._analysisGen) return;
+        this.store.dispatch(s => ({
+          ...s,
+          analysisCache: { ...s.analysisCache, [pid + '-' + index]: data },
+          splitChapters: { ...s.splitChapters, [index]: true },
+        }));
+        this._applyAnalysis(data, index);
+      } catch (e) {
+        if (gen === this._analysisGen) {
+          console.warn('章节分析失败:', index, e.message);
+        }
+      }
+    })();
+  }
+
+  _openAnalysisConfig() {
+    const pid = this.store.state.currentProjectId;
+    if (!pid) { this.showToast('请先打开一个项目', 'warning'); return; }
+    const chapterSelect = document.getElementById('analysis-chapter-list');
+    if (chapterSelect) {
+      chapterSelect.innerHTML = this.store.state.chapters.map(ch => {
+        const cacheKey = pid + '-' + ch.index;
+        const analyzed = !!this.store.state.analysisCache[cacheKey];
+        return `<label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;${analyzed ? 'opacity:0.4' : ''}">
+          <input type="checkbox" value="${ch.index}" ${analyzed ? 'disabled checked' : ''}>
+          <span>第${ch.index}章 ${ch.title || ''} ${analyzed ? '(已分析)' : ''}</span>
+        </label>`;
+      }).join('');
+    }
+    this._openModal('analysis-config');
+  }
+
+  _startAnalysis() {
+    const pid = this.store.state.currentProjectId;
+    if (!pid) { this.showToast('请先打开一个项目', 'warning'); return; }
+    const range = document.querySelector('input[name="analysis-range"]:checked');
+    let indices;
+    if (range && range.value === 'select') {
+      const checked = document.querySelectorAll('#analysis-chapter-list input:checked');
+      indices = Array.from(checked).map(cb => parseInt(cb.value));
+    } else {
+      indices = this.store.state.chapters.map(ch => ch.index);
+    }
+    indices = indices.filter(i => !this.store.state.analysisCache[pid + '-' + i]);
+    if (indices.length === 0) {
+      this.showToast('没有可分析的章节', 'info');
+      this._closeModal('analysis-config');
+      return;
+    }
+    this._closeModal('analysis-config');
+    this._analyzeBatch(pid, indices);
   }
 
   _triggerSentenceSplit() {

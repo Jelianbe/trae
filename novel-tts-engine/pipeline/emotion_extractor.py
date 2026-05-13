@@ -31,7 +31,8 @@ EMOTION_CLASS_L1 = ['neutral', 'excited', 'subdued']
 EMOTION_LABEL_L2 = ['joy', 'anger', 'sadness', 'surprise', 'fear', 'neutral', 'unknown']
 
 # unknown 判定阈值：所有情绪得分 <= 此值时归为 unknown
-UNKNOWN_SCORE_THRESHOLD = 0.25
+# 调整记录: 0.25→0.15 (2026-05-12)，降低 unknown 误判率，适配短文本场景
+UNKNOWN_SCORE_THRESHOLD = 0.15
 
 # unknown 判定最小文本长度：文本长度 < 此值时归为 unknown
 UNKNOWN_MIN_TEXT_LENGTH = 5
@@ -427,9 +428,10 @@ class EmotionExtractor:
         quote_pos = quote_match.start()
         prefix = text[max(0, quote_pos - 10):quote_pos]
         
-        match = GUIDE_PHRASE_PATTERN.search(prefix)
-        if match:
-            return match.group(1)
+        # 使用 findall 找到所有匹配，取最靠近引号的那个
+        matches = GUIDE_PHRASE_PATTERN.findall(prefix)
+        if matches:
+            return matches[-1]  # 最后一个匹配最靠近引号
         
         return ""
     
@@ -746,9 +748,21 @@ class EmotionExtractor:
                     # 继承上下文情绪，给予 0.4 的基础分（超过 neutral 上限 0.25）
                     scores[context_hint] += 0.4
         
-        # 取最高分
+        # 取最高分（先 clamp 所有分数到 [0.0, 1.0]）
+        for emotion_key in scores:
+            scores[emotion_key] = min(scores[emotion_key], 1.0)
         best_emotion = max(scores, key=scores.get)
         best_score = scores[best_emotion]
+        
+        # === 祈使句误判修复：愤怒 → 恐惧豁免 ===
+        # 当 anger 分数较高时，如果文本包含明确恐惧信号且 fear 分数不为零，
+        # 说明这是恐惧驱动的祈使句（"快跑！"、"别过来！"），不是愤怒
+        if best_emotion == 'anger' and best_score >= 0.4:
+            fear_signals = ['快跑', '逃', '别过来', '救命', '危险', '求饶', '饶命', '别杀', '别伤害']
+            has_fear_signal = any(signal in text for signal in fear_signals)
+            if has_fear_signal and scores.get('fear', 0) > 0.1:
+                best_emotion = 'fear'
+                best_score = max(best_score * 0.8, scores['fear'])
         
         # unknown 判定：所有情绪得分 <= 阈值 且无引导词加分
         # unknown 表示"无法判断情绪类型"，不等于"中性"

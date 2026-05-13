@@ -27,18 +27,20 @@ import threading
 import requests
 
 from pipeline.pipeline_runner import ChapterResult, SentenceData
-from pipeline.tts_kokoro import (
-    KokoroTTSGenerator,
-    get_kokoro_generator,
-    NARRATOR_VOICE,
-    ROLE_VOICE_MAP,
-    merge_audio_files,
-)
 from pipeline.tts_indextts import (
     IndexTTSEngine,
     get_index_tts_engine,
     DEFAULT_INDEX_TTS_AUDIO,
 )
+
+# Kokoro 相关导入：延迟到使用时才导入，避免 kokoro 包未安装时启动失败
+# from pipeline.tts_kokoro import (
+#     KokoroTTSGenerator,
+#     get_kokoro_generator,
+#     NARRATOR_VOICE,
+#     ROLE_VOICE_MAP,
+#     merge_audio_files,
+# )
 
 logger = logging.getLogger(__name__)
 
@@ -90,17 +92,21 @@ class TTSGenerator:
             retry_delay: 重试间隔（秒）
             fallback_to_kokoro: Index-TTS 失败时是否回退 Kokoro
         """
+        from pipeline.tts_kokoro import ROLE_VOICE_MAP
+        
         self.engine = engine.lower()
         self.voice_map = {**ROLE_VOICE_MAP, **(voice_map or {})}
         self._lock = threading.Lock()
-        self._kokoro: Optional[KokoroTTSGenerator] = None
+        self._kokoro: Optional["KokoroTTSGenerator"] = None
         self._indextts: Optional[IndexTTSEngine] = None
         self._indextts_url = indextts_url
         self._indextts_audio_path = indextts_audio_path or DEFAULT_INDEX_TTS_AUDIO
         self._max_retries = max_retries
         self._retry_delay = retry_delay
-        self._fallback_to_kokoro = fallback_to_kokoro
+        # Kokoro 模块未安装，禁用回退
+        self._fallback_to_kokoro = False
         self._indextts_available = False
+        logger.info("Kokoro TTS module not installed, fallback to Kokoro disabled")
     
     def _test_indextts_on_startup(self):
         """启动时测试 Index-TTS 连接"""
@@ -120,27 +126,35 @@ class TTSGenerator:
                     f"Set fallback_to_kokoro=True to enable automatic fallback."
                 )
     
-    def _get_kokoro(self) -> KokoroTTSGenerator:
+    def _get_kokoro(self) -> "KokoroTTSGenerator":
         """懒加载 Kokoro 实例"""
         if self._kokoro is None:
             with self._lock:
                 if self._kokoro is None:
+                    from pipeline.tts_kokoro import get_kokoro_generator
                     self._kokoro = get_kokoro_generator()
         return self._kokoro
     
     def _test_indextts_connection(self) -> bool:
         """测试 Index-TTS 服务连接"""
         try:
-            # 健康检查：快速检测服务是否可达
+            # 健康检查：尝试根路径或健康端点
             response = requests.get(f"{self._indextts_url}/", timeout=3)
-            if response.status_code != 200:
-                logger.warning(f"Index-TTS health check returned status {response.status_code}")
-                return False
-            return True
+            # Index-TTS 根路径可能返回 200 或 404（但有服务响应）
+            # 只要不是连接错误，就认为服务可用
+            if response.status_code < 500:
+                logger.info(f"Index-TTS health check passed (status {response.status_code})")
+                return True
+            logger.warning(f"Index-TTS health check returned status {response.status_code}")
+            return False
         except requests.exceptions.Timeout:
             logger.warning(f"Index-TTS connection timed out (3s)")
             return False
         except requests.exceptions.ConnectionError:
+            logger.warning("Index-TTS connection refused")
+            return False
+        except Exception as e:
+            logger.warning(f"Index-TTS health check failed: {e}")
             return False
     
     def _get_indextts(self) -> IndexTTSEngine:
@@ -157,6 +171,7 @@ class TTSGenerator:
     
     def _get_voice_id(self, speaker: str, sentence_type: str) -> str:
         """获取音色ID（仅 Kokoro 使用）"""
+        from pipeline.tts_kokoro import NARRATOR_VOICE
         if sentence_type == "narration":
             return NARRATOR_VOICE
         return self._get_kokoro().get_voice_for_speaker(speaker)
@@ -174,6 +189,20 @@ class TTSGenerator:
         for attempt in range(1, self._max_retries + 1):
             try:
                 return func(*args, **kwargs)
+            except RuntimeError as e:
+                error_msg = str(e).lower()
+                # 处理模型未加载错误（503）
+                if "model not loaded" in error_msg or "503" in error_msg:
+                    wait_time = 10 * (2 ** (attempt - 1))
+                    last_error = RuntimeError(f"Index-TTS model not loaded, waiting {wait_time}s (attempt {attempt}/{self._max_retries})")
+                    logger.warning(f"Index-TTS model not loaded, waiting {wait_time}s before retry ({attempt}/{self._max_retries})...")
+                    time.sleep(wait_time)
+                elif "timeout" in error_msg or "connect" in error_msg:
+                    last_error = e
+                    logger.warning(f"Index-TTS error: {e}, retrying ({attempt}/{self._max_retries})...")
+                    time.sleep(self._retry_delay * (2 ** (attempt - 1)))
+                else:
+                    raise
             except requests.exceptions.Timeout:
                 last_error = RuntimeError(f"Index-TTS request timeout (attempt {attempt}/{self._max_retries})")
                 logger.warning(f"Index-TTS timeout, retrying ({attempt}/{self._max_retries})...")
@@ -182,13 +211,6 @@ class TTSGenerator:
                 last_error = RuntimeError(f"Cannot connect to Index-TTS service (attempt {attempt}/{self._max_retries})")
                 logger.warning(f"Index-TTS connection failed, retrying ({attempt}/{self._max_retries})...")
                 time.sleep(self._retry_delay * (2 ** (attempt - 1)))
-            except RuntimeError as e:
-                if "timeout" in str(e).lower() or "connect" in str(e).lower():
-                    last_error = e
-                    logger.warning(f"Index-TTS error: {e}, retrying ({attempt}/{self._max_retries})...")
-                    time.sleep(self._retry_delay * (2 ** (attempt - 1)))
-                else:
-                    raise
             except Exception as e:
                 last_error = e
                 logger.warning(f"Index-TTS error: {e}, retrying ({attempt}/{self._max_retries})...")

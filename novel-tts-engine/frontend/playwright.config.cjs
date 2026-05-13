@@ -14,15 +14,17 @@ module.exports = defineConfig({
   },
   projects: [
     {
-      name: 'chromium',
+      name: 'msedge',
       use: {
         browserName: 'chromium',
+        channel: 'msedge',
       },
     },
   ],
   webServer: {
-    command: 'cd ../backend && uvicorn main:app --host 0.0.0.0 --port 8000',
+    command: 'cd ../backend; uvicorn main:app --host 0.0.0.0 --port 8000',
     port: 8000,
     reuseExistingServer: true,
+    timeout: 120000,
   },
 })

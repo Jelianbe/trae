@@ -46,7 +46,7 @@ export function renderProjectsList(projects) {
   el.innerHTML = projects.map(p => renderProjectCard(p)).join('');
 }
 
-export function renderChapterTree(chapters, currentIndex) {
+export function renderChapterTree(chapters, currentIndex, isEditMode) {
   const tree = document.getElementById('chapter-tree');
   if (!tree) return;
   if (!chapters || chapters.length === 0) {
@@ -67,6 +67,8 @@ export function renderChapterTree(chapters, currentIndex) {
           iconHtml = '<i class="fa-solid fa-check-circle ch-icon done"></i>';
         } else if (ch.status === 'processing') {
           iconHtml = '<span class="ch-ring processing" data-chapter="' + ch.id + '"></span>';
+        } else if (isEditMode) {
+          iconHtml = '<i class="fa-solid fa-pen ch-icon edit-mode"></i>';
         } else {
           iconHtml = '<span class="ch-ring pending"></span>';
         }
@@ -78,104 +80,228 @@ export function renderChapterTree(chapters, currentIndex) {
       }).join('')}
     </div>`;
   }).join('');
-  const progress = `<div style="font-size:0.72rem;color:var(--text-muted);padding:2px 12px 6px">${doneCount}/${totalCount} 章已分析</div>`;
-  tree.innerHTML = progress + vols;
+  const progress = isEditMode
+    ? `<div style="font-size:0.72rem;color:var(--text-muted);padding:2px 12px 6px">${totalCount} 章</div>`
+    : `<div style="font-size:0.72rem;color:var(--text-muted);padding:2px 12px 6px">${doneCount}/${totalCount} 章已分析</div>`;
+  const newChapterBtn = `<div class="chapter-item add-chapter-btn" data-action="add-chapter">
+    <i class="fa-solid fa-plus" style="font-size:0.7rem"></i>
+    <span>新建章节</span>
+  </div>`;
+  tree.innerHTML = progress + vols + newChapterBtn;
 }
 
-export function renderSegments(segments, selectedIndex, fragmentMode, ttsCache, chapterIndex) {
+export function renderSegments(segments, selectedIndex, selectedFragIndex, splitMode, ttsCache, chapterIndex, editMode, isCreationMode) {
+  // 创作模式：空章节显示文本输入区
+  if (isCreationMode && (!segments || segments.length === 0)) {
+    return `<div class="creation-mode-container">
+      <div class="creation-guide">
+        <i class="fa-solid fa-pen-nib" style="font-size:2rem;opacity:0.3;margin-bottom:8px"></i>
+        <p style="margin:0 0 4px;color:var(--text-muted)">开始创作你的故事</p>
+        <p style="margin:0;font-size:0.8rem;color:var(--text-muted);opacity:0.7">在下方输入内容，按 Enter 键分段</p>
+      </div>
+      <div class="text-input-area">
+        <textarea id="chapter-text-input" placeholder="输入章节内容...&#10;按 Enter 键添加段落&#10;按 Ctrl+Enter 插入空行" rows="4"></textarea>
+        <div class="text-input-actions">
+          <button class="btn btn-sm btn-ghost" data-action="insert-empty-line" title="插入空行 (Ctrl+Enter)"><i class="fa-solid fa-return"></i> 插入空行</button>
+          <button class="btn btn-sm btn-primary" data-action="commit-text-input"><i class="fa-solid fa-plus"></i> 添加</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
   if (!segments || segments.length === 0) {
     return '<div style="text-align:center;padding:60px 20px;color:var(--text-muted)"><i class="fa-solid fa-book-open" style="font-size:3rem;margin-bottom:16px;opacity:0.3"></i><p>点击章节查看分析结果</p></div>';
   }
 
-  const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)', onomatopoeia:'var(--type-onomatopoeia)' };
-  const typeLabels = { narration:'旁白', dialogue:'对话', onomatopoeia:'拟声' };
-  const typeIcons = { narration:'fa-book-open', dialogue:'fa-comment', onomatopoeia:'fa-volume-high' };
-  const emotionLabels = { neutral:'普通', happy:'开心', sad:'悲伤', angry:'愤怒', surprise:'惊讶', fear:'恐惧', mixed:'混合' };
+  // 创作模式下在末尾也显示输入区
+  let inputAreaHTML = '';
+  if (isCreationMode) {
+    inputAreaHTML = `<div class="text-input-area compact">
+      <textarea id="chapter-text-input" placeholder="继续输入..." rows="2"></textarea>
+      <div class="text-input-actions">
+        <button class="btn btn-sm btn-ghost" data-action="insert-empty-line" title="插入空行 (Ctrl+Enter)"><i class="fa-solid fa-return"></i></button>
+        <button class="btn btn-sm btn-primary" data-action="commit-text-input"><i class="fa-solid fa-plus"></i></button>
+      </div>
+    </div>`;
+  }
 
-  const dc = segments.filter(s => s.type === 'dialogue').length;
-  const nc = segments.filter(s => s.type === 'narration').length;
-  const oc = segments.filter(s => s.type === 'onomatopoeia').length;
-  let statsHTML = `<div class="segments-stats">
-    <span><i class="fa-solid fa-paragraph"></i> 段落 ${segments.length}</span>
-    <span class="stat-dialogue"><i class="fa-solid fa-comment"></i> 对话 ${dc}</span>
-    <span class="stat-narration"><i class="fa-solid fa-book-open"></i> 旁白 ${nc}</span>`;
-  if (oc > 0) statsHTML += `<span class="stat-onomatopoeia"><i class="fa-solid fa-volume-high"></i> 拟声 ${oc}</span>`;
+  if (!splitMode) {
+    // 原文模式：不渲染句子拆分
+    const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)', onomatopoeia:'var(--type-onomatopoeia)' };
+    return '<div class="segments-stats"><span class="stat-segments"><i class="fa-solid fa-paragraph"></i> 段落 ' + segments.length + '</span></div>' +
+      segments.map((seg, i) => {
+        const sel = selectedIndex === i ? 'selected' : '';
+        const mainType = (seg.fragments && seg.fragments.length > 0) ? seg.fragments[0].type : 'narration';
+        return `<div class="segment-card ${sel}" data-index="${i}" data-action="select-segment">
+          <div class="segment-color-bar" style="background:${typeColors[mainType] || 'var(--border)'}"></div>
+          <div class="segment-header">
+            <div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>
+          </div>
+          ${sel && editMode ? _renderInlineEditor(seg, i, null, ttsCache, chapterIndex) : ''}
+        </div>`;
+      }).join('');
+  }
+
+  // 记录片段统计
+  const mixedCount = segments.filter(s => (s.fragments || []).length > 1).length;
+  console.debug('[句子拆分] 段落=' + segments.length + ', 混合句=' + mixedCount);
+
+  const totalFrags = segments.reduce((sum, s) => sum + (s.fragments || []).length, 0);
+  let statsHTML = `<div class="segments-stats"><span class="stat-segments"><i class="fa-solid fa-paragraph"></i> 段落 ${segments.length}</span>`;
+  if (mixedCount > 0) {
+    statsHTML += `<span class="stat-mixed"><i class="fa-solid fa-scissors"></i> 句子拆分 ${mixedCount} 句 / ${totalFrags} 段</span>`;
+  }
   statsHTML += '</div>';
 
-  const chKey = chapterIndex != null ? chapterIndex : '';
-  const chTtsCache = (ttsCache && ttsCache[chKey]) || {};
-
+  const typeColors = { narration:'var(--type-narration)', dialogue:'var(--type-dialogue)', onomatopoeia:'var(--type-onomatopoeia)' };
+  const typeLabels = { narration:'旁白', dialogue:'对话', onomatopoeia:'拟声' };
   let html = '';
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
     const sel = selectedIndex === i ? 'selected' : '';
-    const segType = seg.type || 'narration';
-    const segEmotion = seg.emotion || 'neutral';
-    const hasAudio = !!chTtsCache[i];
-    const frags = seg.fragments || [];
-    const isMixed = frags.length > 1;
+    const isSelected = selectedIndex === i;
+    const frags = seg.fragments || [{ type: 'narration', text: seg.text, speaker: '' }];
 
-    let colorBar;
-    if (isMixed) {
-      const bars = frags.map(f =>
-        `<div class="segment-color-bar" style="background:${typeColors[f.type] || 'var(--border)'}"></div>`
-      ).join('');
-      colorBar = `<div class="stacked-color-bars">${bars}</div>`;
-    } else {
-      colorBar = `<div class="segment-color-bar" style="background:${typeColors[segType] || 'var(--border)'}"></div>`;
-    }
-
-    let textHTML;
-    if (isMixed) {
-      const fragSpans = frags.map((f, fi) =>
-        `<span class="frag-span" data-frag="${fi}" data-type="${f.type}" data-speaker="${f.speaker || ''}">${escapeHtml(f.text)}</span>`
-      ).join('');
-      textHTML = `<div class="seg-text-wrapper"><span class="seg-text">${fragSpans}</span></div>`;
-    } else {
-      textHTML = `<div class="seg-text-wrapper"><span class="seg-text">${escapeHtml(seg.text)}</span></div>`;
-    }
-
-    let speakerHTML = '';
-    if (isMixed) {
-      const speakers = [...new Set(frags.filter(f => f.speaker).map(f => f.speaker))];
-      if (speakers.length > 0) {
-        speakerHTML = speakers.map(s =>
-          `<span class="seg-speaker"><span class="speaker-dot" style="background:var(--accent-muted)"></span>${escapeHtml(s)}</span>`
-        ).join('');
+    // 堆叠色条
+    let barHTML = '';
+    if (frags.length > 1) {
+      const totalLen = seg.text.length || 1;
+      barHTML = '<div class="seg-color-stack">';
+      for (const f of frags) {
+        const pct = Math.max(10, (f.text.length / totalLen) * 100);
+        barHTML += `<div class="seg-color-strip" style="height:${pct}%;background:${typeColors[f.type] || 'var(--border)'}" title="${typeLabels[f.type] || f.type}"></div>`;
       }
-    } else if (seg.speaker) {
-      speakerHTML = `<span class="seg-speaker"><span class="speaker-dot" style="background:var(--accent-muted)"></span>${escapeHtml(seg.speaker)}</span>`;
+      barHTML += '</div>';
+    } else {
+      barHTML = `<div class="segment-color-bar" style="background:${typeColors[frags[0].type] || 'var(--border)'}"></div>`;
     }
 
-    const emotionHTML = segEmotion !== 'neutral'
-      ? `<span class="seg-emotion-badge">${emotionLabels[segEmotion] || segEmotion}</span>`
-      : '';
+    // 原文 + 悬停方框（多 fragment 时包裹 span）
+    let textHTML = '';
+    if (frags.length > 1) {
+      for (let j = 0; j < frags.length; j++) {
+        const f = frags[j];
+        const isFragSel = selectedFragIndex != null && selectedFragIndex === j && selectedIndex === i;
+        textHTML += `<span class="frag-hover ${isFragSel ? 'frag-selected' : ''}" data-seg-index="${i}" data-frag-index="${j}" title="${typeLabels[f.type] || f.type}${f.speaker ? ' · ' + f.speaker : ''}">${escapeHtml(f.text)}</span>`;
+      }
+    } else {
+      textHTML = `<span class="seg-text">${escapeHtml(seg.text)}</span>`;
+    }
 
-    const audioBtn = hasAudio
-      ? `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="play-segment" data-seg="${i}" title="试听"><i class="fa-solid fa-play"></i></button>`
-      : `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="generate-segment" data-seg="${i}" title="生成音频"><i class="fa-solid fa-waveform-lines"></i></button>`;
+    // 说话人标签 + 音频按钮
+    let speakerHTML = '';
+    if (frags.length === 1 && frags[0].type === 'dialogue' && frags[0].speaker) {
+      speakerHTML = `<span class="seg-speaker" style="color:${frags[0].speakerColor || 'var(--text-secondary)'}">${escapeHtml(frags[0].speaker)}</span>`;
+    }
 
-    const mixedBadge = isMixed
-      ? `<span class="seg-type-badge seg-type-badge-mixed"><i class="fa-solid fa-layer-group"></i> 混合句 (${frags.length} 片段)</span>`
-      : `<span class="seg-type-badge"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i> ${typeLabels[segType] || segType}</span>`;
+    const chKey = chapterIndex != null ? chapterIndex : '';
+    const cacheForSeg = (ttsCache && ttsCache[chKey] && ttsCache[chKey][i]) ? ttsCache[chKey][i] : null;
+    const audioBtn = cacheForSeg
+      ? `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="play-segment" data-seg="${i}" title="试听"><i class="fa-solid fa-play"></i> 试听</button>`
+      : `<button class="btn btn-ghost btn-sm audio-card-btn" data-action="generate-segment" data-seg="${i}" title="生成音频"><i class="fa-solid fa-waveform-lines"></i> 生成</button>`;
 
-    html += `<div class="segment-card ${sel} ${isMixed ? 'mixed-segment' : ''}" data-index="${i}" data-type="${segType}" data-action="select-segment">
-      ${colorBar}
+    html += `<div class="segment-card ${sel}" data-index="${i}" data-action="select-segment">
+      ${barHTML}
       <div class="segment-header">
-        <div class="seg-type-icon"><i class="fa-solid ${typeIcons[segType] || 'fa-book-open'}"></i></div>
-        ${textHTML}
-        <div class="seg-actions">
-          ${audioBtn}
-        </div>
+        <div class="seg-text-wrapper">${textHTML}</div>
       </div>
       <div class="segment-meta">
-        ${mixedBadge}
         ${speakerHTML}
-        ${emotionHTML}
+        ${audioBtn}
       </div>
+      ${isSelected ? _renderInlineEditor(seg, i, selectedFragIndex, ttsCache, chapterIndex) : ''}
     </div>`;
   }
-  return statsHTML + html;
+  return statsHTML + html + inputAreaHTML;
+}
+
+function _renderInlineEditor(seg, segIdx, selectedFragIndex, ttsCache, chapterIndex) {
+  if (!seg) return '';
+
+  const typeLabels = { narration:'旁白', dialogue:'对话', onomatopoeia:'拟声' };
+  const emotions = [
+    { value:'neutral', label:'平静', icon:'fa-circle' },
+    { value:'joy', label:'喜悦', icon:'fa-face-smile' },
+    { value:'anger', label:'愤怒', icon:'fa-face-angry' },
+    { value:'sadness', label:'悲伤', icon:'fa-face-sad-tear' },
+    { value:'fear', label:'恐惧', icon:'fa-face-fearful' },
+    { value:'surprise', label:'惊讶', icon:'fa-face-surprise' },
+  ];
+
+  const frags = seg.fragments || [];
+  const hasFrags = frags.length > 1;
+  
+  // 如果有 fragments 且选中了某个 fragment，使用该 fragment 的类型
+  // 否则使用段落级别的类型或第一个 fragment 的类型
+  let currentType, currentSpeaker, currentEmotion, currentSpeed, currentTone;
+  
+  if (hasFrags && selectedFragIndex != null && frags[selectedFragIndex]) {
+    const frag = frags[selectedFragIndex];
+    currentType = frag.type || 'narration';
+    currentSpeaker = frag.speaker || '';
+    currentEmotion = frag.emotion || seg.emotion || 'neutral';
+    currentSpeed = frag.speed || seg.speed || 1.0;
+    currentTone = frag.tone || seg.tone || 'normal';
+  } else {
+    currentType = seg.type || (frags.length > 0 ? frags[0].type : 'narration');
+    currentSpeaker = seg.speaker || (frags.length > 0 ? frags[0].speaker : '');
+    currentEmotion = seg.emotion || 'neutral';
+    currentSpeed = seg.speed || 1.0;
+    currentTone = seg.tone || 'normal';
+  }
+
+  const chKey = chapterIndex != null ? chapterIndex : '';
+  const hasAudio = ttsCache && ttsCache[chKey] && ttsCache[chKey][segIdx];
+
+  const emotionBtns = emotions.map(e => {
+    const active = currentEmotion === e.value ? ' active' : '';
+    return `<button class="emo-btn${active}" data-action="set-emotion" data-emotion="${e.value}" title="${e.label}"><i class="fa-solid ${e.icon}"></i></button>`;
+  }).join('');
+
+  // 类型下拉框：如果有 fragments，显示当前 fragment 的类型
+  const typeOptions = ['narration', 'dialogue', 'onomatopoeia'].map(t => 
+    `<option value="${t}" ${currentType===t?'selected':''}>${typeLabels[t]}</option>`
+  ).join('');
+
+  return `<div class="inline-editor">
+    <div class="inline-editor-inner">
+      <div class="editor-row">
+        <div class="editor-field">
+          <label>类型</label>
+          <select class="editor-select" data-action="set-type" data-seg="${segIdx}" data-frag="${hasFrags && selectedFragIndex != null ? selectedFragIndex : ''}">
+            ${typeOptions}
+          </select>
+        </div>
+        ${currentSpeaker ? `<div class="editor-field">
+          <label>说话人</label>
+          <span class="editor-speaker">${escapeHtml(currentSpeaker)}</span>
+        </div>` : ''}
+        <div class="editor-field">
+          <label>情绪</label>
+          <div class="emotion-btns">${emotionBtns}</div>
+        </div>
+        <div class="editor-field">
+          <label>语速</label>
+          <div class="speed-control">
+            <input type="range" min="0.5" max="2.0" step="0.1" value="${currentSpeed}" data-action="set-speed" data-seg="${segIdx}" data-frag="${hasFrags && selectedFragIndex != null ? selectedFragIndex : ''}">
+            <span class="speed-val">${currentSpeed.toFixed(1)}x</span>
+          </div>
+        </div>
+        <div class="editor-field">
+          <label>音调</label>
+          <select class="editor-select" data-action="set-tone" data-seg="${segIdx}" data-frag="${hasFrags && selectedFragIndex != null ? selectedFragIndex : ''}">
+            <option value="low" ${currentTone==='low'?'selected':''}>低</option>
+            <option value="normal" ${currentTone==='normal'?'selected':''}>正常</option>
+            <option value="high" ${currentTone==='high'?'selected':''}>高</option>
+          </select>
+        </div>
+        <div class="editor-actions">
+          <button class="btn btn-sm btn-ghost" data-action="generate-segment" data-seg="${segIdx}" ${hasFrags && selectedFragIndex != null ? 'data-frag="' + selectedFragIndex + '"' : ''}><i class="fa-solid fa-waveform-lines"></i> 生成</button>
+          <button class="btn btn-sm btn-primary" data-action="play-segment" data-seg="${segIdx}" ${hasAudio?'':'disabled'} ${hasFrags && selectedFragIndex != null ? 'data-frag="' + selectedFragIndex + '"' : ''}><i class="fa-solid fa-play"></i> 试听</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 export function renderCharacters(chars) {
@@ -189,6 +315,69 @@ export function renderCharacters(chars) {
       </div>
     </div>
   `).join('');
+}
+
+export function renderSegmentEditor(seg, ttsCache, chapterIndex) {
+  if (!seg) return '';
+
+  const typeLabels = { narration:'旁白', dialogue:'对话', onomatopoeia:'拟声' };
+  const emotions = [
+    { value:'neutral', label:'平静', icon:'fa-circle' },
+    { value:'joy', label:'喜悦', icon:'fa-face-smile' },
+    { value:'anger', label:'愤怒', icon:'fa-face-angry' },
+    { value:'sadness', label:'悲伤', icon:'fa-face-sad-tear' },
+    { value:'fear', label:'恐惧', icon:'fa-face-fearful' },
+    { value:'surprise', label:'惊讶', icon:'fa-face-surprise' },
+  ];
+
+  const currentEmotion = seg.emotion || 'neutral';
+  const currentSpeed = seg.speed || 1.0;
+  const currentTone = seg.tone || 'normal';
+  const chKey = chapterIndex != null ? chapterIndex : '';
+  const segIdx = seg._index || 0;
+  const hasAudio = ttsCache && ttsCache[chKey] && ttsCache[chKey][segIdx];
+
+  const emotionBtns = emotions.map(e => {
+    const active = currentEmotion === e.value ? ' active' : '';
+    return `<button class="emo-btn${active}" data-action="set-emotion" data-emotion="${e.value}" title="${e.label}"><i class="fa-solid ${e.icon}"></i></button>`;
+  }).join('');
+
+  return `<div class="segment-editor-inner">
+    <div class="editor-text"><span class="seg-text">${escapeHtml(seg.text)}</span></div>
+    <div class="editor-row">
+      <div class="editor-field">
+        <label>类型</label>
+        <select class="editor-select" data-action="set-type" data-key="type">
+          <option value="narration" ${seg.type==='narration'?'selected':''}>旁白</option>
+          <option value="dialogue" ${seg.type==='dialogue'?'selected':''}>对话</option>
+          <option value="onomatopoeia" ${seg.type==='onomatopoeia'?'selected':''}>拟声</option>
+        </select>
+      </div>
+      <div class="editor-field">
+        <label>情绪</label>
+        <div class="emotion-btns">${emotionBtns}</div>
+      </div>
+      <div class="editor-field">
+        <label>语速</label>
+        <div class="speed-control">
+          <input type="range" min="0.5" max="2.0" step="0.1" value="${currentSpeed}" data-action="set-speed" data-key="speed">
+          <span class="speed-val">${currentSpeed.toFixed(1)}x</span>
+        </div>
+      </div>
+      <div class="editor-field">
+        <label>音调</label>
+        <select class="editor-select" data-action="set-tone" data-key="tone">
+          <option value="low" ${currentTone==='low'?'selected':''}>低</option>
+          <option value="normal" ${currentTone==='normal'?'selected':''}>正常</option>
+          <option value="high" ${currentTone==='high'?'selected':''}>高</option>
+        </select>
+      </div>
+    </div>
+    <div class="editor-actions">
+      <button class="btn btn-sm btn-ghost" data-action="generate-segment-editor" data-seg="${segIdx}" ${hasAudio?'':'title="调用 TTS 引擎生成"' }><i class="fa-solid fa-waveform-lines"></i> 生成</button>
+      <button class="btn btn-sm btn-primary" data-action="play-segment-editor" data-seg="${segIdx}" ${hasAudio?'':'disabled'}><i class="fa-solid fa-play"></i> 试听</button>
+    </div>
+  </div>`;
 }
 
 export function renderEmptyState(message) {

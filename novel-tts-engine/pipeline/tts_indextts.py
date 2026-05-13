@@ -50,6 +50,7 @@ EMOTION_TO_TEXT = {
     "surprise": "惊讶地说",
     "fear": "害怕地说",
     "neutral": "平静地说",
+    "unknown": "平静地说",  # unknown 等同于 calm
 }
 
 

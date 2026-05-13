@@ -1,9 +1,14 @@
 export class AppStore {
   constructor(initialState = {}) {
     let savedVoiceCache = {};
+    let savedDrafts = {};
     try {
       const raw = localStorage.getItem('noveltts_voice_preview_cache');
       if (raw) savedVoiceCache = JSON.parse(raw);
+    } catch {}
+    try {
+      const raw = localStorage.getItem('noveltts_chapter_drafts');
+      if (raw) savedDrafts = JSON.parse(raw);
     } catch {}
 
     this.state = {
@@ -32,6 +37,7 @@ export class AppStore {
       analysisProgress: null,
       voiceFilter: 'all',
       voicePreviewCache: savedVoiceCache, // {voiceName: audioUrl} 持久化缓存
+      chapterDrafts: savedDrafts, // {projectId-chapterIndex: segments[]} 章节草稿
       undoStack: [],
       redoStack: [],
       voices: [],
@@ -48,6 +54,11 @@ export class AppStore {
     try {
       if (newState.voicePreviewCache && Object.keys(newState.voicePreviewCache).length > 0) {
         localStorage.setItem('noveltts_voice_preview_cache', JSON.stringify(newState.voicePreviewCache));
+      }
+    } catch {}
+    try {
+      if (newState.chapterDrafts) {
+        localStorage.setItem('noveltts_chapter_drafts', JSON.stringify(newState.chapterDrafts));
       }
     } catch {}
     for (const fn of this._listeners) {
