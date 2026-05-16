@@ -1,0 +1,4207 @@
+{
+  "short_tests_mode_a": {
+    "total": 368,
+    "correct": 81,
+    "wrong": 227,
+    "false_positive": 58,
+    "false_negative": 2,
+    "unknown_correct": 10,
+    "accuracy": 0.22010869565217392,
+    "errors": [
+      {
+        "para_id": "H-001",
+        "expected": "掌柜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "客官来得巧，正好还剩一间。"
+      },
+      {
+        "para_id": "H-003",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "师弟，别来无恙。"
+      },
+      {
+        "para_id": "H-004",
+        "expected": "黑衣人",
+        "actual": "苏夜",
+        "type": "mismatch",
+        "dialogue": "把东西交出来。"
+      },
+      {
+        "para_id": "H-007",
+        "expected": "药老",
+        "actual": "萧炎",
+        "type": "mismatch",
+        "dialogue": "这枚丹药，你先服下。"
+      },
+      {
+        "para_id": "H-009",
+        "expected": "林轩",
+        "actual": "他又劝",
+        "type": "mismatch",
+        "dialogue": "机会难得，一起去吧。"
+      },
+      {
+        "para_id": "H-013",
+        "expected": "黑衣人",
+        "actual": "林轩",
+        "type": "mismatch",
+        "dialogue": "交出那块玉石，饶你不死。"
+      },
+      {
+        "para_id": "H-015",
+        "expected": "萧炎",
+        "actual": "药老",
+        "type": "mismatch",
+        "dialogue": "很好，我买了。"
+      },
+      {
+        "para_id": "H-017",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "很快了，相信我。"
+      },
+      {
+        "para_id": "H-020",
+        "expected": "GROUP:CROWD",
+        "actual": "骑士",
+        "type": "mismatch",
+        "dialogue": "冲啊！"
+      },
+      {
+        "para_id": "H-021",
+        "expected": "联盟成员",
+        "actual": "博士",
+        "type": "mismatch",
+        "dialogue": "杀了他们！"
+      },
+      {
+        "para_id": "H-023",
+        "expected": "艾德温",
+        "actual": "艾德温怒",
+        "type": "mismatch",
+        "dialogue": "加尔文，你背叛了我们！"
+      },
+      {
+        "para_id": "H-026",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "等等我！"
+      },
+      {
+        "para_id": "H-028",
+        "expected": "黑衣人",
+        "actual": "苏夜",
+        "type": "mismatch",
+        "dialogue": "不可能……"
+      },
+      {
+        "para_id": "H-029",
+        "expected": "小翠",
+        "actual": "赵天行",
+        "type": "mismatch",
+        "dialogue": "她出去了，我是小翠。"
+      },
+      {
+        "para_id": "H-031",
+        "expected": "伊莉雅",
+        "actual": "苏夜",
+        "type": "mismatch",
+        "dialogue": "救命！"
+      },
+      {
+        "para_id": "H-034",
+        "expected": "首领",
+        "actual": "众人齐声呐",
+        "type": "mismatch",
+        "dialogue": "骑士们，冲锋！"
+      },
+      {
+        "para_id": "H-034",
+        "expected": "骑士们",
+        "actual": "众人齐声呐",
+        "type": "mismatch",
+        "dialogue": "杀！"
+      },
+      {
+        "para_id": "H-035",
+        "expected": "林雪",
+        "actual": "她咬牙",
+        "type": "mismatch",
+        "dialogue": "我会找到的。"
+      },
+      {
+        "para_id": "A1-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "幽石林"
+      },
+      {
+        "para_id": "A1-2",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "断龙崖"
+      },
+      {
+        "para_id": "A1-3",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "陨星谷"
+      },
+      {
+        "para_id": "A2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "地火苔"
+      },
+      {
+        "para_id": "A2-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "玄冰剑"
+      },
+      {
+        "para_id": "A2-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "九转还魂丹"
+      },
+      {
+        "para_id": "A3-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "轰！"
+      },
+      {
+        "para_id": "A3-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "嗖——"
+      },
+      {
+        "para_id": "A3-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "咔嚓！"
+      },
+      {
+        "para_id": "A4-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "求稳"
+      },
+      {
+        "para_id": "A4-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "苦修"
+      },
+      {
+        "para_id": "A4-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "暂避锋芒"
+      },
+      {
+        "para_id": "A5-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "跳，还是不跳"
+      },
+      {
+        "para_id": "A5-2",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "如果失败了怎么办？"
+      },
+      {
+        "para_id": "A5-3",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "这老家伙八成在骗我。"
+      },
+      {
+        "para_id": "B1-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "丹方玉简"
+      },
+      {
+        "para_id": "B1-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话，仅旁白（若系统认为有对话则错误）"
+      },
+      {
+        "para_id": "B1-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "噬金蚁"
+      },
+      {
+        "para_id": "B1-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B1-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "青锋剑"
+      },
+      {
+        "para_id": "B1-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "仓央洲"
+      },
+      {
+        "para_id": "B2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B2-2",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "黑风谷"
+      },
+      {
+        "para_id": "B2-2",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B2-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "天元城"
+      },
+      {
+        "para_id": "B2-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B3-1",
+        "expected": "(无对话)",
+        "actual": "张家",
+        "type": "false_positive",
+        "dialogue": "张家"
+      },
+      {
+        "para_id": "B3-1",
+        "expected": "(无对话)",
+        "actual": "仓央洲",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B3-2",
+        "expected": "(无对话)",
+        "actual": "弟子",
+        "type": "false_positive",
+        "dialogue": "青云宗"
+      },
+      {
+        "para_id": "B3-2",
+        "expected": "(无对话)",
+        "actual": "弟子",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B3-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "万宝楼"
+      },
+      {
+        "para_id": "B3-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B4-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "真元"
+      },
+      {
+        "para_id": "B4-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B4-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "元婴"
+      },
+      {
+        "para_id": "B4-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B4-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "金丹"
+      },
+      {
+        "para_id": "B4-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B5-1",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "远超"
+      },
+      {
+        "para_id": "B5-1",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B5-2",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "精湛"
+      },
+      {
+        "para_id": "B5-2",
+        "expected": "(无对话)",
+        "actual": "长老",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B5-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "诡异"
+      },
+      {
+        "para_id": "B5-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "C2-1",
+        "expected": "孙项明",
+        "actual": "郭垣",
+        "type": "mismatch",
+        "dialogue": "郭道友。"
+      },
+      {
+        "para_id": "C2-1",
+        "expected": "郭垣",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "嘿，这次打算去哪探？"
+      },
+      {
+        "para_id": "C2-1",
+        "expected": "孙项明",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "老地方碰碰运气。"
+      },
+      {
+        "para_id": "C2-2",
+        "expected": "掌门",
+        "actual": "林雪",
+        "type": "mismatch",
+        "dialogue": "不行，你修为太弱。"
+      },
+      {
+        "para_id": "C2-2",
+        "expected": "萧炎",
+        "actual": "掌门",
+        "type": "mismatch",
+        "dialogue": "那我陪她一起去。"
+      },
+      {
+        "para_id": "C2-3",
+        "expected": "小师妹",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "师兄，你受伤了？"
+      },
+      {
+        "para_id": "C2-3",
+        "expected": "师兄（他）",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "无妨，皮外伤。"
+      },
+      {
+        "para_id": "C2-3",
+        "expected": "小师妹",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "快服下这枚疗伤丹。"
+      },
+      {
+        "para_id": "C3-1",
+        "expected": "林雪",
+        "actual": "林轩",
+        "type": "mismatch",
+        "dialogue": "林轩，你又在偷懒！"
+      },
+      {
+        "para_id": "C3-2",
+        "expected": "对手",
+        "actual": "萧炎",
+        "type": "mismatch",
+        "dialogue": "萧炎，认输吧，你不是我的对手。"
+      },
+      {
+        "para_id": "C4-2",
+        "expected": "黑袍年轻人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这枚丹药归我了。"
+      },
+      {
+        "para_id": "C5-2",
+        "expected": "林雪",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "小心保管，别弄丢了。"
+      },
+      {
+        "para_id": "C6-1",
+        "expected": "萧炎",
+        "actual": "林轩",
+        "type": "mismatch",
+        "dialogue": "林轩的剑法果然厉害。"
+      },
+      {
+        "para_id": "D2-1",
+        "expected": "未知",
+        "actual": "(未检测到)",
+        "type": "false_negative",
+        "dialogue": "这家伙是什么来头？"
+      },
+      {
+        "para_id": "D2-2",
+        "expected": "未知",
+        "actual": "(未检测到)",
+        "type": "false_negative",
+        "dialogue": "救命啊！"
+      },
+      {
+        "para_id": "D3-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "天火三玄变，第一变：熔岩体。"
+      },
+      {
+        "para_id": "D3-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "入此门者，当弃一切希望。"
+      },
+      {
+        "para_id": "E1-1",
+        "expected": "药尘",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "老夫自有分寸。"
+      },
+      {
+        "para_id": "E1-2",
+        "expected": "萧炎",
+        "actual": "药老",
+        "type": "mismatch",
+        "dialogue": "是，药老教训得对。"
+      },
+      {
+        "para_id": "E1-3",
+        "expected": "林雪",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "多谢孙兄。"
+      },
+      {
+        "para_id": "E2-1",
+        "expected": "散修",
+        "actual": "老者",
+        "type": "mismatch",
+        "dialogue": "是，是……老者饶命！"
+      },
+      {
+        "para_id": "E2-2",
+        "expected": "拄拐老妪",
+        "actual": "拐老妪沙哑地",
+        "type": "mismatch",
+        "dialogue": "小娃娃，此地危险。"
+      },
+      {
+        "para_id": "E2-2",
+        "expected": "年轻修士",
+        "actual": "拐老妪沙哑地",
+        "type": "mismatch",
+        "dialogue": "老妪，敢问前方是什么地方？"
+      },
+      {
+        "para_id": "E2-3",
+        "expected": "中年修士",
+        "actual": "少年",
+        "type": "mismatch",
+        "dialogue": "少年，你太狂妄了。"
+      },
+      {
+        "para_id": "F1-1",
+        "expected": "(无对话)",
+        "actual": "萧炎",
+        "type": "false_positive",
+        "dialogue": "入此门者，当弃一切希望。"
+      },
+      {
+        "para_id": "F1-2",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "天劫降临，万物俱灭。"
+      },
+      {
+        "para_id": "F2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "如果能活着回去……"
+      },
+      {
+        "para_id": "F2-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "一定要撑住。"
+      },
+      {
+        "para_id": "F2-3",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "不行，得想个办法。"
+      },
+      {
+        "para_id": "B1-混",
+        "expected": "药老",
+        "actual": "萧炎",
+        "type": "mismatch",
+        "dialogue": "丹方玉简"
+      },
+      {
+        "para_id": "B1-混",
+        "expected": "萧炎",
+        "actual": "丹方玉简",
+        "type": "mismatch",
+        "dialogue": "这东西值多少钱？"
+      },
+      {
+        "para_id": "B1-混",
+        "expected": "(无此对话)",
+        "actual": "萧炎",
+        "type": "false_positive",
+        "dialogue": "无价之宝。"
+      },
+      {
+        "para_id": "B2-混",
+        "expected": "林雪",
+        "actual": "仓央洲",
+        "type": "mismatch",
+        "dialogue": "仓央洲"
+      },
+      {
+        "para_id": "B2-混",
+        "expected": "孙项明",
+        "actual": "仓央洲",
+        "type": "mismatch",
+        "dialogue": "这就是你说的宝地？"
+      },
+      {
+        "para_id": "B2-混",
+        "expected": "(无此对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "耐心点，宝藏在地底。"
+      },
+      {
+        "para_id": "B3-混",
+        "expected": "林雪",
+        "actual": "张家",
+        "type": "mismatch",
+        "dialogue": "张家"
+      },
+      {
+        "para_id": "B3-混",
+        "expected": "(无此对话)",
+        "actual": "张家",
+        "type": "false_positive",
+        "dialogue": "听说张家最近收了一批好药材。"
+      },
+      {
+        "para_id": "B4-混",
+        "expected": "郭垣",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "真元"
+      },
+      {
+        "para_id": "B4-混",
+        "expected": "孙项明",
+        "actual": "郭垣",
+        "type": "mismatch",
+        "dialogue": "哼，就这点本事？"
+      },
+      {
+        "para_id": "B4-混",
+        "expected": "(无此对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "还没完。"
+      },
+      {
+        "para_id": "B5-混",
+        "expected": "林雪",
+        "actual": "修士",
+        "type": "mismatch",
+        "dialogue": "远超"
+      },
+      {
+        "para_id": "B5-混",
+        "expected": "萧炎",
+        "actual": "林雪",
+        "type": "mismatch",
+        "dialogue": "这家伙简直是个怪物。"
+      },
+      {
+        "para_id": "B5-混",
+        "expected": "(无此对话)",
+        "actual": "萧炎",
+        "type": "false_positive",
+        "dialogue": "没错，他修习的功法也很特殊。"
+      },
+      {
+        "para_id": "F2-3-补",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "不行，得想个办法。"
+      },
+      {
+        "para_id": "GT-修仙-001",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您终于醒了！"
+      },
+      {
+        "para_id": "GT-修仙-002",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "小翠，我睡了多久？"
+      },
+      {
+        "para_id": "GT-修仙-003",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您昏迷了整整三天！"
+      },
+      {
+        "para_id": "GT-修仙-004",
+        "expected": "林天豪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "轩儿！你终于醒了！"
+      },
+      {
+        "para_id": "GT-修仙-005",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "父亲。"
+      },
+      {
+        "para_id": "GT-修仙-006",
+        "expected": "林天豪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "轩儿，你感觉如何？"
+      },
+      {
+        "para_id": "GT-修仙-007",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "父亲放心，孩儿已经无碍。"
+      },
+      {
+        "para_id": "GT-修仙-008",
+        "expected": "林天豪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "那就好，那就好。"
+      },
+      {
+        "para_id": "GT-修仙-009",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是，父亲。"
+      },
+      {
+        "para_id": "GT-修仙-010",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "既来之，则安之。"
+      },
+      {
+        "para_id": "GT-修仙-011",
+        "expected": "王管家",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，老奴是王管家。"
+      },
+      {
+        "para_id": "GT-修仙-012",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "进来吧。"
+      },
+      {
+        "para_id": "GT-修仙-013",
+        "expected": "王管家",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，这是您要的书籍。"
+      },
+      {
+        "para_id": "GT-修仙-014",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "辛苦王叔了。"
+      },
+      {
+        "para_id": "GT-修仙-015",
+        "expected": "王管家",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷客气了，老奴告退。"
+      },
+      {
+        "para_id": "GT-修仙-016",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "看来，我需要尽快提升实力。"
+      },
+      {
+        "para_id": "GT-修仙-017",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您休息一下吧。"
+      },
+      {
+        "para_id": "GT-修仙-018",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "好。"
+      },
+      {
+        "para_id": "GT-修仙-019",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您真厉害！"
+      },
+      {
+        "para_id": "GT-修仙-020",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "还差得远呢。"
+      },
+      {
+        "para_id": "GT-修仙-021",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷要去武馆？"
+      },
+      {
+        "para_id": "GT-修仙-022",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "府里太安逸了，我需要更大的压力。"
+      },
+      {
+        "para_id": "GT-修仙-023",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "要下雨了。"
+      },
+      {
+        "para_id": "GT-修仙-024",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，我们快回去吧！"
+      },
+      {
+        "para_id": "GT-修仙-025",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这一世，我一定要站在这个世界的巅峰！"
+      },
+      {
+        "para_id": "GT-修仙-026",
+        "expected": "赵虎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "让开！让开！"
+      },
+      {
+        "para_id": "GT-修仙-027",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "那是赵家的少爷赵虎。"
+      },
+      {
+        "para_id": "GT-修仙-028",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "淬体境三重？这么厉害！"
+      },
+      {
+        "para_id": "GT-修仙-029",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "可不是嘛，赵家可是我们天元城的三大家族之一！"
+      },
+      {
+        "para_id": "GT-修仙-030",
+        "expected": "赵虎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "哟，这不是林家的废物少爷吗？"
+      },
+      {
+        "para_id": "GT-修仙-031",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "赵少爷说笑了。让路。"
+      },
+      {
+        "para_id": "GT-修仙-032",
+        "expected": "赵虎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "怎么？不敢说话？"
+      },
+      {
+        "para_id": "GT-修仙-033",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这林家少爷，胆子不小啊！"
+      },
+      {
+        "para_id": "GT-修仙-034",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是啊，敢这么跟赵虎说话！"
+      },
+      {
+        "para_id": "GT-修仙-035",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "请出示身份证明。"
+      },
+      {
+        "para_id": "GT-修仙-036",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "听说这次考核很严格，要通过三关才能成为正式学员！"
+      },
+      {
+        "para_id": "GT-修仙-037",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "下一个，林轩！"
+      },
+      {
+        "para_id": "GT-修仙-038",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "请出拳。"
+      },
+      {
+        "para_id": "GT-修仙-039",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "三百斤！"
+      },
+      {
+        "para_id": "GT-修仙-040",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "恭喜你，林轩，你被录取了！"
+      },
+      {
+        "para_id": "GT-修仙-041",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "多谢考官。"
+      },
+      {
+        "para_id": "GT-修仙-042",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林轩，你来得真早！"
+      },
+      {
+        "para_id": "GT-修仙-043",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "李铁。你怎么也这么早？"
+      },
+      {
+        "para_id": "GT-修仙-044",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "哈哈，我这不是怕落后嘛！"
+      },
+      {
+        "para_id": "GT-修仙-045",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "对了，听说今天有大师兄的授课！"
+      },
+      {
+        "para_id": "GT-修仙-046",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "淬体境九重？"
+      },
+      {
+        "para_id": "GT-修仙-047",
+        "expected": "陈风",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "今天，我要讲的是武道的根基——淬体！"
+      },
+      {
+        "para_id": "GT-修仙-048",
+        "expected": "陈风",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "武道一途，没有捷径可走，唯有勤修苦练！"
+      },
+      {
+        "para_id": "GT-修仙-049",
+        "expected": "陈风",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你很不错，好好努力，将来必成大器！"
+      },
+      {
+        "para_id": "GT-修仙-050",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "多谢大师兄指点！"
+      },
+      {
+        "para_id": "GT-修仙-051",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林轩！该吃饭了！"
+      },
+      {
+        "para_id": "GT-修仙-052",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "来了！"
+      },
+      {
+        "para_id": "GT-修仙-053",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林轩，你的进步真快！"
+      },
+      {
+        "para_id": "GT-修仙-054",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是你让着我。再来！"
+      },
+      {
+        "para_id": "GT-修仙-055",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明天，又是新的一天！"
+      },
+      {
+        "para_id": "GT-都市异能-001",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你在这里！"
+      },
+      {
+        "para_id": "GT-都市异能-002",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林雪，你怎么上来了？"
+      },
+      {
+        "para_id": "GT-都市异能-003",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "公司出事了。"
+      },
+      {
+        "para_id": "GT-都市异能-004",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "今天有个神秘组织来公司搜查"
+      },
+      {
+        "para_id": "GT-都市异能-005",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他们怎么知道这里有异能者？"
+      },
+      {
+        "para_id": "GT-都市异能-006",
+        "expected": "老陈",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，来会议室一趟。"
+      },
+      {
+        "para_id": "GT-都市异能-007",
+        "expected": "黑衣人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏先生，我们是暗影会的调查员。"
+      },
+      {
+        "para_id": "GT-都市异能-008",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我不知道你们在说什么。"
+      },
+      {
+        "para_id": "GT-都市异能-009",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，快来老地方！"
+      },
+      {
+        "para_id": "GT-都市异能-010",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是赵天行赵大哥。"
+      },
+      {
+        "para_id": "GT-都市异能-011",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我是华夏异能者联盟的负责人。"
+      },
+      {
+        "para_id": "GT-都市异能-012",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明天开始，你来联盟总部报道。"
+      },
+      {
+        "para_id": "GT-都市异能-013",
+        "expected": "联盟成员",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "暗影会的人来了！"
+      },
+      {
+        "para_id": "GT-都市异能-014",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你跟我去前线！"
+      },
+      {
+        "para_id": "GT-都市异能-015",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "干得好，苏夜！"
+      },
+      {
+        "para_id": "GT-都市异能-016",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我建议潜入基地。"
+      },
+      {
+        "para_id": "GT-都市异能-017",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "太危险了。"
+      },
+      {
+        "para_id": "GT-都市异能-018",
+        "expected": "博士",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "样本准备好了吗？"
+      },
+      {
+        "para_id": "GT-都市异能-019",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这不是科学，这是犯罪！"
+      },
+      {
+        "para_id": "GT-都市异能-020",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你这次立了大功。"
+      },
+      {
+        "para_id": "GT-都市异能-021",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是大家共同努力的结果。"
+      },
+      {
+        "para_id": "GT-都市异能-022",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你太棒了！"
+      },
+      {
+        "para_id": "GT-都市异能-023",
+        "expected": "三人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为了守护这个世界！"
+      },
+      {
+        "para_id": "GT-西幻-001",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "北方有异动。"
+      },
+      {
+        "para_id": "GT-西幻-002",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我能感觉到魔力的波动。"
+      },
+      {
+        "para_id": "GT-西幻-003",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "那不是雷声。"
+      },
+      {
+        "para_id": "GT-西幻-004",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是炎魔，至少有三只。"
+      },
+      {
+        "para_id": "GT-西幻-005",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "情况如何？"
+      },
+      {
+        "para_id": "GT-西幻-006",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "炎魔入侵，立即组织防御。"
+      },
+      {
+        "para_id": "GT-西幻-007",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是！"
+      },
+      {
+        "para_id": "GT-西幻-008",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "射击！"
+      },
+      {
+        "para_id": "GT-西幻-009",
+        "expected": "骑士",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "弓箭无效！"
+      },
+      {
+        "para_id": "GT-西幻-010",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "换银箭！"
+      },
+      {
+        "para_id": "GT-西幻-011",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它们在试探我们的实力。"
+      },
+      {
+        "para_id": "GT-西幻-012",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "根据古籍记载，炎魔不会无缘无故出现。"
+      },
+      {
+        "para_id": "GT-西幻-013",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "一定是有人召唤了它们。"
+      },
+      {
+        "para_id": "GT-西幻-014",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "巡逻队在北边发现了痕迹。"
+      },
+      {
+        "para_id": "GT-西幻-015",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "有人类与炎魔勾结？"
+      },
+      {
+        "para_id": "GT-西幻-016",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "很有可能。"
+      },
+      {
+        "para_id": "GT-西幻-017",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明天一早，我带人去北方调查。"
+      },
+      {
+        "para_id": "GT-西幻-018",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我和你一起去。"
+      },
+      {
+        "para_id": "GT-西幻-019",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我留守哨站，组织防御。"
+      },
+      {
+        "para_id": "GT-西幻-020",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "魔力波动越来越强了。"
+      },
+      {
+        "para_id": "GT-西幻-021",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "防御！"
+      },
+      {
+        "para_id": "GT-西幻-022",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它变强了。"
+      },
+      {
+        "para_id": "GT-西幻-023",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "就是现在！"
+      },
+      {
+        "para_id": "GT-西幻-024",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "没事吧？"
+      },
+      {
+        "para_id": "GT-西幻-025",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "没事，继续前进。"
+      },
+      {
+        "para_id": "GT-西幻-026",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他在召唤更多的炎魔。"
+      },
+      {
+        "para_id": "GT-西幻-027",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "分三组，同时攻击。伊莉雅，你负责打断仪式。"
+      },
+      {
+        "para_id": "GT-西幻-028",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明白。"
+      },
+      {
+        "para_id": "GT-西幻-029",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "莫洛克？"
+      },
+      {
+        "para_id": "GT-西幻-030",
+        "expected": "莫洛克",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "没想到你会记得我。"
+      },
+      {
+        "para_id": "GT-西幻-031",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你为什么要召唤炎魔？"
+      },
+      {
+        "para_id": "GT-西幻-032",
+        "expected": "莫洛克",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为了力量！"
+      },
+      {
+        "para_id": "GT-西幻-033",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你疯了！炎魔只会毁灭一切！"
+      },
+      {
+        "para_id": "GT-西幻-034",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "情况比我们想象的严重。"
+      },
+      {
+        "para_id": "GT-西幻-035",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "足以摧毁整个哨站。"
+      },
+      {
+        "para_id": "GT-西幻-036",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须请求支援。"
+      },
+      {
+        "para_id": "GT-西幻-037",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "在支援到达之前，我们必须加强防御。"
+      },
+      {
+        "para_id": "GT-西幻-038",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "把所有魔法师都调来。"
+      },
+      {
+        "para_id": "GT-西幻-039",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我有个主意。"
+      },
+      {
+        "para_id": "GT-西幻-040",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "古籍中提到过，炎魔害怕圣水和银的组合物。"
+      },
+      {
+        "para_id": "GT-西幻-041",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你能制作吗？"
+      },
+      {
+        "para_id": "GT-西幻-042",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "可以，但需要时间。"
+      },
+      {
+        "para_id": "GT-西幻-043",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们没有两天时间。"
+      },
+      {
+        "para_id": "GT-西幻-044",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它来了。"
+      },
+      {
+        "para_id": "GT-西幻-045",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "全体准备战斗！"
+      },
+      {
+        "para_id": "GT-西幻-046",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它还有两个小时就会到达。"
+      },
+      {
+        "para_id": "GT-西幻-047",
+        "expected": "年轻骑士",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们能赢吗？"
+      },
+      {
+        "para_id": "GT-西幻-048",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须赢。"
+      },
+      {
+        "para_id": "GT-西幻-049",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是圣光药剂，能暂时增强你的力量。"
+      },
+      {
+        "para_id": "GT-西幻-050",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "谢谢你，伊莉雅。"
+      },
+      {
+        "para_id": "GT-西幻-051",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "不会失败的。"
+      },
+      {
+        "para_id": "GT-西幻-052",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "防线已经布置完毕。"
+      },
+      {
+        "para_id": "GT-西幻-053",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "攻击！"
+      },
+      {
+        "para_id": "GT-西幻-054",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "退守内墙！"
+      },
+      {
+        "para_id": "GT-西幻-055",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它的力量太强了。"
+      },
+      {
+        "para_id": "GT-西幻-056",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "艾德温！"
+      },
+      {
+        "para_id": "GT-西幻-057",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "赢了吗？"
+      },
+      {
+        "para_id": "GT-西幻-058",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "赢了。"
+      },
+      {
+        "para_id": "GT-西幻-059",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "城墙需要完全重建。"
+      },
+      {
+        "para_id": "GT-西幻-060",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "王都的支援什么时候到？"
+      },
+      {
+        "para_id": "GT-西幻-061",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "预计明天。"
+      },
+      {
+        "para_id": "GT-西幻-062",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他趁乱逃走了。"
+      },
+      {
+        "para_id": "GT-西幻-063",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "黑暗势力正在集结，目标是王都。"
+      },
+      {
+        "para_id": "GT-西幻-064",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须提前警告国王。"
+      },
+      {
+        "para_id": "GT-西幻-065",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这场战争才刚刚开始。"
+      },
+      {
+        "para_id": "GT-西幻-066",
+        "expected": "雷纳德",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "艾德温骑士，你的英勇事迹已经传遍王都。"
+      },
+      {
+        "para_id": "GT-西幻-067",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我只是做了该做的事。"
+      },
+      {
+        "para_id": "GT-西幻-068",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "城墙需要重建，但人员伤亡不大。"
+      },
+      {
+        "para_id": "GT-西幻-069",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是证据。"
+      },
+      {
+        "para_id": "GT-西幻-070",
+        "expected": "雷纳德",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "必须立即报告国王。"
+      },
+      {
+        "para_id": "GT-西幻-071",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们和你一起回去。"
+      },
+      {
+        "para_id": "GT-西幻-072",
+        "expected": "雷纳德",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "莫洛克的同党。"
+      },
+      {
+        "para_id": "GT-西幻-073",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须尽快查出来。"
+      },
+      {
+        "para_id": "GT-西幻-074",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为什么？"
+      },
+      {
+        "para_id": "GT-西幻-075",
+        "expected": "托马斯",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "莫洛克承诺给我力量……"
+      },
+      {
+        "para_id": "GT-西幻-076",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你背叛了圣光。"
+      },
+      {
+        "para_id": "GT-西幻-077",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "按军法处置。"
+      },
+      {
+        "para_id": "GT-西幻-078",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "等等。"
+      },
+      {
+        "para_id": "GT-西幻-079",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他可能有更多的情报。"
+      },
+      {
+        "para_id": "GT-西幻-080",
+        "expected": "托马斯",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "放过我的家人，他们什么都不知道。"
+      },
+      {
+        "para_id": "GT-西幻-081",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我答应你。"
+      },
+      {
+        "para_id": "GT-西幻-082",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须立刻赶回王都。"
+      },
+      {
+        "para_id": "GT-西幻-083",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "勇敢的骑士们，感谢你们的到来。"
+      },
+      {
+        "para_id": "GT-西幻-084",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "陛下，黑暗势力正在集结。"
+      },
+      {
+        "para_id": "GT-西幻-085",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们将组建一支新的联军，对抗黑暗。"
+      },
+      {
+        "para_id": "GT-西幻-086",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "艾德温，你愿意担任先锋吗？"
+      },
+      {
+        "para_id": "GT-西幻-087",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是我的荣幸，陛下。"
+      },
+      {
+        "para_id": "GT-西幻-088",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "让我们为了光明，为了正义，为了这个世界！"
+      },
+      {
+        "para_id": "GT-西幻-089",
+        "expected": "众人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为了光明！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-001",
+        "expected": "测验魔石碑",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "斗之力，三段！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-002",
+        "expected": "中年男子",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎，斗之力，三段！级别：低级！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-003",
+        "expected": "测验人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "下一个，萧媚！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-004",
+        "expected": "测试员",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "下一个，萧薰儿！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-005",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎哥哥。"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-006",
+        "expected": "萧炎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我现在还有资格让你怎么叫么？"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-007",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎哥哥，以前你曾经与薰儿说过，要能放下，才能拿起，提放自如"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-008",
+        "expected": "萧炎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "呵呵，自在人？我也只会说而已，你看我现在的模样，象自在人吗？"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-009",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎哥哥，虽然并不知道你究竟是怎么回事，不过，薰儿相信，你会"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-010",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "当年的萧炎哥哥，的确很吸引人……"
+      }
+    ],
+    "per_category": {
+      "dialogue": {
+        "total": 287,
+        "correct": 71
+      },
+      "non_dialogue": {
+        "total": 47,
+        "correct": 0
+      },
+      "unknown_speaker": {
+        "total": 14,
+        "correct": 10
+      }
+    },
+    "elapsed": 32.90222716331482
+  },
+  "short_tests_mode_b": {
+    "total": 368,
+    "correct": 83,
+    "wrong": 225,
+    "false_positive": 58,
+    "false_negative": 2,
+    "unknown_correct": 10,
+    "accuracy": 0.22554347826086957,
+    "errors": [
+      {
+        "para_id": "H-003",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "师弟，别来无恙。"
+      },
+      {
+        "para_id": "H-004",
+        "expected": "黑衣人",
+        "actual": "苏夜",
+        "type": "mismatch",
+        "dialogue": "把东西交出来。"
+      },
+      {
+        "para_id": "H-007",
+        "expected": "药老",
+        "actual": "萧炎",
+        "type": "mismatch",
+        "dialogue": "这枚丹药，你先服下。"
+      },
+      {
+        "para_id": "H-009",
+        "expected": "林轩",
+        "actual": "他又劝",
+        "type": "mismatch",
+        "dialogue": "机会难得，一起去吧。"
+      },
+      {
+        "para_id": "H-013",
+        "expected": "黑衣人",
+        "actual": "林轩",
+        "type": "mismatch",
+        "dialogue": "交出那块玉石，饶你不死。"
+      },
+      {
+        "para_id": "H-015",
+        "expected": "萧炎",
+        "actual": "药老",
+        "type": "mismatch",
+        "dialogue": "很好，我买了。"
+      },
+      {
+        "para_id": "H-017",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "很快了，相信我。"
+      },
+      {
+        "para_id": "H-020",
+        "expected": "GROUP:CROWD",
+        "actual": "骑士",
+        "type": "mismatch",
+        "dialogue": "冲啊！"
+      },
+      {
+        "para_id": "H-021",
+        "expected": "联盟成员",
+        "actual": "博士",
+        "type": "mismatch",
+        "dialogue": "杀了他们！"
+      },
+      {
+        "para_id": "H-023",
+        "expected": "艾德温",
+        "actual": "艾德温怒",
+        "type": "mismatch",
+        "dialogue": "加尔文，你背叛了我们！"
+      },
+      {
+        "para_id": "H-026",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "等等我！"
+      },
+      {
+        "para_id": "H-028",
+        "expected": "黑衣人",
+        "actual": "苏夜",
+        "type": "mismatch",
+        "dialogue": "不可能……"
+      },
+      {
+        "para_id": "H-029",
+        "expected": "小翠",
+        "actual": "赵天行",
+        "type": "mismatch",
+        "dialogue": "她出去了，我是小翠。"
+      },
+      {
+        "para_id": "H-031",
+        "expected": "伊莉雅",
+        "actual": "苏夜",
+        "type": "mismatch",
+        "dialogue": "救命！"
+      },
+      {
+        "para_id": "H-034",
+        "expected": "骑士们",
+        "actual": "博士",
+        "type": "mismatch",
+        "dialogue": "杀！"
+      },
+      {
+        "para_id": "H-035",
+        "expected": "林雪",
+        "actual": "她咬牙",
+        "type": "mismatch",
+        "dialogue": "我会找到的。"
+      },
+      {
+        "para_id": "A1-1",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "幽石林"
+      },
+      {
+        "para_id": "A1-2",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "断龙崖"
+      },
+      {
+        "para_id": "A1-3",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "陨星谷"
+      },
+      {
+        "para_id": "A2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "地火苔"
+      },
+      {
+        "para_id": "A2-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "玄冰剑"
+      },
+      {
+        "para_id": "A2-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "九转还魂丹"
+      },
+      {
+        "para_id": "A3-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "轰！"
+      },
+      {
+        "para_id": "A3-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "嗖——"
+      },
+      {
+        "para_id": "A3-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "咔嚓！"
+      },
+      {
+        "para_id": "A4-1",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "求稳"
+      },
+      {
+        "para_id": "A4-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "苦修"
+      },
+      {
+        "para_id": "A4-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "暂避锋芒"
+      },
+      {
+        "para_id": "A5-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "跳，还是不跳"
+      },
+      {
+        "para_id": "A5-2",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "如果失败了怎么办？"
+      },
+      {
+        "para_id": "A5-3",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "这老家伙八成在骗我。"
+      },
+      {
+        "para_id": "B1-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "丹方玉简"
+      },
+      {
+        "para_id": "B1-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话，仅旁白（若系统认为有对话则错误）"
+      },
+      {
+        "para_id": "B1-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "噬金蚁"
+      },
+      {
+        "para_id": "B1-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B1-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "青锋剑"
+      },
+      {
+        "para_id": "B1-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "仓央洲"
+      },
+      {
+        "para_id": "B2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B2-2",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "黑风谷"
+      },
+      {
+        "para_id": "B2-2",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B2-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "天元城"
+      },
+      {
+        "para_id": "B2-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B3-1",
+        "expected": "(无对话)",
+        "actual": "张家",
+        "type": "false_positive",
+        "dialogue": "张家"
+      },
+      {
+        "para_id": "B3-1",
+        "expected": "(无对话)",
+        "actual": "仓央洲",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B3-2",
+        "expected": "(无对话)",
+        "actual": "弟子",
+        "type": "false_positive",
+        "dialogue": "青云宗"
+      },
+      {
+        "para_id": "B3-2",
+        "expected": "(无对话)",
+        "actual": "弟子",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B3-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "万宝楼"
+      },
+      {
+        "para_id": "B3-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B4-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "真元"
+      },
+      {
+        "para_id": "B4-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B4-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "元婴"
+      },
+      {
+        "para_id": "B4-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B4-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "金丹"
+      },
+      {
+        "para_id": "B4-3",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B5-1",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "远超"
+      },
+      {
+        "para_id": "B5-1",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B5-2",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "精湛"
+      },
+      {
+        "para_id": "B5-2",
+        "expected": "(无对话)",
+        "actual": "长老",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "B5-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "诡异"
+      },
+      {
+        "para_id": "B5-3",
+        "expected": "(无对话)",
+        "actual": "修士",
+        "type": "false_positive",
+        "dialogue": "无对话"
+      },
+      {
+        "para_id": "C2-1",
+        "expected": "孙项明",
+        "actual": "郭垣",
+        "type": "mismatch",
+        "dialogue": "郭道友。"
+      },
+      {
+        "para_id": "C2-1",
+        "expected": "郭垣",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "嘿，这次打算去哪探？"
+      },
+      {
+        "para_id": "C2-1",
+        "expected": "孙项明",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "老地方碰碰运气。"
+      },
+      {
+        "para_id": "C2-2",
+        "expected": "掌门",
+        "actual": "林雪",
+        "type": "mismatch",
+        "dialogue": "不行，你修为太弱。"
+      },
+      {
+        "para_id": "C2-2",
+        "expected": "萧炎",
+        "actual": "掌门",
+        "type": "mismatch",
+        "dialogue": "那我陪她一起去。"
+      },
+      {
+        "para_id": "C2-3",
+        "expected": "师兄（他）",
+        "actual": "小师妹",
+        "type": "mismatch",
+        "dialogue": "无妨，皮外伤。"
+      },
+      {
+        "para_id": "C2-3",
+        "expected": "小师妹",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "快服下这枚疗伤丹。"
+      },
+      {
+        "para_id": "C3-1",
+        "expected": "林雪",
+        "actual": "林轩",
+        "type": "mismatch",
+        "dialogue": "林轩，你又在偷懒！"
+      },
+      {
+        "para_id": "C3-2",
+        "expected": "对手",
+        "actual": "萧炎",
+        "type": "mismatch",
+        "dialogue": "萧炎，认输吧，你不是我的对手。"
+      },
+      {
+        "para_id": "C4-2",
+        "expected": "黑袍年轻人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这枚丹药归我了。"
+      },
+      {
+        "para_id": "C5-2",
+        "expected": "林雪",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "小心保管，别弄丢了。"
+      },
+      {
+        "para_id": "C6-1",
+        "expected": "萧炎",
+        "actual": "林轩",
+        "type": "mismatch",
+        "dialogue": "林轩的剑法果然厉害。"
+      },
+      {
+        "para_id": "D2-1",
+        "expected": "未知",
+        "actual": "(未检测到)",
+        "type": "false_negative",
+        "dialogue": "这家伙是什么来头？"
+      },
+      {
+        "para_id": "D2-2",
+        "expected": "未知",
+        "actual": "(未检测到)",
+        "type": "false_negative",
+        "dialogue": "救命啊！"
+      },
+      {
+        "para_id": "D3-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "天火三玄变，第一变：熔岩体。"
+      },
+      {
+        "para_id": "D3-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "入此门者，当弃一切希望。"
+      },
+      {
+        "para_id": "E1-1",
+        "expected": "药尘",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "老夫自有分寸。"
+      },
+      {
+        "para_id": "E1-1",
+        "expected": "萧炎",
+        "actual": "药尘",
+        "type": "mismatch",
+        "dialogue": "那就有劳药老了。"
+      },
+      {
+        "para_id": "E1-2",
+        "expected": "萧炎",
+        "actual": "药老",
+        "type": "mismatch",
+        "dialogue": "是，药老教训得对。"
+      },
+      {
+        "para_id": "E1-3",
+        "expected": "林雪",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "多谢孙兄。"
+      },
+      {
+        "para_id": "E2-1",
+        "expected": "散修",
+        "actual": "老者",
+        "type": "mismatch",
+        "dialogue": "是，是……老者饶命！"
+      },
+      {
+        "para_id": "E2-2",
+        "expected": "拄拐老妪",
+        "actual": "拐老妪沙哑地",
+        "type": "mismatch",
+        "dialogue": "小娃娃，此地危险。"
+      },
+      {
+        "para_id": "E2-2",
+        "expected": "年轻修士",
+        "actual": "拐老妪沙哑地",
+        "type": "mismatch",
+        "dialogue": "老妪，敢问前方是什么地方？"
+      },
+      {
+        "para_id": "E2-3",
+        "expected": "中年修士",
+        "actual": "少年",
+        "type": "mismatch",
+        "dialogue": "少年，你太狂妄了。"
+      },
+      {
+        "para_id": "F1-1",
+        "expected": "(无对话)",
+        "actual": "萧炎",
+        "type": "false_positive",
+        "dialogue": "入此门者，当弃一切希望。"
+      },
+      {
+        "para_id": "F1-2",
+        "expected": "(无对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "天劫降临，万物俱灭。"
+      },
+      {
+        "para_id": "F2-1",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "如果能活着回去……"
+      },
+      {
+        "para_id": "F2-2",
+        "expected": "(无对话)",
+        "actual": "未知",
+        "type": "false_positive",
+        "dialogue": "一定要撑住。"
+      },
+      {
+        "para_id": "F2-3",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "不行，得想个办法。"
+      },
+      {
+        "para_id": "B1-混",
+        "expected": "药老",
+        "actual": "萧炎",
+        "type": "mismatch",
+        "dialogue": "丹方玉简"
+      },
+      {
+        "para_id": "B1-混",
+        "expected": "萧炎",
+        "actual": "丹方玉简",
+        "type": "mismatch",
+        "dialogue": "这东西值多少钱？"
+      },
+      {
+        "para_id": "B1-混",
+        "expected": "(无此对话)",
+        "actual": "萧炎",
+        "type": "false_positive",
+        "dialogue": "无价之宝。"
+      },
+      {
+        "para_id": "B2-混",
+        "expected": "林雪",
+        "actual": "仓央洲",
+        "type": "mismatch",
+        "dialogue": "仓央洲"
+      },
+      {
+        "para_id": "B2-混",
+        "expected": "孙项明",
+        "actual": "仓央洲",
+        "type": "mismatch",
+        "dialogue": "这就是你说的宝地？"
+      },
+      {
+        "para_id": "B2-混",
+        "expected": "(无此对话)",
+        "actual": "林雪",
+        "type": "false_positive",
+        "dialogue": "耐心点，宝藏在地底。"
+      },
+      {
+        "para_id": "B3-混",
+        "expected": "林雪",
+        "actual": "张家",
+        "type": "mismatch",
+        "dialogue": "张家"
+      },
+      {
+        "para_id": "B3-混",
+        "expected": "(无此对话)",
+        "actual": "张家",
+        "type": "false_positive",
+        "dialogue": "听说张家最近收了一批好药材。"
+      },
+      {
+        "para_id": "B4-混",
+        "expected": "郭垣",
+        "actual": "孙项明",
+        "type": "mismatch",
+        "dialogue": "真元"
+      },
+      {
+        "para_id": "B4-混",
+        "expected": "孙项明",
+        "actual": "郭垣",
+        "type": "mismatch",
+        "dialogue": "哼，就这点本事？"
+      },
+      {
+        "para_id": "B4-混",
+        "expected": "(无此对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "还没完。"
+      },
+      {
+        "para_id": "B5-混",
+        "expected": "林雪",
+        "actual": "修士",
+        "type": "mismatch",
+        "dialogue": "远超"
+      },
+      {
+        "para_id": "B5-混",
+        "expected": "萧炎",
+        "actual": "林雪",
+        "type": "mismatch",
+        "dialogue": "这家伙简直是个怪物。"
+      },
+      {
+        "para_id": "B5-混",
+        "expected": "(无此对话)",
+        "actual": "萧炎",
+        "type": "false_positive",
+        "dialogue": "没错，他修习的功法也很特殊。"
+      },
+      {
+        "para_id": "F2-3-补",
+        "expected": "(无对话)",
+        "actual": "孙项明",
+        "type": "false_positive",
+        "dialogue": "不行，得想个办法。"
+      },
+      {
+        "para_id": "GT-修仙-001",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您终于醒了！"
+      },
+      {
+        "para_id": "GT-修仙-002",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "小翠，我睡了多久？"
+      },
+      {
+        "para_id": "GT-修仙-003",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您昏迷了整整三天！"
+      },
+      {
+        "para_id": "GT-修仙-004",
+        "expected": "林天豪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "轩儿！你终于醒了！"
+      },
+      {
+        "para_id": "GT-修仙-005",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "父亲。"
+      },
+      {
+        "para_id": "GT-修仙-006",
+        "expected": "林天豪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "轩儿，你感觉如何？"
+      },
+      {
+        "para_id": "GT-修仙-007",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "父亲放心，孩儿已经无碍。"
+      },
+      {
+        "para_id": "GT-修仙-008",
+        "expected": "林天豪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "那就好，那就好。"
+      },
+      {
+        "para_id": "GT-修仙-009",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是，父亲。"
+      },
+      {
+        "para_id": "GT-修仙-010",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "既来之，则安之。"
+      },
+      {
+        "para_id": "GT-修仙-011",
+        "expected": "王管家",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，老奴是王管家。"
+      },
+      {
+        "para_id": "GT-修仙-012",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "进来吧。"
+      },
+      {
+        "para_id": "GT-修仙-013",
+        "expected": "王管家",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，这是您要的书籍。"
+      },
+      {
+        "para_id": "GT-修仙-014",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "辛苦王叔了。"
+      },
+      {
+        "para_id": "GT-修仙-015",
+        "expected": "王管家",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷客气了，老奴告退。"
+      },
+      {
+        "para_id": "GT-修仙-016",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "看来，我需要尽快提升实力。"
+      },
+      {
+        "para_id": "GT-修仙-017",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您休息一下吧。"
+      },
+      {
+        "para_id": "GT-修仙-018",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "好。"
+      },
+      {
+        "para_id": "GT-修仙-019",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，您真厉害！"
+      },
+      {
+        "para_id": "GT-修仙-020",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "还差得远呢。"
+      },
+      {
+        "para_id": "GT-修仙-021",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷要去武馆？"
+      },
+      {
+        "para_id": "GT-修仙-022",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "府里太安逸了，我需要更大的压力。"
+      },
+      {
+        "para_id": "GT-修仙-023",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "要下雨了。"
+      },
+      {
+        "para_id": "GT-修仙-024",
+        "expected": "小翠",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "少爷，我们快回去吧！"
+      },
+      {
+        "para_id": "GT-修仙-025",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这一世，我一定要站在这个世界的巅峰！"
+      },
+      {
+        "para_id": "GT-修仙-026",
+        "expected": "赵虎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "让开！让开！"
+      },
+      {
+        "para_id": "GT-修仙-027",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "那是赵家的少爷赵虎。"
+      },
+      {
+        "para_id": "GT-修仙-028",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "淬体境三重？这么厉害！"
+      },
+      {
+        "para_id": "GT-修仙-029",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "可不是嘛，赵家可是我们天元城的三大家族之一！"
+      },
+      {
+        "para_id": "GT-修仙-030",
+        "expected": "赵虎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "哟，这不是林家的废物少爷吗？"
+      },
+      {
+        "para_id": "GT-修仙-031",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "赵少爷说笑了。让路。"
+      },
+      {
+        "para_id": "GT-修仙-032",
+        "expected": "赵虎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "怎么？不敢说话？"
+      },
+      {
+        "para_id": "GT-修仙-033",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这林家少爷，胆子不小啊！"
+      },
+      {
+        "para_id": "GT-修仙-034",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是啊，敢这么跟赵虎说话！"
+      },
+      {
+        "para_id": "GT-修仙-035",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "请出示身份证明。"
+      },
+      {
+        "para_id": "GT-修仙-036",
+        "expected": "路人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "听说这次考核很严格，要通过三关才能成为正式学员！"
+      },
+      {
+        "para_id": "GT-修仙-037",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "下一个，林轩！"
+      },
+      {
+        "para_id": "GT-修仙-038",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "请出拳。"
+      },
+      {
+        "para_id": "GT-修仙-039",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "三百斤！"
+      },
+      {
+        "para_id": "GT-修仙-040",
+        "expected": "考官",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "恭喜你，林轩，你被录取了！"
+      },
+      {
+        "para_id": "GT-修仙-041",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "多谢考官。"
+      },
+      {
+        "para_id": "GT-修仙-042",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林轩，你来得真早！"
+      },
+      {
+        "para_id": "GT-修仙-043",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "李铁。你怎么也这么早？"
+      },
+      {
+        "para_id": "GT-修仙-044",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "哈哈，我这不是怕落后嘛！"
+      },
+      {
+        "para_id": "GT-修仙-045",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "对了，听说今天有大师兄的授课！"
+      },
+      {
+        "para_id": "GT-修仙-046",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "淬体境九重？"
+      },
+      {
+        "para_id": "GT-修仙-047",
+        "expected": "陈风",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "今天，我要讲的是武道的根基——淬体！"
+      },
+      {
+        "para_id": "GT-修仙-048",
+        "expected": "陈风",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "武道一途，没有捷径可走，唯有勤修苦练！"
+      },
+      {
+        "para_id": "GT-修仙-049",
+        "expected": "陈风",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你很不错，好好努力，将来必成大器！"
+      },
+      {
+        "para_id": "GT-修仙-050",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "多谢大师兄指点！"
+      },
+      {
+        "para_id": "GT-修仙-051",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林轩！该吃饭了！"
+      },
+      {
+        "para_id": "GT-修仙-052",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "来了！"
+      },
+      {
+        "para_id": "GT-修仙-053",
+        "expected": "李铁",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林轩，你的进步真快！"
+      },
+      {
+        "para_id": "GT-修仙-054",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是你让着我。再来！"
+      },
+      {
+        "para_id": "GT-修仙-055",
+        "expected": "林轩",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明天，又是新的一天！"
+      },
+      {
+        "para_id": "GT-都市异能-001",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你在这里！"
+      },
+      {
+        "para_id": "GT-都市异能-002",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "林雪，你怎么上来了？"
+      },
+      {
+        "para_id": "GT-都市异能-003",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "公司出事了。"
+      },
+      {
+        "para_id": "GT-都市异能-004",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "今天有个神秘组织来公司搜查"
+      },
+      {
+        "para_id": "GT-都市异能-005",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他们怎么知道这里有异能者？"
+      },
+      {
+        "para_id": "GT-都市异能-006",
+        "expected": "老陈",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，来会议室一趟。"
+      },
+      {
+        "para_id": "GT-都市异能-007",
+        "expected": "黑衣人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏先生，我们是暗影会的调查员。"
+      },
+      {
+        "para_id": "GT-都市异能-008",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我不知道你们在说什么。"
+      },
+      {
+        "para_id": "GT-都市异能-009",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，快来老地方！"
+      },
+      {
+        "para_id": "GT-都市异能-010",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是赵天行赵大哥。"
+      },
+      {
+        "para_id": "GT-都市异能-011",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我是华夏异能者联盟的负责人。"
+      },
+      {
+        "para_id": "GT-都市异能-012",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明天开始，你来联盟总部报道。"
+      },
+      {
+        "para_id": "GT-都市异能-013",
+        "expected": "联盟成员",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "暗影会的人来了！"
+      },
+      {
+        "para_id": "GT-都市异能-014",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你跟我去前线！"
+      },
+      {
+        "para_id": "GT-都市异能-015",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "干得好，苏夜！"
+      },
+      {
+        "para_id": "GT-都市异能-016",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我建议潜入基地。"
+      },
+      {
+        "para_id": "GT-都市异能-017",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "太危险了。"
+      },
+      {
+        "para_id": "GT-都市异能-018",
+        "expected": "博士",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "样本准备好了吗？"
+      },
+      {
+        "para_id": "GT-都市异能-019",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这不是科学，这是犯罪！"
+      },
+      {
+        "para_id": "GT-都市异能-020",
+        "expected": "赵天行",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你这次立了大功。"
+      },
+      {
+        "para_id": "GT-都市异能-021",
+        "expected": "苏夜",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是大家共同努力的结果。"
+      },
+      {
+        "para_id": "GT-都市异能-022",
+        "expected": "林雪",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "苏夜，你太棒了！"
+      },
+      {
+        "para_id": "GT-都市异能-023",
+        "expected": "三人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为了守护这个世界！"
+      },
+      {
+        "para_id": "GT-西幻-001",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "北方有异动。"
+      },
+      {
+        "para_id": "GT-西幻-002",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我能感觉到魔力的波动。"
+      },
+      {
+        "para_id": "GT-西幻-003",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "那不是雷声。"
+      },
+      {
+        "para_id": "GT-西幻-004",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是炎魔，至少有三只。"
+      },
+      {
+        "para_id": "GT-西幻-005",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "情况如何？"
+      },
+      {
+        "para_id": "GT-西幻-006",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "炎魔入侵，立即组织防御。"
+      },
+      {
+        "para_id": "GT-西幻-007",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "是！"
+      },
+      {
+        "para_id": "GT-西幻-008",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "射击！"
+      },
+      {
+        "para_id": "GT-西幻-009",
+        "expected": "骑士",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "弓箭无效！"
+      },
+      {
+        "para_id": "GT-西幻-010",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "换银箭！"
+      },
+      {
+        "para_id": "GT-西幻-011",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它们在试探我们的实力。"
+      },
+      {
+        "para_id": "GT-西幻-012",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "根据古籍记载，炎魔不会无缘无故出现。"
+      },
+      {
+        "para_id": "GT-西幻-013",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "一定是有人召唤了它们。"
+      },
+      {
+        "para_id": "GT-西幻-014",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "巡逻队在北边发现了痕迹。"
+      },
+      {
+        "para_id": "GT-西幻-015",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "有人类与炎魔勾结？"
+      },
+      {
+        "para_id": "GT-西幻-016",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "很有可能。"
+      },
+      {
+        "para_id": "GT-西幻-017",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明天一早，我带人去北方调查。"
+      },
+      {
+        "para_id": "GT-西幻-018",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我和你一起去。"
+      },
+      {
+        "para_id": "GT-西幻-019",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我留守哨站，组织防御。"
+      },
+      {
+        "para_id": "GT-西幻-020",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "魔力波动越来越强了。"
+      },
+      {
+        "para_id": "GT-西幻-021",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "防御！"
+      },
+      {
+        "para_id": "GT-西幻-022",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它变强了。"
+      },
+      {
+        "para_id": "GT-西幻-023",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "就是现在！"
+      },
+      {
+        "para_id": "GT-西幻-024",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "没事吧？"
+      },
+      {
+        "para_id": "GT-西幻-025",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "没事，继续前进。"
+      },
+      {
+        "para_id": "GT-西幻-026",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他在召唤更多的炎魔。"
+      },
+      {
+        "para_id": "GT-西幻-027",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "分三组，同时攻击。伊莉雅，你负责打断仪式。"
+      },
+      {
+        "para_id": "GT-西幻-028",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "明白。"
+      },
+      {
+        "para_id": "GT-西幻-029",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "莫洛克？"
+      },
+      {
+        "para_id": "GT-西幻-030",
+        "expected": "莫洛克",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "没想到你会记得我。"
+      },
+      {
+        "para_id": "GT-西幻-031",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你为什么要召唤炎魔？"
+      },
+      {
+        "para_id": "GT-西幻-032",
+        "expected": "莫洛克",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为了力量！"
+      },
+      {
+        "para_id": "GT-西幻-033",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你疯了！炎魔只会毁灭一切！"
+      },
+      {
+        "para_id": "GT-西幻-034",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "情况比我们想象的严重。"
+      },
+      {
+        "para_id": "GT-西幻-035",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "足以摧毁整个哨站。"
+      },
+      {
+        "para_id": "GT-西幻-036",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须请求支援。"
+      },
+      {
+        "para_id": "GT-西幻-037",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "在支援到达之前，我们必须加强防御。"
+      },
+      {
+        "para_id": "GT-西幻-038",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "把所有魔法师都调来。"
+      },
+      {
+        "para_id": "GT-西幻-039",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我有个主意。"
+      },
+      {
+        "para_id": "GT-西幻-040",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "古籍中提到过，炎魔害怕圣水和银的组合物。"
+      },
+      {
+        "para_id": "GT-西幻-041",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你能制作吗？"
+      },
+      {
+        "para_id": "GT-西幻-042",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "可以，但需要时间。"
+      },
+      {
+        "para_id": "GT-西幻-043",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们没有两天时间。"
+      },
+      {
+        "para_id": "GT-西幻-044",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它来了。"
+      },
+      {
+        "para_id": "GT-西幻-045",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "全体准备战斗！"
+      },
+      {
+        "para_id": "GT-西幻-046",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它还有两个小时就会到达。"
+      },
+      {
+        "para_id": "GT-西幻-047",
+        "expected": "年轻骑士",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们能赢吗？"
+      },
+      {
+        "para_id": "GT-西幻-048",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须赢。"
+      },
+      {
+        "para_id": "GT-西幻-049",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是圣光药剂，能暂时增强你的力量。"
+      },
+      {
+        "para_id": "GT-西幻-050",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "谢谢你，伊莉雅。"
+      },
+      {
+        "para_id": "GT-西幻-051",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "不会失败的。"
+      },
+      {
+        "para_id": "GT-西幻-052",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "防线已经布置完毕。"
+      },
+      {
+        "para_id": "GT-西幻-053",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "攻击！"
+      },
+      {
+        "para_id": "GT-西幻-054",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "退守内墙！"
+      },
+      {
+        "para_id": "GT-西幻-055",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "它的力量太强了。"
+      },
+      {
+        "para_id": "GT-西幻-056",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "艾德温！"
+      },
+      {
+        "para_id": "GT-西幻-057",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "赢了吗？"
+      },
+      {
+        "para_id": "GT-西幻-058",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "赢了。"
+      },
+      {
+        "para_id": "GT-西幻-059",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "城墙需要完全重建。"
+      },
+      {
+        "para_id": "GT-西幻-060",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "王都的支援什么时候到？"
+      },
+      {
+        "para_id": "GT-西幻-061",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "预计明天。"
+      },
+      {
+        "para_id": "GT-西幻-062",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他趁乱逃走了。"
+      },
+      {
+        "para_id": "GT-西幻-063",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "黑暗势力正在集结，目标是王都。"
+      },
+      {
+        "para_id": "GT-西幻-064",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须提前警告国王。"
+      },
+      {
+        "para_id": "GT-西幻-065",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这场战争才刚刚开始。"
+      },
+      {
+        "para_id": "GT-西幻-066",
+        "expected": "雷纳德",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "艾德温骑士，你的英勇事迹已经传遍王都。"
+      },
+      {
+        "para_id": "GT-西幻-067",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我只是做了该做的事。"
+      },
+      {
+        "para_id": "GT-西幻-068",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "城墙需要重建，但人员伤亡不大。"
+      },
+      {
+        "para_id": "GT-西幻-069",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是证据。"
+      },
+      {
+        "para_id": "GT-西幻-070",
+        "expected": "雷纳德",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "必须立即报告国王。"
+      },
+      {
+        "para_id": "GT-西幻-071",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们和你一起回去。"
+      },
+      {
+        "para_id": "GT-西幻-072",
+        "expected": "雷纳德",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "莫洛克的同党。"
+      },
+      {
+        "para_id": "GT-西幻-073",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须尽快查出来。"
+      },
+      {
+        "para_id": "GT-西幻-074",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为什么？"
+      },
+      {
+        "para_id": "GT-西幻-075",
+        "expected": "托马斯",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "莫洛克承诺给我力量……"
+      },
+      {
+        "para_id": "GT-西幻-076",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "你背叛了圣光。"
+      },
+      {
+        "para_id": "GT-西幻-077",
+        "expected": "加尔文",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "按军法处置。"
+      },
+      {
+        "para_id": "GT-西幻-078",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "等等。"
+      },
+      {
+        "para_id": "GT-西幻-079",
+        "expected": "伊莉雅",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "他可能有更多的情报。"
+      },
+      {
+        "para_id": "GT-西幻-080",
+        "expected": "托马斯",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "放过我的家人，他们什么都不知道。"
+      },
+      {
+        "para_id": "GT-西幻-081",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我答应你。"
+      },
+      {
+        "para_id": "GT-西幻-082",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们必须立刻赶回王都。"
+      },
+      {
+        "para_id": "GT-西幻-083",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "勇敢的骑士们，感谢你们的到来。"
+      },
+      {
+        "para_id": "GT-西幻-084",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "陛下，黑暗势力正在集结。"
+      },
+      {
+        "para_id": "GT-西幻-085",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我们将组建一支新的联军，对抗黑暗。"
+      },
+      {
+        "para_id": "GT-西幻-086",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "艾德温，你愿意担任先锋吗？"
+      },
+      {
+        "para_id": "GT-西幻-087",
+        "expected": "艾德温",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "这是我的荣幸，陛下。"
+      },
+      {
+        "para_id": "GT-西幻-088",
+        "expected": "国王",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "让我们为了光明，为了正义，为了这个世界！"
+      },
+      {
+        "para_id": "GT-西幻-089",
+        "expected": "众人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "为了光明！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-001",
+        "expected": "测验魔石碑",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "斗之力，三段！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-002",
+        "expected": "中年男子",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎，斗之力，三段！级别：低级！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-003",
+        "expected": "测验人",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "下一个，萧媚！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-004",
+        "expected": "测试员",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "下一个，萧薰儿！"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-005",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎哥哥。"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-006",
+        "expected": "萧炎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "我现在还有资格让你怎么叫么？"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-007",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎哥哥，以前你曾经与薰儿说过，要能放下，才能拿起，提放自如"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-008",
+        "expected": "萧炎",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "呵呵，自在人？我也只会说而已，你看我现在的模样，象自在人吗？"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-009",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "萧炎哥哥，虽然并不知道你究竟是怎么回事，不过，薰儿相信，你会"
+      },
+      {
+        "para_id": "GT-玄幻(斗破)-010",
+        "expected": "萧薰儿",
+        "actual": "未知",
+        "type": "mismatch",
+        "dialogue": "当年的萧炎哥哥，的确很吸引人……"
+      }
+    ],
+    "per_category": {
+      "dialogue": {
+        "total": 287,
+        "correct": 73
+      },
+      "non_dialogue": {
+        "total": 47,
+        "correct": 0
+      },
+      "unknown_speaker": {
+        "total": 14,
+        "correct": 10
+      }
+    },
+    "elapsed": 28.7059965133667
+  },
+  "long_text_tests": [
+    {
+      "id": "LONG-novel_xiuxian",
+      "style": "修仙",
+      "status": "error",
+      "char_count": 3625,
+      "error": "'ChapterResult' object has no attribute 'get'",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\trae\\novel-tts-engine\\analysis_reports\\评估脚本\\run_comprehensive_test.py\", line 245, in run_long_text_tests\n    for sentence in chapter.get('sentences', []):\n                    ^^^^^^^^^^^\nAttributeError: 'ChapterResult' object has no attribute 'get'\n",
+      "elapsed": 47.5499701499939
+    },
+    {
+      "id": "LONG-novel_urban",
+      "style": "都市异能",
+      "status": "error",
+      "char_count": 3614,
+      "error": "'ChapterResult' object has no attribute 'get'",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\trae\\novel-tts-engine\\analysis_reports\\评估脚本\\run_comprehensive_test.py\", line 245, in run_long_text_tests\n    for sentence in chapter.get('sentences', []):\n                    ^^^^^^^^^^^\nAttributeError: 'ChapterResult' object has no attribute 'get'\n",
+      "elapsed": 0.021413326263427734
+    },
+    {
+      "id": "LONG-novel_western",
+      "style": "西幻",
+      "status": "error",
+      "char_count": 5439,
+      "error": "'ChapterResult' object has no attribute 'get'",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\trae\\novel-tts-engine\\analysis_reports\\评估脚本\\run_comprehensive_test.py\", line 245, in run_long_text_tests\n    for sentence in chapter.get('sentences', []):\n                    ^^^^^^^^^^^\nAttributeError: 'ChapterResult' object has no attribute 'get'\n",
+      "elapsed": 0.01485586166381836
+    },
+    {
+      "id": "LONG-novel_doupo",
+      "style": "玄幻(斗破)",
+      "status": "error",
+      "char_count": 28856,
+      "error": "'ChapterResult' object has no attribute 'get'",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\trae\\novel-tts-engine\\analysis_reports\\评估脚本\\run_comprehensive_test.py\", line 245, in run_long_text_tests\n    for sentence in chapter.get('sentences', []):\n                    ^^^^^^^^^^^\nAttributeError: 'ChapterResult' object has no attribute 'get'\n",
+      "elapsed": 0.011984825134277344
+    },
+    {
+      "id": "LONG-novel_guimi",
+      "style": "诡秘(闺秘)",
+      "status": "error",
+      "char_count": 36989,
+      "error": "'ChapterResult' object has no attribute 'get'",
+      "traceback": "Traceback (most recent call last):\n  File \"D:\\trae\\novel-tts-engine\\analysis_reports\\评估脚本\\run_comprehensive_test.py\", line 245, in run_long_text_tests\n    for sentence in chapter.get('sentences', []):\n                    ^^^^^^^^^^^\nAttributeError: 'ChapterResult' object has no attribute 'get'\n",
+      "elapsed": 0.010781288146972656
+    }
+  ],
+  "edge_case_tests": [
+    {
+      "name": "空字符串",
+      "input_length": 0,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0
+    },
+    {
+      "name": "纯空白",
+      "input_length": 8,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0015163421630859375
+    },
+    {
+      "name": "单个字符",
+      "input_length": 1,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0
+    },
+    {
+      "name": "纯标点",
+      "input_length": 4,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0
+    },
+    {
+      "name": "无引号纯叙述",
+      "input_length": 7,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0
+    },
+    {
+      "name": "单个引号（不匹配）",
+      "input_length": 5,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0
+    },
+    {
+      "name": "超长单行（10000字符）",
+      "input_length": 10000,
+      "expected": "no_dialogue",
+      "actual": "no_dialogue",
+      "dialogue_count": 0,
+      "passed": true,
+      "elapsed": 0.0
+    },
+    {
+      "name": "纯引号堆叠",
+      "input_length": 6,
+      "expected": "no_dialogue",
+      "actual": "has_dialogue",
+      "dialogue_count": 3,
+      "passed": false,
+      "elapsed": 0.0
+    },
+    {
+      "name": "引号内空白",
+      "input_length": 5,
+      "expected": "no_dialogue",
+      "actual": "has_dialogue",
+      "dialogue_count": 1,
+      "passed": false,
+      "elapsed": 0.0
+    },
+    {
+      "name": "中英混合引号",
+      "input_length": 13,
+      "expected": "has_dialogue",
+      "actual": "has_dialogue",
+      "dialogue_count": 1,
+      "passed": true,
+      "elapsed": 0.11081361770629883
+    },
+    {
+      "name": "嵌套引号（不常见）",
+      "input_length": 12,
+      "expected": "has_dialogue",
+      "actual": "has_dialogue",
+      "dialogue_count": 2,
+      "passed": true,
+      "elapsed": 0.16831040382385254
+    }
+  ],
+  "exception_tests": [
+    {
+      "test": "无角色库",
+      "status": "passed",
+      "all_unknown": true,
+      "dialogues_found": 1
+    },
+    {
+      "test": "多项目隔离",
+      "status": "passed",
+      "project_a_has_zhang": true,
+      "project_b_has_li": true
+    },
+    {
+      "test": "超长文本(500重复)",
+      "status": "passed",
+      "text_length": 3500,
+      "dialogues_found": 500,
+      "elapsed": 106.3157799243927
+    },
+    {
+      "test": "reset_activity隔离",
+      "status": "passed",
+      "result1_count": 1,
+      "result2_count": 1
+    }
+  ],
+  "module_tests": {
+    "speech_verb_detector": {
+      "status": "partial",
+      "passed": 9,
+      "total": 15
+    },
+    "descriptive_role_extractor": {
+      "status": "failed",
+      "error": "'DescriptiveRoleExtractor' object has no attribute 'match_by_title'"
+    },
+    "names_equivalent": {
+      "status": "partial",
+      "passed": 3,
+      "total": 4
+    }
+  }
+}

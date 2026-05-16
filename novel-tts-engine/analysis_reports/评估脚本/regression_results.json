@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-05-14 10:38:37",
+  "p0_new_a": {
+    "context": {
+      "total": 168,
+      "correct": 63,
+      "unknown": 36,
+      "wrong": 2,
+      "no_detect": 67,
+      "fp": 0,
+      "elapsed": 18.10604429244995,
+      "errors": [
+        {
+          "id": "GT-修仙-027",
+          "expected": "路人",
+          "actual": "边有人低声",
+          "category": "dialogue",
+          "text": "\"那是赵家的少爷赵虎。\"旁边有人低声说道，\"听说他已经是淬体境三重的高手了！\""
+        },
+        {
+          "id": "GT-西幻-003",
+          "expected": "艾德温",
+          "actual": "他沉声",
+          "category": "dialogue",
+          "text": "\"那不是雷声。\"他沉声说道。"
+        }
+      ]
+    },
+    "single": {
+      "total": 168,
+      "correct": 2,
+      "unknown": 166,
+      "wrong": 0,
+      "no_detect": 0,
+      "fp": 0,
+      "elapsed": 0.062220096588134766,
+      "errors": []
+    }
+  },
+  "p0_new_b": {
+    "non_dialogue": {
+      "total": 40,
+      "correct": 23,
+      "unknown": 0,
+      "wrong": 1,
+      "no_detect": 16,
+      "fp": 1,
+      "elapsed": 9.116828680038452,
+      "errors": [
+        {
+          "id": "F2-3",
+          "expected": "未知",
+          "actual": "孙项明",
+          "category": "non_dialogue",
+          "text": "孙项明在黑暗中自语道：“不行，得想个办法。”但他并未出声。"
+        }
+      ]
+    }
+  },
+  "p1_new_1": {
+    "note": "entity_cleaner策略已更新"
+  },
+  "other": {
+    "unknown": {
+      "total": 8,
+      "correct": 7,
+      "unknown": 0,
+      "wrong": 1,
+      "no_detect": 0,
+      "fp": 0,
+      "elapsed": 0.6252419948577881,
+      "errors": [
+        {
+          "id": "D2-2",
+          "expected": "未知",
+          "actual": "影中夹杂着怒",
+          "category": "unknown_speaker",
+          "text": "战场上一片混乱，刀光剑影中夹杂着怒吼。\"给我杀！\"\"撤退！\"\"救命啊！\""
+        }
+      ]
+    },
+    "dialog_sample": {
+      "total": 50,
+      "correct": 30,
+      "unknown": 0,
+      "wrong": 0,
+      "no_detect": 20,
+      "fp": 0,
+      "elapsed": 16.04224944114685,
+      "errors": []
+    }
+  }
+}

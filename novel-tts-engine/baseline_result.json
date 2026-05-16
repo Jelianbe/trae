@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-05-13T13:18:59.275862",
+  "correct": 9,
+  "total": 20,
+  "accuracy": 0.45,
+  "results": [
+    {
+      "id": "X01",
+      "expected": "管事",
+      "actual": "管事",
+      "correct": true,
+      "text": "孙项明！"
+    },
+    {
+      "id": "X02",
+      "expected": "管事",
+      "actual": "无表情的中年修士",
+      "correct": false,
+      "text": "规矩都懂。出来之后，七成收获上交，林家自有灵晶丹药补偿。"
+    },
+    {
+      "id": "X03",
+      "expected": "孙项明",
+      "actual": "管事",
+      "correct": false,
+      "text": "明白。"
+    },
+    {
+      "id": "X04",
+      "expected": "郭垣",
+      "actual": "未知",
+      "correct": false,
+      "text": "哟，老孙！你也来了啊！"
+    },
+    {
+      "id": "X05",
+      "expected": "孙项明",
+      "actual": "郭垣正",
+      "correct": false,
+      "text": "郭道友。"
+    },
+    {
+      "id": "X06",
+      "expected": "郭垣",
+      "actual": "郭垣",
+      "correct": true,
+      "text": "嘿，这次准备往哪边探？"
+    },
+    {
+      "id": "X07",
+      "expected": "孙项明",
+      "actual": "孙项明",
+      "correct": true,
+      "text": "我自知斤两，还是去老地方幽石林碰碰运气。"
+    },
+    {
+      "id": "X08",
+      "expected": "郭垣",
+      "actual": "郭垣",
+      "correct": true,
+      "text": "幽石林好啊，稳妥！"
+    },
+    {
+      "id": "X09",
+      "expected": "郭垣",
+      "actual": "郭垣",
+      "correct": true,
+      "text": "那咱们……各凭机缘？"
+    },
+    {
+      "id": "X10",
+      "expected": "孙项明",
+      "actual": "未知",
+      "correct": false,
+      "text": "自然。"
+    },
+    {
+      "id": "X11",
+      "expected": "孙项明",
+      "actual": "郭垣",
+      "correct": false,
+      "text": "郭垣？！"
+    },
+    {
+      "id": "X12",
+      "expected": "郭垣",
+      "actual": "郭垣",
+      "correct": true,
+      "text": "哼，反应倒快！"
+    },
+    {
+      "id": "X13",
+      "expected": "孙项明",
+      "actual": "孙项明",
+      "correct": true,
+      "text": "想要？自己来拿！"
+    },
+    {
+      "id": "X14",
+      "expected": "郭垣",
+      "actual": "孙项明",
+      "correct": false,
+      "text": "找死！"
+    },
+    {
+      "id": "X15",
+      "expected": "郭垣",
+      "actual": "孙项明",
+      "correct": false,
+      "text": "哈哈！中了老子的蛇涎毒，看你还能撑多久！"
+    },
+    {
+      "id": "X16",
+      "expected": "郭垣",
+      "actual": "孙项明",
+      "correct": false,
+      "text": "想跑？！"
+    },
+    {
+      "id": "X17",
+      "expected": "郭垣",
+      "actual": "郭垣",
+      "correct": true,
+      "text": "什么鬼东西？！"
+    },
+    {
+      "id": "X18",
+      "expected": "郭垣",
+      "actual": "孙项明真",
+      "correct": false,
+      "text": "该死的！"
+    },
+    {
+      "id": "X19",
+      "expected": "前辈",
+      "actual": "孙项明",
+      "correct": false,
+      "text": "别看了，小子，上前来，助我摆脱封印，送你一场造化。"
+    },
+    {
+      "id": "X20",
+      "expected": "孙项明",
+      "actual": "孙项明",
+      "correct": true,
+      "text": "谁！"
+    }
+  ]
+}

@@ -7,15 +7,13 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from pipeline.character_manager import CharacterManager, Character, get_character_manager
-from pipeline.nlp_basics import get_nlp
+from pipeline.nlp_basics import get_nlp, TITLE_WORDS
 from pipeline.semantic_ranker import SemanticRanker, get_semantic_ranker
-from pipeline.character_name_validator import CharacterNameValidator
-from pipeline.speaker_hint_matcher import SpeakerHintMatcher, DIALOGUE_PATTERNS, SPEAKER_PATTERNS, SPEAKER_HINTS
 from pipeline.descriptive_role_extractor import (
     DescriptiveRoleExtractor, TITLE_TRIGGERS, ACTION_TRIGGERS, ADDRESS_TRIGGERS, TitleTriggerMatcher, AddressTriggerMatcher,
 )
-from pipeline.self_reference_inferrer import SelfReferenceInferrer
 from pipeline.pronoun_resolver import PronounResolver, PRONOUNS
+from utils.zh_names import SINGLE_CHAR_SURNAMES
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +27,8 @@ class DialogueContext:
     chapter_id: Optional[int] = None
     context_before: Optional[str] = None
     context_after: Optional[str] = None
+    dialogue: Optional[str] = None
+    prefix_narration: Optional[str] = None  # 纯对话原文，不含 prefix/suffix
 
 
 @dataclass
@@ -82,6 +82,185 @@ def detect_group_speaker(text: str) -> Optional[str]:
     return None
 
 
+# ===== 内联自 speech_verb_detector.py（2026-05-14） =====
+
+# 纯说话动词（不带修饰，约12条）
+# 来源：现代汉语言说动词封闭集合
+SIMPLE_SPEECH_VERBS = [
+    '道', '说', '问', '喊', '叫', '答', '应',
+    '喝', '嚷', '骂', '斥', '吼',
+]
+
+# 表情/情绪修饰 + 说话（前2字情绪/表情，后1~2字说话动词，约30条）
+# 来源：中文网文高频说话模式
+EMOTION_MODIFIED_SPEECH = [
+    '笑道', '叹道', '怒道', '喝道', '哼道', '嚷道',
+    '骂道', '泣道', '冷冷道', '淡淡道', '沉声道',
+    '低声道', '高声道', '厉声道', '轻声道',
+    '冷笑道', '怪笑道', '柔声道', '安慰道',
+    '苦笑道', '涩声道', '颤声道', '怒声道',
+]
+
+# 复合动作 + 说话（动作词 + 道/说/问，约20条）
+# 来源：中文网文高频说话模式
+COMPOUND_ACTION_SPEECH = [
+    '说道', '问道', '答道', '回答道', '回应道',
+    '接道', '续道', '摇头道', '点头道', '叹息道',
+    '冷笑道', '讽刺道', '打趣道', '赞叹道',
+]
+
+# 所有说话动词集合（用于快速查询）
+ALL_SPEECH_VERBS: Set[str] = set(SIMPLE_SPEECH_VERBS + EMOTION_MODIFIED_SPEECH + COMPOUND_ACTION_SPEECH)
+
+# 说话边界词（角色名后紧跟，用于方向-B反向提取）
+SPEECH_BOUNDARY_WORDS = EMOTION_MODIFIED_SPEECH + COMPOUND_ACTION_SPEECH
+
+
+# ===== 内联自 speaker_hint_matcher.py（2026-05-14） =====
+
+# 说话提示词集合（约30条）
+# 来源：中文标点规范 + 网文常见说话动词
+SPEAKER_HINTS = [
+    '道', '说', '问', '喊', '叫', '答', '应', '笑', '叹', '怒',
+    '喝', '哼', '嚷', '骂', '嘟', '喃', '吟', '斥', '骂道', '说道',
+    '问道', '答道', '笑道', '叹道', '怒道', '喝道', '哼道', '嚷道',
+    '沉声道', '低声道', '高声道', '冷冷道', '淡淡道',
+]
+
+# 引号匹配模式
+#
+# 用途：识别中文引号内的对话文本
+# 来源：中文标点规范 GB/T 15834-2011 规定的引号对
+# 边界：仅包含标准中文引号对，不包含英文引号和特殊符号
+_QUOTE_CHARS = '""''「」『』'
+_LEFT_QUOTES = '"「『'
+_RIGHT_QUOTES = '"」』'
+
+
+def _build_quote_patterns():
+    """构建引号对话匹配正则
+    
+    仅捕获引号内的对话内容，不捕获引号前的前缀。
+    前缀信息通过后续的位置计算获得。
+    """
+    patterns = []
+    
+    for lq, rq in [('「', '」'), ('『', '』'), ('"', '"')]:
+        patterns.append(re.compile(
+            rf'{re.escape(lq)}'
+            rf'([^{re.escape(rq)}]+?)'
+            rf'{re.escape(rq)}'
+        ))
+    
+    patterns.append(re.compile(r'"([^"]*?)"'))
+    
+    return patterns
+
+
+DIALOGUE_PATTERNS = _build_quote_patterns()
+
+# 说话人模式：匹配"XX道"、"XX说"等格式
+# 关键：使用贪婪匹配 + 限定名字长度，确保"秦羽问道"提取为"秦羽"
+#
+# 用途：从"秦羽问道"等文本中提取说话人名字"秦羽"
+# 来源：中文句法结构（主语+谓语+引语），网文常见说话模式统计
+# 边界：仅匹配"说话"类动词，不匹配"思考"类动词
+#       名字长度限制1-6字，覆盖绝大多数中文人名
+SPEAKER_PATTERNS = [
+    # 模式1：XX+复合动词（沉声道/低声道/高声道/冷冷道/淡淡道）
+    re.compile(r'([\u4e00-\u9fa5]{1,6})\s*(?:沉声道|低声道|高声道|冷冷道|淡淡道)[：:，,。\s]'),
+    # 模式2：XX+单字动词（道/说/问/喊/叫/答/哼/笑/叹/怒/喝/嚷/骂）
+    re.compile(r'([\u4e00-\u9fa5]{1,6})\s*(?:道|说|问|喊|叫|答|应|笑|叹|怒|喝|哼|嚷|骂)[：:，,。\s]'),
+]
+
+
+# ===== 内联自 speech_verb_detector.py — SpeechVerbDetector 类 =====
+
+class SpeechVerbDetector:
+    """说话动词检测器"""
+
+    def is_speech_verb(self, word: str) -> bool:
+        return word in ALL_SPEECH_VERBS
+
+    def is_speech_related(self, word: str) -> bool:
+        return word in ALL_SPEECH_VERBS
+
+    def get_boundary_pattern(self) -> str:
+        return '|'.join(re.escape(w) for w in SPEECH_BOUNDARY_WORDS)
+
+    def extract_speech_context(self, text: str) -> List[Tuple[str, int]]:
+        results = []
+        for verb in sorted(ALL_SPEECH_VERBS, key=len, reverse=True):
+            start = 0
+            while True:
+                idx = text.find(verb, start)
+                if idx == -1:
+                    break
+                results.append((verb, idx))
+                start = idx + len(verb)
+        results.sort(key=lambda x: x[1])
+        return results
+
+
+_speech_detector = SpeechVerbDetector()
+
+def is_speech_verb(word: str) -> bool:
+    return _speech_detector.is_speech_verb(word)
+
+def is_speech_related(word: str) -> bool:
+    return _speech_detector.is_speech_related(word)
+
+def get_boundary_pattern() -> str:
+    return _speech_detector.get_boundary_pattern()
+
+
+def _clean_speaker_name(name: str, nlp=None) -> str:
+    """清理说话人名称，提取真正的人名。
+    
+    设计原则：
+    1. 优先使用 HanLP 词性标注，提取 NR(人名) 标记的 token
+    2. 当 HanLP 不可用时，使用最小后缀清理（仅移除说话动词）
+    """
+    if not name:
+        return name
+    
+    if nlp:
+        try:
+            result = nlp.analyze(name)
+            nr_tokens = [t.text for t in result.tokens if t.pos in ('NR', 'nr')]
+            if nr_tokens:
+                return ''.join(nr_tokens)
+            
+            nn_tokens = [t.text for t in result.tokens if t.pos in ('NN', 'nn')]
+            if nn_tokens:
+                return ''.join(nn_tokens)
+        except Exception:
+            pass
+    
+    # SPEECH_VERBS
+    #
+    # 用途：从"XX说道"等复合名称中移除说话动词后缀，提取纯角色名
+    # 来源：中文说话动词有限集合，基于中文标点规范和网文常见说话模式
+    # 边界：仅包含明确的说话/回应类动词，不扩展至动作/表情类
+    # 更新日期：2026-05-14
+    # 维护者：内联自 speaker_hint_matcher.py
+    SPEECH_VERBS = [
+        '冷冷道', '淡淡道', '沉声道', '低声道', '高声道',
+        '说道', '问道', '答道', '笑道', '叹道', '怒道', '喝道', '哼道', '嚷道',
+        '骂道', '回应道', '回答道', '接道', '续道',
+        '轻声道', '低声说', '轻声说', '沉声说', '厉声道', '笑着道', '大叫道',
+        '道', '说', '问', '喊', '叫', '答', '应', '笑', '叹', '怒',
+        '喝', '哼', '嚷', '骂', '回',
+    ]
+    
+    for verb in sorted(SPEECH_VERBS, key=len, reverse=True):
+        if name.endswith(verb) and len(name) > len(verb):
+            name = name[:-len(verb)]
+            break
+    
+    return name
+
+
 class SpeakerMatcher:
     # ROLE_CORE_WORDS
     #
@@ -130,7 +309,10 @@ class SpeakerMatcher:
     ):
         self.char_manager = character_manager or get_character_manager()
         self.nlp = get_nlp()
-        self._character_activity: Dict[int, int] = defaultdict(int)
+        # P2-1: 角色频率衰减 - 从简单计数器改为带时间衰减的权重
+        # {character_id: {'weight': float, 'last_update': int}}
+        self._character_activity: Dict[int, Dict] = {}
+        self._activity_counter = 0  # 单调递增计数器，用于衰减计算
         self._recent_speakers: List[str] = []
         self._recent_mentions: List[str] = []
         self._mention_counter = 0
@@ -153,6 +335,14 @@ class SpeakerMatcher:
         self.pronoun_resolver = PronounResolver(self.char_manager)
         self.title_trigger_matcher = TitleTriggerMatcher(self.char_manager)
         self.address_trigger_matcher = AddressTriggerMatcher(self.char_manager)
+
+    @property
+    def current_project_id(self) -> str:
+        return self._current_project_id
+
+    @current_project_id.setter
+    def current_project_id(self, value: str):
+        self._current_project_id = value
 
     def _extract_descriptive_roles(self, text: str) -> List[str]:
         return self.role_extractor.extract(text)
@@ -234,6 +424,9 @@ class SpeakerMatcher:
         if not skip_speech_check and not self._has_speech_context(context):
             return None
 
+        # H-20260516-10: 后台频次堆积
+        self.char_manager.increment_frequency(name, self._current_project_id)
+
         if name in self._temp_char_cache:
             return self._temp_char_cache[name]
 
@@ -289,24 +482,30 @@ class SpeakerMatcher:
         用途：说话人识别只分析旁白内容，对话内容（引号内）不参与识别
         来源：中文标点规范 GB/T 15834-2011
         边界：
-          - 移除所有引号内的对话内容：「...」『...』"..."
+          - 移除所有引号内的对话内容：「...」『...』"..."'...'
           - 保留引号外的旁白描述
           - 如果旁白为空，返回空字符串
-        更新日期：2026-05-09
+        更新日期：2026-05-14
         维护者：说话人识别改进方案
         """
         import re
+
+        NARRATION_QUOTE_PATTERN = re.compile(
+            '[\u300c\u300e\u201c\u2018\']'  # 「『"'  (左引号)
+            '.*?'
+            '[\u300d\u300f\u201d\u2019\']'  # 」』"'  (右引号)
+        )
         
         narration_parts = []
         
         if context_before:
-            narration_parts.append(re.sub(r'[「"『].*?[」"』]', '', context_before))
+            narration_parts.append(NARRATION_QUOTE_PATTERN.sub('', context_before))
         
         if text:
-            narration_parts.append(re.sub(r'[「"『].*?[」"』]', '', text))
+            narration_parts.append(NARRATION_QUOTE_PATTERN.sub('', text))
         
         if context_after:
-            narration_parts.append(re.sub(r'[「"『].*?[」"』]', '', context_after))
+            narration_parts.append(NARRATION_QUOTE_PATTERN.sub('', context_after))
         
         narration = ' '.join(narration_parts)
         return narration.strip()
@@ -320,13 +519,24 @@ class SpeakerMatcher:
           - locked_only=True 时只匹配锁定角色
           - locked_only=False 时匹配所有角色
           - 精确匹配角色名和别名
+          - Phase 2: 增加说话关系验证，只返回有说话动词/动作暗示支撑的匹配
         更新日期：2026-05-09
         维护者：说话人识别改进方案
         """
         if locked_only:
             characters = self.char_manager.get_locked_characters(self._current_project_id)
         else:
-            characters = self.char_manager.get_all_characters(self._current_project_id)
+            # H-20260516-10: 非锁定模式使用 eligible_characters
+            characters = self.char_manager.get_eligible_characters(self._current_project_id)
+        
+        for char in characters:
+            if char.name in narration:
+                idx = narration.index(char.name)
+                window = narration[max(0, idx - 20):idx + len(char.name) + 20]
+                has_speech_verb = any(v in window for v in ALL_SPEECH_VERBS)
+                has_action_hint = any(a in window for a in ['道', '说', '问', '答', '笑', '叹', '点头', '摇头', '转身', '看着', '望向', '走上前', '上前'])
+                if has_speech_verb or has_action_hint:
+                    return char
         
         for char in characters:
             if char.name in narration:
@@ -356,7 +566,12 @@ class SpeakerMatcher:
             for pe in pers:
                 if not self.name_validator.is_valid(pe.text) or self.name_validator.is_verb(pe.text):
                     continue
-                
+                if pe.text in TITLE_WORDS:
+                    continue
+
+                # H-20260516-10: NER 发现的角色名也计入后台频次
+                self.char_manager.increment_frequency(pe.text, self._current_project_id)
+
                 char = self.char_manager.get_character_by_name(pe.text, self._current_project_id)
                 if char:
                     candidates.append((char.name, 'NER角色库匹配', 0.80))
@@ -467,58 +682,64 @@ class SpeakerMatcher:
         self,
         text: str,
         context_before: str,
-        context_after: str
+        context_after: str,
+        prefix_narration: str = ''
     ) -> List[Tuple[str, str, float]]:
         candidates = []
         seen_names = set()
 
+        # 步骤0：引号前旁白前缀优先（H-20260516-10）
+        # 格式：赵总监皱起眉头问道："谁批准的？" → prefix="赵总监皱起眉头问道"
+        # 如果旁白前缀中包含角色库角色名，则该角色有最高优先级
+        if prefix_narration:
+            speech_verbs = {'道', '说', '问', '答', '笑道', '说道', '问道', '答道',
+                            '冷喝', '喝道', '冷笑', '叹道', '怒道', '斥道', '叫道', '喊道'}
+            all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
+            sorted_chars = sorted(all_chars, key=lambda c: -len(c.name))
+            for char in sorted_chars:
+                if char.name in prefix_narration and char.name not in seen_names:
+                    after_name = prefix_narration[prefix_narration.index(char.name) + len(char.name):
+                                                  prefix_narration.index(char.name) + len(char.name) + 15]
+                    has_speech = any(v in after_name for v in speech_verbs)
+                    candidates.append((char.name,
+                        '同行动作主语' if has_speech else '同行引用',
+                        0.88 if has_speech else 0.82))
+                    seen_names.add(char.name)
+                    break
+
         # 步骤1：代词消解优先于 NER（代词比描述性短语更可靠）
+        pronoun_weak_signal = False
         if context_before:
-            # 检查是否有代词，如果有则优先使用代词消解
             pronoun_result = self._resolve_pronoun_in_context(context_before)
             if pronoun_result:
-                char = self._match_candidate_to_character(pronoun_result['name'], context_before)
-                if char:
-                    candidates.append((char.name, f'代词消解({pronoun_result["reason"]})', 0.80 if char.id != -1 else 0.65))
-                    seen_names.add(char.name)
-
-        # 步骤2：NER 提取 PER 实体（过滤带修饰词的实体）
-        if context_before:
-            try:
-                result = self.nlp.analyze(context_before)
-                before_pers = [e for e in result.entities if e.type == 'PER']
-                # 扩展复姓实体（修复 HanLP 对复姓的截断问题）
-                before_pers_expanded = self._expand_surname_entities(context_before, [(e.text, e.type) for e in before_pers])
-                for pe_text, pe_type in reversed(before_pers_expanded):
-                    # 过滤：跳过带修饰词的 PER 实体（如"一个白发老者"、"位身穿黑袍的骑士"）
-                    if pe_type != 'PER':
-                        continue
-                    if not self._is_clean_per_entity(pe_text):
-                        continue
-                    if not self.name_validator.is_valid(pe_text) or self.name_validator.is_verb(pe_text):
-                        continue
-                    is_substring = False
-                    for seen in seen_names:
-                        if pe_text in seen or seen in pe_text:
-                            is_substring = True
-                            break
-                    if is_substring:
-                        continue
-
-                    # 检查是否是角色库中某个名字的部分匹配
-                    char = self._match_candidate_to_character(pe_text, context_before)
-                    if char and char.name not in seen_names:
-                        candidates.append((char.name, '上下文PER(前)', 0.85 if char.id != -1 else 0.60))
+                if pronoun_result.get('weak_signal'):
+                    # P1-3: 代词消解失败传递弱信号
+                    # 记录存在未解析代词，后续步骤不强行匹配
+                    pronoun_weak_signal = True
+                    logger.debug(f"代词弱信号: {pronoun_result['reason']}")
+                else:
+                    char = self._match_candidate_to_character(pronoun_result['name'], context_before)
+                    if char:
+                        candidates.append((char.name, f'代词消解({pronoun_result["reason"]})', 0.80 if char.id != -1 else 0.65))
                         seen_names.add(char.name)
-            except Exception:
-                pass
 
-            descriptive_roles = self.role_extractor.extract(context_before)
+        # 步骤2：NER context_per 路径已移除（2026-05-14）
+        # 原因：消融实验显示 NER context_per 路径净收益 -1.9%
+        # NER 提取的"上下文被提及角色"多数是旁白中提到的非说话人角色
+        # 步骤2：描述性角色提取（从 context_before 旁白中）
+        # 新方案A: 描述性角色必须映射到角色库，非角色库描述不作为候选
+        if context_before:
+            before_narr = self._extract_narration('', context_before, '')
+            if before_narr:
+                descriptive_roles = self.role_extractor.extract(before_narr)
+            else:
+                descriptive_roles = []
             for role in descriptive_roles:
                 if role not in seen_names:
-                    char = self._match_candidate_to_character(role, context_before, skip_speech_check=True)
+                    # 新方案A: require_library=True, 不创建临时角色
+                    char = self._match_candidate_to_character(role, before_narr, skip_speech_check=True, require_library=True)
                     if char:
-                        candidates.append((char.name, '描述性角色', 0.80 if char.id != -1 else 0.60))
+                        candidates.append((char.name, '描述性角色', 0.80))
                         seen_names.add(role)
 
         # 步骤3：身份词提取已删除（2026-05-12）
@@ -529,52 +750,171 @@ class SpeakerMatcher:
             self_ref_candidates = self.self_ref_inferrer.infer(text, context_before or '')
             for name, reason, confidence in self_ref_candidates:
                 if name not in seen_names:
-                    char = self._match_candidate_to_character(name, text)
+                    # 新方案A: require_library=True, 不创建临时角色
+                    char = self._match_candidate_to_character(name, text, require_library=True)
                     if char:
-                        candidates.append((char.name, f'自称推断({reason})', 0.80 if char.id != -1 else 0.60))
-                        seen_names.add(char.name)
+                        candidates.append((char.name, f'自称推断({reason})', 0.80))
+                        seen_names.add(name)
 
         if context_after:
-            descriptive_roles = self.role_extractor.extract(context_after)
+            after_narr = self._extract_narration('', '', context_after)
+            if after_narr:
+                descriptive_roles = self.role_extractor.extract(after_narr)
+            else:
+                descriptive_roles = []
             for role in descriptive_roles:
                 if role not in seen_names:
-                    char = self._match_candidate_to_character(role, context_after, skip_speech_check=True)
+                    # 新方案A: require_library=True, 不创建临时角色
+                    char = self._match_candidate_to_character(role, after_narr, skip_speech_check=True, require_library=True)
                     if char:
-                        candidates.append((char.name, '描述性角色(后)', 0.75 if char.id != -1 else 0.55))
+                        candidates.append((char.name, '描述性角色(后)', 0.75))
                         seen_names.add(role)
 
-            try:
-                result = self.nlp.analyze(context_after)
-                after_pers = [e for e in result.entities if e.type == 'PER']
-                for pe in after_pers:
-                    # 过滤：跳过带修饰词的 PER 实体
-                    if not self._is_clean_per_entity(pe.text):
-                        continue
-                    if not self.name_validator.is_valid(pe.text) or self.name_validator.is_verb(pe.text):
-                        continue
-                    is_substring = False
-                    for seen in seen_names:
-                        if pe.text in seen or seen in pe.text:
-                            is_substring = True
-                            break
-                    if is_substring:
-                        continue
+        # 方向1：语境角色优先（H-20260516-10: 改用 get_eligible_characters 过滤临时角色）
+        if context_before and not candidates:
+            nearby_window = context_before[-120:]
+            all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
+            sorted_chars = sorted(all_chars, key=lambda c: -len(c.name))
+            for char in sorted_chars:
+                if char.name in seen_names:
+                    continue
+                if not self._is_word_boundary_match(nearby_window, char.name):
+                    continue
+                pos = nearby_window.index(char.name)
+                distance = len(nearby_window) - pos
+                proximity_bonus = max(0.10 - 0.005 * distance, 0.0)
+                after_name = nearby_window[pos + len(char.name):pos + len(char.name) + 15]
+                speech_verbs = {'道', '说', '问', '答', '笑道', '说道', '问道', '答道',
+                                '冷喝', '喝道', '冷笑', '叹道', '怒道', '斥道', '叫道', '喊道'}
+                has_speech = any(v in after_name for v in speech_verbs)
+                confidence = min(0.75 + proximity_bonus + (0.10 if has_speech else 0), 0.90)
+                candidates.insert(0, (char.name,
+                    '语境角色优先({})'.format('说话动词' if has_speech else '临近'),
+                    confidence))
+                seen_names.add(char.name)
 
-                    char = self._match_candidate_to_character(pe.text, context_after)
-                    if char and char.name not in seen_names:
-                        candidates.append((char.name, '上下文PER(后)', 0.75 if char.id != -1 else 0.55))
-                        seen_names.add(char.name)
-            except Exception:
-                pass
+        # 方向3：动态候选（角色库精确匹配 + 别名匹配）
+        # H-20260516-10: 改用 get_eligible_characters
+        if not candidates and (context_before or context_after):
+            merged = self._extract_narration('', context_before or '', context_after or '')
+            if merged:
+                all_chars = sorted(
+                    self.char_manager.get_eligible_characters(self._current_project_id),
+                    key=lambda c: -len(c.name)
+                )
+                for char in all_chars:
+                    if char.name in merged:
+                        candidates.append((char.name, '动态候选(角色库)', 0.72))
+                    else:
+                        for alias in char.aliases:
+                            if alias in merged:
+                                candidates.append((char.name, '动态候选(别名:{})'.format(alias), 0.70))
+                                break
 
         # 兜底步骤：在角色库中匹配旁白内容
         # 用于处理"掌柜抬头看了看他，笑道"等场景，其中身份词提取失败但角色库中有该角色
-        if not candidates or (len(candidates) == 1 and candidates[0][0].startswith('未知_')):
-            narration = self._extract_narration('', context_before, context_after)
-            if narration:
-                char_match = self._match_from_character_library(narration)
-                if char_match:
-                    candidates.insert(0, (char_match.name, '角色库旁白匹配', 0.70))
+        # 注意：优先匹配 context_before 中的角色，避免 context_after 中的角色干扰
+        # H-20260515-05 + 方向2(H-20260515-08): 话动特征强化
+        # 方向2改动：扩大说话动词列表 + 扩大窗口至20字 + 提高置信度至0.78
+        if not candidates or (len(candidates) <= 2 and all(c[2] < 0.75 for c in candidates)):
+            if context_before:
+                before_narration = self._extract_narration('', context_before, '')
+                if before_narration:
+                    speech_verbs = ['道', '说', '问', '答', '笑道', '说道', '问道', '答道',
+                                    '冷喝', '喝道', '冷笑', '叹道', '怒道', '斥道', '叫道', '喊道',
+                                    '笑问', '笑骂', '嗔道', '应道', '叹息', '沉吟']
+                    action_verbs = ['端起', '翻开', '打开', '站起身', '皱起', '走到', '看向',
+                                    '扫了', '看了看', '点头', '摇头', '坐下', '合上', '放下',
+                                    '接过', '转身', '摆了摆', '喝了口', '揉了揉', '掏出']
+
+                    all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
+                    for char in all_chars:
+                        if char.name in before_narration:
+                            idx = before_narration.index(char.name)
+                            after_name = before_narration[idx + len(char.name):idx + len(char.name) + 20]
+                            has_speech = any(v in after_name for v in speech_verbs)
+                            has_action = any(v in after_name for v in action_verbs)
+
+                            if has_speech:
+                                candidates.insert(0, (char.name, '角色库旁白匹配(前)(说话)', 0.78))
+                            elif has_action:
+                                candidates.append((char.name, '角色库旁白匹配(前)(动作)', 0.55))
+                            else:
+                                candidates.insert(0, (char.name, '角色库旁白匹配(前)', 0.70))
+            if not candidates or (len(candidates) <= 2 and all(c[2] < 0.75 for c in candidates)):
+                narration = self._extract_narration('', context_before, context_after)
+                if narration:
+                    char_match = self._match_from_character_library(narration)
+                    if char_match:
+                        candidates.insert(0, (char_match.name, '角色库旁白匹配', 0.70))
+
+        # N-2: 动作主语优先
+        # 语言学依据：中文旁白中"角色名+动词"结构的主语通常是动作发出者
+        # 来源：通用句法规则，非静态词表
+        # 边界：只识别角色库中的角色名+动词结构
+        if context_before and candidates:
+            action_subject = self._extract_action_subject(context_before)
+            if action_subject and action_subject in [c[0] for c in candidates]:
+                # 提升动作主语的置信度
+                enhanced = []
+                for name, reason, confidence in candidates:
+                    if name == action_subject:
+                        confidence = min(confidence + 0.10, 0.95)
+                        reason = f'{reason}(动作主语)'
+                    enhanced.append((name, reason, confidence))
+                enhanced.sort(key=lambda x: -x[2])
+                candidates = enhanced
+
+        # 短名/纯职称词置信度惩罚（防子串匹配复发）
+        #
+        # 用途：对短名和纯职称词的置信度做上限约束，防止它们在候选排序中
+        #       错误压过完整角色名
+        # 来源：v7.0 别名匹配 Bug 修复发现——"总监"等纯职称词被注册为临时角色后，
+        #       以其较短长度获得不合理的近因衰减优势
+        # 边界：
+        #   - TITLE_WORDS 中的词置信度减半
+        #   - 2字名（不含姓氏）置信度上限 0.60
+        #   - 不影响 3 字以上的正常角色名
+        # 更新日期：2026-05-16
+        # 维护者：v7.0 别名匹配 Bug 修复
+        from utils.config import SHORT_NAME_CONFIDENCE_PENALTY, SHORT_NAME_CONFIDENCE_CAP
+
+        penalized = []
+        for name, reason, confidence in candidates:
+            if name in TITLE_WORDS:
+                confidence *= SHORT_NAME_CONFIDENCE_PENALTY
+            elif len(name) <= 2:
+                confidence = min(confidence, SHORT_NAME_CONFIDENCE_CAP)
+            penalized.append((name, reason, confidence))
+        candidates = sorted(penalized, key=lambda x: -x[2])
+
+        # P2-2: 近因衰减（反粘着机制）
+        # v7.0 长文本基线显示：连续对话中最近说话人被过度优先
+        # 原理：对话通常是轮流进行的，刚说完的人不应立即再次说话
+        # 衰减梯度：越近的角色获得越多的负分
+        from utils.config import RECENCY_DECAY_RECENT, RECENCY_DECAY_SECOND, RECENCY_DECAY_OTHER
+
+        if candidates and self._recent_speakers:
+            recent_rank = {}
+            for i, name in enumerate(reversed(self._recent_speakers[-5:])):
+                recent_rank[name] = len(self._recent_speakers[-5:]) - i  # 最近=5, 次近=4, ...
+
+            decayed = []
+            for name, reason, confidence in candidates:
+                if name in recent_rank:
+                    rank = recent_rank[name]
+                    # 衰减量：最近的 -RECENCY_DECAY_RECENT，次近 -RECENCY_DECAY_SECOND，其余 -RECENCY_DECAY_OTHER
+                    if rank == len(self._recent_speakers[-5:]):
+                        decay = RECENCY_DECAY_RECENT
+                    elif rank == len(self._recent_speakers[-5:]) - 1:
+                        decay = RECENCY_DECAY_SECOND
+                    else:
+                        decay = RECENCY_DECAY_OTHER
+                    confidence = max(confidence - decay, 0.20)
+                    reason = f'{reason}(近因衰减-r{rank})'
+                decayed.append((name, reason, confidence))
+            decayed.sort(key=lambda x: -x[2])
+            return decayed
 
         if not candidates:
             candidates.append(('未知_无法推断', '无上下文线索', 0.30))
@@ -628,18 +968,25 @@ class SpeakerMatcher:
         使用局部窗口（最近说话人 + 活跃度）来解析代词。
 
         Returns:
-            {'name': str, 'reason': str, 'confidence': float} or None
+            {'name': str, 'reason': str, 'confidence': float} 解析成功
+            {'weak_signal': True, 'pronoun': str, 'gender': str} 检测到代词但无法解析（P1-3）
+            None 未检测到代词
         """
         import re
         from pipeline.pronoun_resolver import PRONOUNS
 
+        found_pronoun = None
+        found_gender = None
+
         for pronoun, gender in PRONOUNS.items():
             if pronoun in text:
+                found_pronoun = pronoun
+                found_gender = gender
                 # 使用局部窗口解析代词
                 result = self.pronoun_resolver.resolve_in_local_window(
                     gender,
                     self._recent_speakers,
-                    character_activity=self._character_activity,
+                    character_activity={cid: data['weight'] for cid, data in self._character_activity.items()},
                     recent_mentions=self._recent_mentions,
                     context_before=text
                 )
@@ -649,13 +996,26 @@ class SpeakerMatcher:
                         'reason': f'{pronoun}→{result.character.name}',
                         'confidence': result.confidence
                     }
+
+        # P1-3: 代词消解失败传递弱信号
+        # 检测到代词但局部窗口内无法解析时，返回弱信号而非 None
+        # 后续步骤可利用此信号（如降低其他候选人置信度），但不强行匹配
+        if found_pronoun:
+            return {
+                'weak_signal': True,
+                'pronoun': found_pronoun,
+                'gender': found_gender,
+                'reason': f'检测到代词"{found_pronoun}"但无法解析'
+            }
+
         return None
 
     def _match_candidate_to_character(
         self,
         candidate_name: str,
         context: str,
-        skip_speech_check: bool = False
+        skip_speech_check: bool = False,
+        require_library: bool = False
     ) -> Optional[Character]:
         """将候选名字匹配到角色库。
 
@@ -669,6 +1029,7 @@ class SpeakerMatcher:
 
         设计原则：角色库优先，但只基于候选名字本身进行精确/别名匹配，
         不依赖旁白中的模糊搜索。
+        当 require_library=True 时，不创建临时角色。
         """
         # 步骤1：精确匹配角色名（项目范围内）
         char = self.char_manager.get_character_by_name(candidate_name, self._current_project_id)
@@ -680,10 +1041,32 @@ class SpeakerMatcher:
         if char:
             return char
 
+        # 步骤2.5：角色核心词后缀匹配（无新增硬编码）
+        # H-20260516-10: 改用 get_eligible_characters
+        from pipeline.descriptive_role_extractor import DescriptiveRoleExtractor
+
+        all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
+        if len(candidate_name) >= 4:
+            for char in all_chars:
+                if len(char.name) >= 2 and len(candidate_name) > len(char.name):
+                    if candidate_name.endswith(char.name):
+                        return char
+
+        for core_word in DescriptiveRoleExtractor.ROLE_CORE_WORDS_SORTED:
+            if len(candidate_name) > len(core_word) and candidate_name.endswith(core_word):
+                exact_char = self.char_manager.get_character_by_name(core_word, self._current_project_id)
+                if exact_char:
+                    return exact_char
+                for char in all_chars:
+                    if core_word in char.name:
+                        return char
+
         # 步骤3：创建临时角色（兜底）
-        # skip_speech_check=True 用于已从上下文提取的候选词（如身份词、描述性角色）
-        temp_char = self._register_temporary_character(candidate_name, context, skip_speech_check)
-        return temp_char
+        # require_library=True 时不创建临时角色
+        if not require_library:
+            temp_char = self._register_temporary_character(candidate_name, context, skip_speech_check)
+            return temp_char
+        return None
 
     @contextmanager
     def chapter_context(self, chapter_id: int):
@@ -716,6 +1099,22 @@ class SpeakerMatcher:
             persons = []
         return list(set(persons))
 
+    @staticmethod
+    def _is_word_boundary_match(text: str, target: str) -> bool:
+        idx = text.find(target)
+        if idx < 0:
+            return False
+        if idx > 0:
+            prev_char = text[idx - 1]
+            if '\u4e00' <= prev_char <= '\u9fff':
+                return False
+        end = idx + len(target)
+        if end < len(text):
+            next_char = text[end]
+            if '\u4e00' <= next_char <= '\u9fff':
+                return False
+        return True
+
     def match_by_name(self, name: str) -> Optional[MatchResult]:
         char = self.char_manager.get_character_by_name(name)
         if char:
@@ -740,7 +1139,8 @@ class SpeakerMatcher:
         return self.title_trigger_matcher.match_by_title(title)
 
     def match_by_semantic(self, sentence: str) -> Optional[MatchResult]:
-        all_chars = self.char_manager.get_all_characters()
+        # H-20260516-10: 改用 get_eligible_characters
+        all_chars = self.char_manager.get_eligible_characters()
         if not all_chars:
             return None
 
@@ -818,7 +1218,8 @@ class SpeakerMatcher:
 
         for addr in ADDRESS_TRIGGERS:
             if addr in text:
-                for char in self.char_manager.get_all_characters():
+                # H-20260516-10: 改用 get_eligible_characters
+                for char in self.char_manager.get_eligible_characters():
                     if addr in char.aliases or char.name.endswith(addr):
                         unique_recent = []
                         for recent in reversed(self._recent_speakers[-3:]):
@@ -844,7 +1245,7 @@ class SpeakerMatcher:
         local_result = self.pronoun_resolver.resolve_in_local_window(
             gender,
             self._recent_speakers,
-            character_activity=self._character_activity,
+            character_activity={cid: data['weight'] for cid, data in self._character_activity.items()},
             recent_mentions=self._recent_mentions,
             context_before=context.context_before or ''
         )
@@ -870,9 +1271,10 @@ class SpeakerMatcher:
                 )
 
         candidates = []
-        for char in self.char_manager.get_all_characters():
+        # H-20260516-10: 改用 get_eligible_characters
+        for char in self.char_manager.get_eligible_characters():
             if char.gender == gender:
-                activity = self._character_activity.get(char.id, 0)
+                activity = self._get_activity_weight(char.id)
                 candidates.append((char, activity))
 
         if not candidates:
@@ -893,15 +1295,74 @@ class SpeakerMatcher:
         return self.pronoun_resolver.resolve_in_local_window(gender, self._recent_speakers)
 
     def match_speaker(self, context: DialogueContext) -> Optional[MatchResult]:
+        narration = self._extract_narration(
+            context.text,
+            context.context_before or '',
+            context.context_after or ''
+        )
+
+        # N-4: 对话中"X的"所有格排除
+        # 语言学依据：中文所有格结构 X的 中，X 是领有者/话题，极少是说话人自称
+        # 来源：通用句法规则，非静态词表
+        # 边界：只排除 2-4 字人名/称呼 + 的 结构
+        possessive_excluded = set()
+        dialogue_text = context.dialogue or ''
+        if dialogue_text:
+            for m in re.finditer(r'([\u4e00-\u9fa5\u2027·]{2,4})的', dialogue_text):
+                possessive_excluded.add(m.group(1))
+        
+        # H-20260515-05: 称呼排除增强
+        # 对话以"XX，"开头时，XX是被称呼者而非说话者
+        if dialogue_text:
+            vocative_match = re.match(r'^[\u201c\u201d\u2018\u2019"\'"]*([\u4e00-\u9fa5\u2027·]{2,4})[，,]', dialogue_text)
+            if vocative_match:
+                addressed_name = vocative_match.group(1)
+                possessive_excluded.add(addressed_name)
+                logger.debug(f"H-05称呼排除: 对话以'{addressed_name}'开头，视为被称呼者")
+
         if context.context_before or context.context_after:
             context_candidates = self._extract_context_speakers(
-                context.text,
+                narration,
                 context.context_before or '',
-                context.context_after or ''
+                context.context_after or '',
+                context.prefix_narration or ''
             )
             if context_candidates:
                 name, reason, confidence = context_candidates[0]
-                # 不直接返回未知，允许后续 fallback 策略尝试匹配角色库
+                # N-4: 排除所有格中的 X
+                if name in possessive_excluded:
+                    logger.debug(f"N-4所有格排除: {name} 在对话中作为所有格出现，排除")
+                    context_candidates = context_candidates[1:]
+                    if context_candidates:
+                        name, reason, confidence = context_candidates[0]
+                
+                # H-20260515-05: 对话轮换模型
+                # 检测context_before中最后一个对话的说话人，如果当前候选是同一人且置信度<0.70，尝试第二候选
+                last_dialogue_speaker = None
+                if context.context_before:
+                    dialogue_patterns = [
+                        r'([\u4e00-\u9fa5\u2027·]{2,4})\s*(?:道|说|问|答|笑道|说道|问道|答道)\s*:?\s*[\u300d\u300f"\'\u2019]',
+                        r'([\u4e00-\u9fa5\u2027·]{2,4})\s*(?:道|说|问|答|笑道|说道|问道|答道)\s*[：:]',
+                    ]
+                    for pattern in dialogue_patterns:
+                        matches = list(re.finditer(pattern, context.context_before))
+                        if matches:
+                            last_match = matches[-1]
+                            last_dialogue_speaker = last_match.group(1)
+                            break
+                
+                if name == last_dialogue_speaker and confidence < 0.70 and len(context_candidates) > 1:
+                    logger.debug(f"H-05对话轮换: '{name}'是上一个对话的说话人，尝试第二候选")
+                    for alt_candidate in context_candidates[1:]:
+                        alt_name, alt_reason, alt_confidence = alt_candidate
+                        if alt_name not in possessive_excluded and not alt_name.startswith('未知_') and alt_name != '未知':
+                            alt_char = self.char_manager.get_character_by_name(alt_name, self._current_project_id)
+                            if alt_char:
+                                return MatchResult(
+                                    character=alt_char,
+                                    confidence=alt_confidence,
+                                    match_type=f'context_reasoning:{alt_reason}(对话轮换)'
+                                )
                 if not name.startswith('未知_') and name != '未知':
                     char = self.char_manager.get_character_by_name(name, self._current_project_id)
                     if char:
@@ -929,11 +1390,11 @@ class SpeakerMatcher:
                 if result:
                     return result
 
-                # 如果 speaker_hint 存在但匹配不到角色，创建新角色
+                hint_context = narration if narration else (context.context_before or '') + (context.context_after or '')
                 hint_char = self.char_manager.find_or_create(
                     context.speaker_hint,
                     project_id=self._current_project_id,
-                    context=context.text
+                    context=hint_context
                 )
                 if hint_char:
                     return MatchResult(
@@ -954,44 +1415,74 @@ class SpeakerMatcher:
                     return result
 
         if context.chapter_id is not None and self.semantic_ranker.is_available():
-            result = self.match_by_semantic(context.text)
+            result = self.match_by_semantic(narration)
             if result:
                 return result
 
-        trigger_result = self.match_by_trigger_words(context.text, context)
+        trigger_result = self.match_by_trigger_words(narration, context)
         if trigger_result:
+            matched_name = trigger_result.character.name
+            if matched_name in narration:
+                prefix_pattern = re.compile(
+                    rf'([\u4e00-\u9fa5]){re.escape(matched_name)}'
+                )
+                prefix_matches = prefix_pattern.findall(narration)
+                if prefix_matches:
+                    for prefix_char in prefix_matches:
+                        full_candidate = prefix_char + matched_name
+                        full_char = self.char_manager.get_character_by_name(
+                            full_candidate, self._current_project_id
+                        )
+                        if full_char:
+                            return MatchResult(
+                                character=full_char,
+                                confidence=0.85,
+                                match_type=f'context_reasoning:角色名扩展({full_candidate})'
+                            )
             return trigger_result
 
-        result = self._infer_from_address(context)
+        result = self._infer_from_address(narration, context)
         if result:
             return result
 
+        char = self._match_from_character_library(narration)
+        if char:
+            # N-4: 所有格排除检查
+            if char.name not in possessive_excluded:
+                return MatchResult(
+                    character=char,
+                    confidence=0.70,
+                    match_type='角色库旁白匹配'
+                )
+            else:
+                logger.debug(f"N-4所有格排除: {char.name} 在对话中作为所有格出现，排除")
+
         return None
 
-    def _infer_from_address(self, context: DialogueContext) -> Optional[MatchResult]:
-        text = context.text
-        addressed_char = self.address_trigger_matcher.find_addressed_character(text)
+    def _infer_from_address(self, narration: str, context: DialogueContext) -> Optional[MatchResult]:
+        addressed_char = self.address_trigger_matcher.find_addressed_character(narration)
         address_confidence = 0.9 if addressed_char else 0
 
         candidates = []
 
         if addressed_char:
-            for char in self.char_manager.get_all_characters():
+            # H-20260516-10: 改用 get_eligible_characters
+            for char in self.char_manager.get_eligible_characters():
                 if char.id != addressed_char.id:
-                    activity = self._character_activity.get(char.id, 0)
+                    activity = self._get_activity_weight(char.id)
                     candidates.append((char, 0.6 + activity * 0.05, activity))
 
         if self._recent_mentions:
             for mentioned in reversed(self._recent_mentions[-5:]):
                 char = self.char_manager.get_character_by_name(mentioned)
                 if char and (not addressed_char or char.id != addressed_char.id):
-                    activity = self._character_activity.get(char.id, 0)
+                    activity = self._get_activity_weight(char.id)
                     candidates.append((char, 0.5 + activity * 0.03, activity))
 
         if context.prev_speaker:
             prev_char = self.char_manager.get_character_by_name(context.prev_speaker)
             if prev_char and (not addressed_char or prev_char.id != addressed_char.id):
-                activity = self._character_activity.get(prev_char.id, 0)
+                activity = self._get_activity_weight(prev_char.id)
                 candidates.append((prev_char, 0.4, activity))
 
         if not candidates:
@@ -1021,13 +1512,80 @@ class SpeakerMatcher:
             match_type='address_inference'
         )
 
+    def _get_activity_weight(self, character_id: int) -> float:
+        """P2-1: 获取角色的衰减后活动权重。"""
+        from utils.config import ACTIVITY_DECAY_FACTOR
+        if character_id not in self._character_activity:
+            return 0.0
+        activity_data = self._character_activity[character_id]
+        time_diff = self._activity_counter - activity_data['last_update']
+        # 指数衰减: weight = initial_weight * exp(-decay * time_diff)
+        import math
+        decayed_weight = activity_data['weight'] * math.exp(-ACTIVITY_DECAY_FACTOR * time_diff)
+        return decayed_weight
+
     def update_activity(self, character_id: int, name: str):
-        self._character_activity[character_id] = self._character_activity.get(character_id, 0) + 1
+        """更新角色活动度。P2-1: 添加指数衰减机制。"""
+        from utils.config import ACTIVITY_INCREMENT, ACTIVITY_DECAY_FACTOR
+        
+        self._activity_counter += 1
+        
+        # 先对所有角色应用衰减（懒衰减：只在更新时计算）
+        # 然后更新目标角色
+        current_data = self._character_activity.get(character_id)
+        if current_data:
+            # 先应用衰减到当前权重
+            import math
+            time_diff = self._activity_counter - current_data['last_update']
+            decayed_weight = current_data['weight'] * math.exp(-ACTIVITY_DECAY_FACTOR * time_diff)
+            # 再加上新增量
+            new_weight = decayed_weight + ACTIVITY_INCREMENT
+        else:
+            new_weight = ACTIVITY_INCREMENT
+        
+        self._character_activity[character_id] = {
+            'weight': new_weight,
+            'last_update': self._activity_counter
+        }
 
         if name not in self._recent_speakers:
             self._recent_speakers.append(name)
             if len(self._recent_speakers) > 10:
                 self._recent_speakers.pop(0)
+
+    def _extract_action_subject(self, narration: str) -> Optional[str]:
+        """N-2: 从旁白中提取动作主语。
+
+        语言学依据：中文旁白中"角色名+动词"结构的主语通常是动作发出者
+        来源：通用句法规则，非静态词表
+        边界：只识别角色库中的角色名+说话/动作动词结构
+
+        Returns:
+            角色名 或 None
+        """
+        import re
+
+        # H-20260516-10: 改用 get_eligible_characters
+        all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
+        if not all_chars:
+            return None
+
+        # 按角色名长度降序排序，优先匹配长名称
+        char_names = sorted([c.name for c in all_chars], key=len, reverse=True)
+
+        for char_name in char_names:
+            if char_name not in narration:
+                continue
+
+            # 在角色名后面寻找说话/动作动词
+            idx = narration.find(char_name)
+            after_name = narration[idx + len(char_name):idx + len(char_name) + 15]
+
+            # 检查是否紧跟说话动词或动作动词
+            if re.match(r'^(?:说道|道|说|问|答|笑道|冷喝|喝道|冷笑|摇头|点头|起身|站起|坐下|看向|看向|走向|转身|翻开|端起|放下|拿起)', after_name):
+                return char_name
+
+        return None
 
     def cache_dialogue(self, character_name: str, dialogue_text: str):
         if character_name not in self._character_dialogues:
@@ -1084,7 +1642,8 @@ class SpeakerMatcher:
 
         return None, None
 
-    def analyze_dialogue(self, text: str, chapter_id: int = None) -> List[Tuple[str, Optional[Character]]]:
+    def analyze_dialogue(self, text: str, chapter_id: int = None,
+                         match_speaker_override=None) -> List[Tuple[str, Optional[Character]]]:
         dialogues = []
         seen_positions = set()
 
@@ -1098,15 +1657,31 @@ class SpeakerMatcher:
 
         self._build_dialogue_cache(text, chapter_id)
 
-        self._recent_speakers.clear()
-        self._recent_mentions.clear()
-        self._character_activity.clear()
+        # 用 DialogueBoundaryDetector 过滤非对话引号内容
+        try:
+            from pipeline.dialogue_boundary_detector import DialogueBoundaryDetector
+            detector = DialogueBoundaryDetector()
+            all_quote_results = detector.detect_all(text)
+            non_dialogue_positions = {
+                (r.quote_info.start_pos, r.quote_info.end_pos)
+                for r in all_quote_results if not r.is_dialogue
+            }
+            dialogues = [
+                d for d in dialogues if (d[0], d[1]) not in non_dialogue_positions
+            ]
+        except Exception:
+            pass
+
+        # P0-7: v7.0 原则8 — _recent_speakers 不应在每次 analyze_dialogue 时清空
+        # 角色活跃度、最近说话人、最近提及都应该跨段落/章节累积
+        # 只有在项目级别 reset 时才清空（由调用方控制）
 
         dialogues.sort(key=lambda x: x[0])
         results = []
         prev_speaker = None
         last_successful_speaker = None
         prev_had_explicit_hint = False
+        _match_speaker = match_speaker_override or self.match_speaker
         for i, (start, end, dialogue) in enumerate(dialogues):
             prefix_start = dialogues[i-1][1] if i > 0 else 0
             prefix = text[prefix_start:start].strip()
@@ -1122,6 +1697,7 @@ class SpeakerMatcher:
 
             context = DialogueContext(
                 text=prefix + " " + dialogue + " " + suffix,
+                dialogue=dialogue,
                 speaker_hint=speaker_hint,
                 prev_speaker=last_successful_speaker,
                 mentioned_characters=mentioned,
@@ -1130,7 +1706,7 @@ class SpeakerMatcher:
                 context_after=suffix,
             )
 
-            match_result = self.match_speaker(context)
+            match_result = _match_speaker(context)
 
             if match_result and match_result.character and match_result.character.name != '未知' and not match_result.character.name.startswith('未知_'):
                 speaker = match_result.character
@@ -1173,6 +1749,230 @@ class SpeakerMatcher:
                     char = self.char_manager.get_character_by_alias(speaker_hint)
                 if char and getattr(char, 'name', None):
                     self.cache_dialogue(char.name, dialogue)
+
+
+# ===== 内联自 character_name_validator.py（2026-05-14） =====
+
+# 非人名词黑名单（技术债务）
+# 问题：此列表基于经验枚举而非统计验证，应逐步迁移至 ContextDiversityValidator 的统计阈值
+PER_BLACKLIST: Set[str] = {
+    '一个', '两个', '三个', '这个', '那个', '什么', '怎么', '为什么',
+    '今天', '明天', '昨天', '现在', '时候', '地方', '东西', '事情',
+    '样子', '办法', '问题', '可能', '可以', '应该', '一定', '非常',
+    '而且', '但是', '所以', '因为', '如果', '虽然', '然而',
+}
+
+
+class CharacterNameValidator:
+    """角色名称验证器"""
+
+    def __init__(self, nlp=None):
+        self.nlp = nlp
+        self._blacklist: Set[str] = PER_BLACKLIST | self._load_false_person_words()
+
+    def _load_false_person_words(self) -> Set[str]:
+        false_person_words = {
+            '一声', '一眼', '一手', '一脚', '一头', '一边', '一半',
+            '一切', '一起', '一定', '一点', '一些', '一般', '一样',
+            '一直', '一向', '一旦', '一定', '一切',
+            '突然', '忽然', '猛然', '骤然', '陡然', '赫然',
+            '缓缓', '慢慢', '渐渐', '匆匆', '悄悄', '默默',
+            '微微', '轻轻', '暗暗', '偷偷', '狠狠', '死死',
+            '仿佛', '似乎', '好像', '犹如', '如同', '宛如',
+        }
+        return false_person_words
+
+    def is_valid(self, name: str) -> bool:
+        if not name or len(name) < 2 or len(name) > 6:
+            return False
+        if name in self._blacklist:
+            return False
+        if len(name) >= 2 and name[0] in SINGLE_CHAR_SURNAMES:
+            return True
+        non_person_suffixes = ['的', '了', '着', '过', '吗', '呢', '吧', '啊', '哦', '呀']
+        if name[-1] in non_person_suffixes:
+            return False
+        return True
+
+    def is_valid_speaker_candidate(self, name: str) -> bool:
+        if not name or len(name) < 2 or len(name) > 8:
+            return False
+        if name in self._blacklist:
+            return False
+        return True
+
+    def is_verb(self, name: str) -> bool:
+        verb_suffixes = ['说道', '道', '说', '问', '喊', '叫', '笑', '叹',
+                         '答', '应', '怒', '喝', '哼', '嚷', '跑', '走',
+                         '看', '听', '想', '做', '打', '拿', '放', '吃']
+        for suffix in verb_suffixes:
+            if name.endswith(suffix) and len(name) > len(suffix):
+                return True
+        if self.nlp:
+            try:
+                result = self.nlp.analyze(name)
+                for token in result.tokens:
+                    if token.pos in ('v', 'vd', 'vf', 'vi', 'vl', 'vshi', 'vyou'):
+                        return True
+            except Exception:
+                pass
+        return False
+
+
+# ===== 内联自 speaker_hint_matcher.py — SpeakerHintMatcher 类（2026-05-14） =====
+
+class SpeakerHintMatcher:
+    """说话人提示词匹配器"""
+
+    def __init__(self, name_validator, nlp=None):
+        self.name_validator = name_validator
+        self.nlp = nlp
+
+    def extract_speaker_hint(self, text: str) -> Tuple[Optional[str], str]:
+        if not text:
+            return None, 'none'
+
+        for pattern in SPEAKER_PATTERNS:
+            match = pattern.search(text)
+            if match:
+                name = _clean_speaker_name(match.group(1).strip(), self.nlp)
+                if self.name_validator.is_valid_speaker_candidate(name):
+                    return name, 'explicit_hint'
+
+        for pattern in DIALOGUE_PATTERNS:
+            for match in pattern.finditer(text):
+                start = match.start()
+                prefix = text[max(0, start - 30):start].strip()
+                for sp in SPEAKER_PATTERNS:
+                    pm = sp.search(prefix)
+                    if pm:
+                        name = _clean_speaker_name(pm.group(1).strip(), self.nlp)
+                        if self.name_validator.is_valid_speaker_candidate(name):
+                            return name, 'prefix_hint'
+
+        return None, 'none'
+
+    def extract_speech_patterns(self, text: str) -> List[Tuple[str, str]]:
+        if not text:
+            return []
+
+        results = []
+        for pattern in SPEAKER_PATTERNS:
+            for match in pattern.finditer(text):
+                name = _clean_speaker_name(match.group(1).strip(), self.nlp)
+                hint = match.group(0).strip()
+                if self.name_validator.is_valid_speaker_candidate(name):
+                    results.append((name, hint))
+
+        return results
+
+    def extract_post_dialogue_hint(self, suffix: str) -> Optional[str]:
+        if not suffix:
+            return None
+
+        for pattern in SPEAKER_PATTERNS:
+            match = pattern.search(suffix[:50])
+            if match:
+                name = _clean_speaker_name(match.group(1).strip(), self.nlp)
+                if self.name_validator.is_valid_speaker_candidate(name):
+                    return name
+
+        return None
+
+    def _is_address_pattern(self, text: str, prefix: str) -> bool:
+        if not prefix:
+            return False
+
+        address_patterns = [
+            re.compile(r'([\u4e00-\u9fa5]{2,6})[，,、\s]'),
+            re.compile(r'([\u4e00-\u9fa5]{2,6})(?:啊|呀|呢|吧)[！!？?]?'),
+        ]
+
+        for pattern in address_patterns:
+            match = pattern.search(prefix)
+            if match:
+                name = match.group(1).strip()
+                if self.name_validator.is_valid_speaker_candidate(name):
+                    return True
+
+        return False
+
+
+# ===== 内联自 self_reference_inferrer.py（2026-05-14） =====
+
+# 自称词映射
+#
+# 用途：通过自称词（我、朕、本座等）推断说话人身份
+# 来源：汉语称谓体系——古代官职谦辞与通用谦辞
+# 边界：仅包含有明确语言学/文献依据的谦辞
+# 硬性约束：上限15条，当前9条
+SELF_REFERENCE_MAP: Dict[str, str] = {
+    '我': 'first_person',
+    '吾': 'first_person_classical',
+    '朕': 'first_person_emperor',
+    '本座': 'first_person_cultivation',
+    '本王': 'first_person_king',
+    '老夫': 'first_person_elder_male',
+    '老身': 'first_person_elder_female',
+    '奴家': 'first_person_humble_female',
+    '妾身': 'first_person_concubine',
+}
+
+assert len(SELF_REFERENCE_MAP) <= 15, (
+    f"SELF_REFERENCE_MAP 超出15条上限（当前{len(SELF_REFERENCE_MAP)}条），"
+    "请审查是否越界，或重构为统计方法"
+)
+
+
+class SelfReferenceInferrer:
+    """自称词推断器"""
+
+    def __init__(self, char_manager):
+        self.char_manager = char_manager
+
+    def infer(self, text: str, context: str = '') -> List[Tuple[str, str, float]]:
+        candidates = []
+
+        for ref_word, ref_type in SELF_REFERENCE_MAP.items():
+            if ref_word in text:
+                known_chars = self._find_nearby_characters(context)
+                if known_chars:
+                    for char in known_chars[:1]:
+                        candidates.append((char.name, f'自称词:{ref_word}→{char.name}', 0.75))
+                else:
+                    candidates.append(('未知', f'自称词:{ref_word}', 0.40))
+
+        return candidates
+
+    def infer_gender_from_context(self, name: str, context: str) -> str:
+        male_indicators = ['他', '男子', '男人', '公子', '陛下', '王爷', '少爷',
+                          '老夫', '朕', '本王', '本座']
+        female_indicators = ['她', '女子', '女人', '小姐', '夫人', '姑娘', '娘娘',
+                            '奴家', '妾身', '姑娘', '妹妹', '姐姐']
+
+        male_count = sum(1 for w in male_indicators if w in context)
+        female_count = sum(1 for w in female_indicators if w in context)
+
+        if male_count > female_count:
+            return 'male'
+        elif female_count > male_count:
+            return 'female'
+        else:
+            return 'unknown'
+
+    def _find_nearby_characters(self, context: str) -> list:
+        # H-20260516-10: 改用 get_eligible_characters
+        all_chars = self.char_manager.get_eligible_characters()
+        found = []
+        for char in all_chars:
+            if char.name in context:
+                found.append(char)
+                continue
+            for alias in char.aliases:
+                if alias in context:
+                    found.append(char)
+                    break
+        return found
 
 
 _speaker_matcher: Optional[SpeakerMatcher] = None

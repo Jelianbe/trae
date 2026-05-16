@@ -1,0 +1,544 @@
+# -*- coding: utf-8 -*-
+"""HybridSpeakerMatcher —— 规则优先 + LLM 兜底的说话人识别匹配器。
+
+架构：
+  L1: 确定性规则（≥0.85） —— 委托给 LegacyRuleMatcher
+  L2: NLP 辅助规则（0.5-0.85） —— 委托给 LegacyRuleMatcher
+  L3: LLM 兜底 —— 仅当 L1+L2 返回 None 或 confidence < 0.6
+
+核心原则：
+  - SpeakerMatcher（LegacyRuleMatcher）一行不改
+  - LLM 使用固定 confidence = 0.85（1.5B 模型无元认知能力）
+  - 候选人列表由 CharacterManager.build_candidate_list() 提供
+"""
+
+import logging
+import re
+from collections import deque
+from typing import Optional
+
+from pipeline.speaker_matcher_interface import DialogueContext, MatchResult
+from pipeline.legacy_rule_matcher import LegacyRuleMatcher, AbstractSpeakerMatcher
+from pipeline.character_manager import CharacterManager, ChapterRoleCache
+
+
+logger = logging.getLogger(__name__)
+
+# 规则 confidence < 此阈值时，触发 LLM 兜底
+LLM_THRESHOLD = 0.7
+
+# Phase 2 回归验证期间，LLM 默认禁用。
+# 启用方式：将 LLM_ENABLED = True
+LLM_ENABLED = False
+
+# 匹配类型降权表：某些匹配路径虽给了置信度，
+# 但在实际测试中发现不可靠，需要降权后再参与 LLM 阈值判断。
+#
+# 用途：避免规则层自信地给出错误答案后跳过 LLM。
+# 来源：《回声》《修仙传》测试数据分析（2026-05-14）
+# 更新日期：2026-05-14
+# 注意：实际 match_type 为 'context_reasoning:角色库旁白匹配' 格式，
+# 所以使用子串匹配（见 match_speaker 中的 MATCH_TYPE_DENY_PREFIXES）
+MATCH_TYPE_DEWEIGHT = {
+    # Step 1: 旁白中的非说话人角色被匹配（"妈妈截胡"类错误）
+    '角色库旁白匹配': 0.55,
+    '角色库旁白匹配(前)': 0.55,
+    # Step 2: 代词消解动态降权（见 PRONOUN_DENY_PREFIXES / PRONOUN_DEWEIGHT_UNSTABLE）
+    # Step 3（待评估）：自称推断降权
+}
+# 当 match_type 包含这些前缀时，视为不可靠匹配
+MATCH_TYPE_DENY_PREFIXES = tuple(MATCH_TYPE_DEWEIGHT.keys())
+
+# 代词消解动态降权：稳定时不降，不稳定时降到此值
+# 不稳定性 = prev_speaker_history 中角色变化 ≥ 2 次
+PRONOUN_DENY_PREFIXES = ('代词消解', 'pronoun_')
+PRONOUN_DEWEIGHT_UNSTABLE = 0.55
+
+# LLM Prompt
+LLM_PROMPT_SYSTEM = """你是一个小说对话解析引擎。给定上下文和候选人列表，推断对话的说话人。
+
+规则：
+1. 只能从候选人列表中选择，编号必须与列表一致
+2. 如果所有候选人都不匹配，回答"unknown"
+3. 优先选择在上下文中有动作描述暗示的候选人
+4. 注意代词"他/她"指向最近被提及的同性别角色
+5. 注意上下文中的'XX道/XX说'格式直接指明说话人
+
+示例1:
+上下文：苏夜站在门口，脸色铁青。
+对话：「你给我滚出去！」
+下文：林雪愣住了。
+候选人：1.苏夜(男) 2.林雪(女) 3.其他角色
+回答：1.苏夜
+
+示例2:
+上下文：赵天行冷冷地扫了他一眼。
+对话：「属下不敢。」
+下文：那人低着头，额上已经渗出了汗。
+候选人：1.赵天行(男) 2.其他角色
+回答：unknown
+
+示例3:
+上下文：药老抓住萧炎的手腕，灵力探入。
+对话：「你这样下去会死的。」
+下文：萧炎只是摇了摇头。
+候选人：1.药老(男) 2.萧炎(男) 3.其他角色
+回答：1.药老"""
+
+
+class HybridSpeakerMatcher(AbstractSpeakerMatcher):
+    """混合说话人匹配器：规则优先 + LLM 兜底。"""
+
+    def __init__(
+        self,
+        char_manager: CharacterManager,
+        rule_matcher: LegacyRuleMatcher = None,
+        llm_model_name: str = "Qwen/Qwen2.5-1.5B-Instruct",
+    ):
+        self.char_manager = char_manager
+        self.rule_matcher = rule_matcher or LegacyRuleMatcher(char_manager)
+        self.llm_model_name = llm_model_name
+
+        # 章节级临时角色缓存
+        self.chapter_cache = ChapterRoleCache()
+
+        # LLM 延迟加载状态
+        self._llm_loaded = False
+        self._llm_model = None
+        self._llm_tokenizer = None
+        self._llm_device = "cpu"
+
+        # 统计计数器
+        self._llm_call_count = 0
+        self._rule_match_count = 0
+
+        # 代词消解稳定性追踪
+        self._prev_speaker_history = deque(maxlen=6)
+
+    @property
+    def current_project_id(self) -> str:
+        return getattr(self.rule_matcher, 'current_project_id', '')
+
+    @current_project_id.setter
+    def current_project_id(self, value: str):
+        self.rule_matcher.current_project_id = value
+
+    def _ensure_llm_loaded(self) -> bool:
+        """延迟加载 LLM。失败时返回 False，触发降级。"""
+        if self._llm_loaded:
+            return True
+        try:
+            import os
+            os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+            os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
+            from transformers import AutoModelForCausalLM, AutoTokenizer
+            import torch
+
+            self._llm_tokenizer = AutoTokenizer.from_pretrained(
+                self.llm_model_name, trust_remote_code=True, local_files_only=True
+            )
+            self._llm_device = "cuda" if torch.cuda.is_available() else "cpu"
+            self._llm_model = AutoModelForCausalLM.from_pretrained(
+                self.llm_model_name,
+                torch_dtype=torch.float16 if self._llm_device == "cuda" else torch.float32,
+                device_map="auto" if self._llm_device == "cuda" else None,
+                trust_remote_code=True,
+                local_files_only=True,
+            )
+            if self._llm_device == "cpu":
+                self._llm_model = self._llm_model.to("cpu")
+            self._llm_loaded = True
+            logger.info(f"LLM 加载成功: {self.llm_model_name} ({self._llm_device})")
+            return True
+        except Exception as e:
+            logger.warning(f"LLM 加载失败，降级为纯规则模式: {e}")
+            return False
+
+    def _build_llm_prompt(self, context: DialogueContext, candidates: list) -> str:
+        """构建 LLM Prompt。"""
+        candidate_str = " ".join([
+            f"{i+1}.{c.name}({'男' if c.gender == 'male' else '女' if c.gender == 'female' else '?'})"
+            for i, c in enumerate(candidates)
+        ])
+
+        context_before = getattr(context, 'context_before', '') or ''
+        context_after = getattr(context, 'context_after', '') or ''
+        dialogue_text = getattr(context, 'dialogue', None) or context.text
+
+        return (
+            f"上下文：{context_before}\n"
+            f"对话：「{dialogue_text}」\n"
+            f"下文：{context_after}\n"
+            f"候选人：{candidate_str}\n"
+            f"回答："
+        )
+
+    def _llm_infer(self, prompt: str) -> str:
+        """LLM 推理。"""
+        import torch
+
+        messages = [
+            {"role": "system", "content": LLM_PROMPT_SYSTEM},
+            {"role": "user", "content": prompt},
+        ]
+
+        text_input = self._llm_tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+        inputs = self._llm_tokenizer(text_input, return_tensors="pt").to(self._llm_device)
+
+        with torch.no_grad():
+            outputs = self._llm_model.generate(
+                **inputs,
+                max_new_tokens=20,
+                do_sample=False,
+                pad_token_id=self._llm_tokenizer.eos_token_id,
+            )
+
+        response = self._llm_tokenizer.decode(
+            outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True
+        )
+        return response.strip()
+
+    def _parse_llm_response(self, response: str, candidates: list) -> str:
+        """解析 LLM 输出，返回 uid 或 "unknown"。
+
+        预期格式："1.苏夜" 或 "unknown"
+        """
+        response = response.strip().lower()
+
+        if "unknown" in response or "其他角色" in response:
+            return "unknown"
+
+        # 匹配 "编号.名字"
+        match = re.match(r'^(\d+)\.?\s*(.+)', response)
+        if match:
+            index = int(match.group(1))
+            name = match.group(2).strip()
+            if 1 <= index <= len(candidates):
+                return candidates[index - 1].id
+
+        # 按名字匹配
+        for c in candidates:
+            if c.name.lower() in response or response in c.name.lower():
+                return c.id
+
+        return "unknown"
+
+    def _resolve_to_match_result(self, uid_or_name) -> Optional[MatchResult]:
+        """将 LLM 返回的 uid/name 转换为 MatchResult。
+
+        uid 格式：
+        - 数字：按 id 查找（DB 角色）
+        - "temp:xxx"：临时角色，按名字查找
+        - 直接名字：按名字查找
+        """
+        if uid_or_name is None:
+            return None
+
+        # 数字 id → DB 角色
+        if isinstance(uid_or_name, (int, float)):
+            char = self.char_manager.get_character_by_id(int(uid_or_name))
+            if char:
+                return MatchResult(character=char, confidence=0.85, match_type="llm")
+            return None
+
+        # temp:xxx → 提取名字
+        if isinstance(uid_or_name, str) and uid_or_name.startswith("temp:"):
+            name = uid_or_name[5:]
+            char = self.char_manager.get_character_by_name(name, self.current_project_id)
+            if char:
+                return MatchResult(character=char, confidence=0.85, match_type="llm")
+            return None
+
+        # 数字字符串 → 按 id 查找
+        if isinstance(uid_or_name, str) and uid_or_name.isdigit():
+            char = self.char_manager.get_character_by_id(int(uid_or_name))
+            if char:
+                return MatchResult(character=char, confidence=0.85, match_type="llm")
+            return None
+
+        # 字符串 → 按名字查找
+        if isinstance(uid_or_name, str):
+            char = self.char_manager.get_character_by_name(uid_or_name, self.current_project_id)
+            if char:
+                return MatchResult(character=char, confidence=0.85, match_type="llm")
+            return None
+
+        return None
+
+    def _adjust_context_window(self, context: DialogueContext) -> DialogueContext:
+        """按对话长度调整 context_before/context_after 的窗口大小。
+
+        策略：
+        - 短对话（≤ 20 字符，单句）：前/后各取一句话（到句号边界）
+        - 长对话（> 20 字符或多句）：前/后各扩展到句号边界
+
+        原因：短句说话人信息就在紧挨着的句子里，长句需要更多上下文。
+        """
+        dialogue_text = getattr(context, 'dialogue', None) or context.text
+        before = context.context_before or ''
+        after = context.context_after or ''
+        sentence_splitter = re.compile(r'[。！？\n]')
+
+        is_long = len(dialogue_text) > 20 or bool(re.search(r'[。！？]', dialogue_text))
+
+        if is_long:
+            # 长对话：向前扩展到前一个句号，向后扩展到后一个句号
+            if before:
+                sentences = sentence_splitter.split(before)
+                if len(sentences) > 1:
+                    before = sentences[-1]
+            if after:
+                sentences = sentence_splitter.split(after)
+                after = sentences[0]
+        else:
+            # 短对话：前后各取一句
+            if before:
+                sentences = sentence_splitter.split(before)
+                before = sentences[-1] if sentences else before
+            if after:
+                sentences = sentence_splitter.split(after)
+                after = sentences[0] if sentences else after
+
+        context.context_before = before.strip()
+        context.context_after = after.strip()
+        return context
+
+    def _build_dynamic_candidates(self, context: DialogueContext) -> list:
+        """构建动态候选人列表。
+
+        优先级：
+        1. 上下文旁白中精确匹配的角色库角色（最长匹配优先）
+        2. 上下文中的描述性角色（通过 DescriptiveRoleExtractor + NER）
+        3. 仅当 < 3 个候选人时，用全局活跃角色补满到 3 个
+
+        原则：只分析旁白，对话内容（引号内）不参与角色匹配。
+        """
+        context_chars = []
+        seen_ids = set()
+
+        # 合并旁白（去除引号内容）
+        narration = self.rule_matcher._extract_narration(
+            '', context.context_before or '', context.context_after or ''
+        )
+
+        # ---- 层1：角色库精确匹配（最长优先） ----
+        # H-20260516-10: 改用 get_eligible_characters
+        if narration:
+            all_chars = sorted(
+                self.char_manager.get_eligible_characters(self.current_project_id),
+                key=lambda c: -len(c.name)  # 最长优先
+            )
+            for char in all_chars:
+                if char.id in seen_ids:
+                    continue
+                if char.name in narration:
+                    context_chars.append(char)
+                    seen_ids.add(char.id)
+                else:
+                    for alias in char.aliases:
+                        if alias in narration:
+                            context_chars.append(char)
+                            seen_ids.add(char.id)
+                            break
+
+        # ---- 层2：描述性角色提取 + NER ----
+        try:
+            descriptive_roles = self.rule_matcher.role_extractor.extract(narration)
+            for role in descriptive_roles:
+                if len(context_chars) >= 6:
+                    break
+                if role in [c.name for c in context_chars]:
+                    continue
+                temp_char = self.char_manager.find_or_create(
+                    role, project_id=self.current_project_id, context=narration
+                )
+                if temp_char and temp_char.id not in seen_ids:
+                    context_chars.append(temp_char)
+                    seen_ids.add(temp_char.id)
+        except Exception:
+            pass
+
+        # ---- 层3：NER 提取新角色 ----
+        try:
+            nlp = getattr(self.rule_matcher, 'nlp', None)
+            if nlp:
+                result = nlp.analyze(narration)
+                for entity in result.entities:
+                    if len(context_chars) >= 6:
+                        break
+                    if entity.type != 'PER':
+                        continue
+                    if not self.rule_matcher.name_validator.is_valid_speaker_candidate(entity.text):
+                        continue
+                    if len(entity.text) > 8:
+                        continue
+                    temp_char = self.char_manager.find_or_create(
+                        entity.text, project_id=self.current_project_id, context=narration
+                    )
+                    if temp_char and temp_char.id not in seen_ids:
+                        context_chars.append(temp_char)
+                        seen_ids.add(temp_char.id)
+        except Exception:
+            pass
+
+        # ---- 层4：仅当 < 3 时补满到 3（全局活跃角色，最低优先级） ----
+        if len(context_chars) < 3:
+            global_candidates = self.char_manager.build_candidate_list(
+                self.current_project_id, self.chapter_cache, max_candidates=6
+            )
+            for c in global_candidates:
+                if len(context_chars) >= 3:
+                    break
+                if c.id not in seen_ids:
+                    context_chars.append(c)
+                    seen_ids.add(c.id)
+
+        return context_chars[:6]
+
+    def _llm_fallback(self, context: DialogueContext) -> Optional[MatchResult]:
+        """L3 LLM 兜底。Phase 2 回归验证期间禁用。"""
+        self._llm_call_count += 1
+
+        if not LLM_ENABLED:
+            return None
+
+        if not self._ensure_llm_loaded():
+            return None
+
+        # 先调整上下文窗口
+        context = self._adjust_context_window(context)
+
+        candidates = self._build_dynamic_candidates(context)
+        if not candidates:
+            return None
+
+        prompt = self._build_llm_prompt(context, candidates)
+        response = self._llm_infer(prompt)
+        uid_or_name = self._parse_llm_response(response, candidates)
+
+        if uid_or_name == "unknown":
+            dialogue_text = getattr(context, 'dialogue', None) or context.text
+            logger.info(f"LLM 回答 unknown: {dialogue_text[:30]}")
+            return None
+
+        result = self._resolve_to_match_result(uid_or_name)
+        if result:
+            dialogue_text = getattr(context, 'dialogue', None) or context.text
+            logger.info(
+                f"LLM 匹配成功: '{dialogue_text[:20]}...' → {result.character.name}(0.85)"
+            )
+        return result
+
+    def match_speaker(self, context: DialogueContext) -> Optional[MatchResult]:
+        """L1+L2 → 如果失败或低置信度 → L3 LLM。
+
+        通过参数传递方式被 analyze_dialogue 调用，
+        不会与 rule_matcher 产生递归。
+        """
+        result = self.rule_matcher.match_speaker(context)
+
+        if result is None:
+            return self._llm_fallback(context)
+
+        self._rule_match_count += 1
+
+        # 降权检查：如果 match_type 包含 MATCH_TYPE_DENY_PREFIXES 中的任一前缀
+        # 且原始置信度低于 0.8（高于 0.8 的匹配视为高置信正确匹配，不降权）
+        if result.match_type and result.confidence < 0.8 and any(
+            p in result.match_type for p in MATCH_TYPE_DENY_PREFIXES
+        ):
+            matched_key = next(
+                p for p in MATCH_TYPE_DENY_PREFIXES if p in result.match_type
+            )
+            deweighted = MATCH_TYPE_DEWEIGHT[matched_key]
+            if deweighted < LLM_THRESHOLD:
+                llm_result = self._llm_fallback(context)
+                if llm_result and llm_result.confidence > deweighted:
+                    self._update_speaker_history(llm_result.character.name)
+                    return llm_result
+                return result
+            return result
+
+        # 代词消解动态降权：如果 match_type 是代词消解且 prev_speaker 不稳定
+        # 不稳定性 = 最近 6 段中有 ≥ 2 次角色变化
+        if result.match_type and result.confidence < 0.8 and any(
+            p in result.match_type for p in PRONOUN_DENY_PREFIXES
+        ):
+            if self._is_prev_speaker_unstable():
+                llm_result = self._llm_fallback(context)
+                if llm_result and llm_result.confidence > PRONOUN_DEWEIGHT_UNSTABLE:
+                    self._update_speaker_history(llm_result.character.name)
+                    return llm_result
+                self._update_speaker_history(result.character.name)
+                return result
+            self._update_speaker_history(result.character.name)
+            return result
+
+        if result.confidence < LLM_THRESHOLD:
+            llm_result = self._llm_fallback(context)
+            if llm_result and llm_result.confidence > result.confidence:
+                self._update_speaker_history(llm_result.character.name)
+                return llm_result
+            self._update_speaker_history(result.character.name)
+            return result
+
+        self._update_speaker_history(result.character.name)
+        return result
+
+    def _update_speaker_history(self, speaker_name: str):
+        """更新 prev_speaker 历史队列。"""
+        self._prev_speaker_history.append(speaker_name)
+
+    def _is_prev_speaker_unstable(self) -> bool:
+        """判断 prev_speaker 近期是否不稳定。
+
+        不稳定性：最近 6 段中有 ≥ 2 次角色变化。
+        例如：['妈妈','妈妈','妈妈','林洋','林洋','苏晚'] → 变化 2 次，不稳定
+               ['林洋','林洋','林洋','林洋','林洋','林洋'] → 变化 0 次，稳定
+        """
+        if len(self._prev_speaker_history) < 3:
+            return False
+        changes = sum(
+            1 for i in range(1, len(self._prev_speaker_history))
+            if self._prev_speaker_history[i] != self._prev_speaker_history[i-1]
+        )
+        return changes >= 2
+
+    def get_speaker_for_sentence(self, sentence: str, prev_speaker: str = None,
+                                  chapter_id: int = None) -> Optional[str]:
+        """获取指定句子的说话人。委托给规则匹配器。"""
+        return self.rule_matcher.get_speaker_for_sentence(sentence, prev_speaker, chapter_id)
+
+    def reset_activity(self):
+        """重置角色活跃度。委托 + 清空章节缓存。"""
+        self.rule_matcher.reset_activity()
+        self.chapter_cache.clear()
+
+    def backfill_unknown_speakers(self, content: str, chapter_id: int = None):
+        """回填未知说话人。纯委托。"""
+        return self.rule_matcher.backfill_unknown_speakers(content, chapter_id)
+
+    def analyze_dialogue(self, content: str, chapter_id: int = None):
+        """分析对话，返回 (dialogue_text, speaker) 列表。
+
+        通过参数传递 hybrid match_speaker 给 rule_matcher.analyze_dialogue，
+        使得引号提取 + 对话过滤走 rule_matcher 的现有逻辑，
+        但说话人匹配走 HybridSpeakerMatcher.match_speaker()（规则+LLM）。
+        """
+        return self.rule_matcher.analyze_dialogue(
+            content, chapter_id, match_speaker_override=self.match_speaker,
+        )
+
+    def get_stats(self) -> dict:
+        """返回统计信息。"""
+        total = self._llm_call_count + self._rule_match_count
+        return {
+            "llm_calls": self._llm_call_count,
+            "rule_matches": self._rule_match_count,
+            "total": total,
+            "llm_ratio": self._llm_call_count / total if total > 0 else 0,
+        }

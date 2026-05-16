@@ -1,0 +1,326 @@
+[
+  {
+    "index": 1,
+    "dialogue": "命运",
+    "rule_speaker": null,
+    "rule_confidence": 0.0,
+    "llm_triggered": true,
+    "llm_result": "unknown",
+    "hybrid_speaker": null
+  },
+  {
+    "index": 2,
+    "dialogue": "不甘心啊……",
+    "rule_speaker": null,
+    "rule_confidence": 0.0,
+    "llm_triggered": true,
+    "llm_result": "仓央洲",
+    "hybrid_speaker": "仓央洲"
+  },
+  {
+    "index": 3,
+    "dialogue": "壮年",
+    "rule_speaker": null,
+    "rule_confidence": 0.0,
+    "llm_triggered": true,
+    "llm_result": "他知",
+    "hybrid_speaker": "他知"
+  },
+  {
+    "index": 4,
+    "dialogue": "孙项明！",
+    "rule_speaker": "中年修士",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "中年修士"
+  },
+  {
+    "index": 5,
+    "dialogue": "规矩都懂。出来之后，七成收获上交，林家自有灵晶丹药补偿。",
+    "rule_speaker": "张边",
+    "rule_confidence": 0.7,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "张边"
+  },
+  {
+    "index": 6,
+    "dialogue": "明白。",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 7,
+    "dialogue": "哟，老孙！你也来了啊！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 8,
+    "dialogue": "郭道友。",
+    "rule_speaker": "张家",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "张家"
+  },
+  {
+    "index": 9,
+    "dialogue": "嘿，这次准备往哪边探？",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 10,
+    "dialogue": "我自知斤两，还是去老地方‘幽石林’碰碰运气。",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 11,
+    "dialogue": "幽石林好啊，稳妥！",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 12,
+    "dialogue": "那咱们……各凭机缘？",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 13,
+    "dialogue": "自然。",
+    "rule_speaker": "修士",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "修士"
+  },
+  {
+    "index": 14,
+    "dialogue": "幽石林",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 15,
+    "dialogue": "地火苔",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 16,
+    "dialogue": "求稳",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 17,
+    "dialogue": "蚀骨甲虫",
+    "rule_speaker": "修士",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "修士"
+  },
+  {
+    "index": 18,
+    "dialogue": "嗤！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 19,
+    "dialogue": "滋滋",
+    "rule_speaker": null,
+    "rule_confidence": 0.0,
+    "llm_triggered": true,
+    "llm_result": "unknown",
+    "hybrid_speaker": null
+  },
+  {
+    "index": 20,
+    "dialogue": "郭垣？！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 21,
+    "dialogue": "哼，反应倒快！",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 22,
+    "dialogue": "想要？自己来拿！",
+    "rule_speaker": "丹方玉简",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "丹方玉简"
+  },
+  {
+    "index": 23,
+    "dialogue": "找死！",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 24,
+    "dialogue": "噗！",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 25,
+    "dialogue": "哈哈！中了老子的‘蛇涎毒’，看你还能撑多久！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 26,
+    "dialogue": "想跑？！",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 27,
+    "dialogue": "什么鬼东西？！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 28,
+    "dialogue": "哆哆哆",
+    "rule_speaker": "郭垣",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "郭垣"
+  },
+  {
+    "index": 29,
+    "dialogue": "该死的！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 30,
+    "dialogue": "别看了，小子，上前来，助我摆脱封印，送你一场造化。",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 31,
+    "dialogue": "谁！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 32,
+    "dialogue": "别这么紧张，我要是有恶意你早死了",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 33,
+    "dialogue": "别慌啊，我要杀你比你想的容易的多。",
+    "rule_speaker": null,
+    "rule_confidence": 0.0,
+    "llm_triggered": true,
+    "llm_result": "unknown",
+    "hybrid_speaker": null
+  },
+  {
+    "index": 34,
+    "dialogue": "前辈！",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 35,
+    "dialogue": "上祭坛来",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.75,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  },
+  {
+    "index": 36,
+    "dialogue": "不知如何能帮前辈脱困",
+    "rule_speaker": "孙项明",
+    "rule_confidence": 0.85,
+    "llm_triggered": false,
+    "llm_result": null,
+    "hybrid_speaker": "孙项明"
+  }
+]

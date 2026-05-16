@@ -1,0 +1,51 @@
+{
+  "system": "LegacyRuleMatcher (SpeakerMatcher)",
+  "total_items": 243,
+  "correct_count": 183,
+  "error_count": 60,
+  "accuracy": 0.753,
+  "style_breakdown": {
+    "都市": {
+      "correct": 48,
+      "total": 65,
+      "accuracy": 0.738
+    },
+    "历史": {
+      "correct": 45,
+      "total": 57,
+      "accuracy": 0.789
+    },
+    "修仙": {
+      "correct": 47,
+      "total": 62,
+      "accuracy": 0.758
+    },
+    "西幻": {
+      "correct": 43,
+      "total": 59,
+      "accuracy": 0.729
+    }
+  },
+  "difficulty_breakdown": {
+    "显式提示": {
+      "correct": 45,
+      "total": 50,
+      "accuracy": 0.9
+    },
+    "其他": {
+      "correct": 71,
+      "total": 106,
+      "accuracy": 0.67
+    },
+    "别名映射": {
+      "correct": 32,
+      "total": 37,
+      "accuracy": 0.865
+    },
+    "代词消解": {
+      "correct": 35,
+      "total": 50,
+      "accuracy": 0.7
+    }
+  }
+}

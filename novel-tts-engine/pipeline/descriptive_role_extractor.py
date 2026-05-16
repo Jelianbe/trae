@@ -123,17 +123,38 @@ class TitleTriggerMatcher:
         self.char_manager = char_manager
 
     def match_by_title(self, title: str) -> Optional:
-        """通过头衔匹配角色"""
+        """通过头衔匹配角色。
+
+        P0-6 修复：改为核心词精确匹配，不再使用 in 子串匹配。
+        规则：title 必须是角色名或别名的后缀（精确匹配核心词），
+        如果有多个候选，返回 None（无法消歧），调用方应使用其他路径。
+
+        v7.0 原则3：头衔/描述性角色匹配必须使用核心词精确匹配
+        """
         from pipeline.speaker_matcher import MatchResult
 
         all_chars = self.char_manager.get_all_characters()
+        matched = []
         for char in all_chars:
-            if title in char.name or title in char.aliases:
-                return MatchResult(
-                    character=char,
-                    confidence=0.85,
-                    match_type='title'
-                )
+            # 核心词后缀匹配：title 必须是 name 的后缀
+            if char.name.endswith(title):
+                matched.append(char)
+            # 别名完全匹配
+            elif title in char.aliases:
+                matched.append(char)
+
+        if not matched:
+            return None
+
+        if len(matched) == 1:
+            return MatchResult(
+                character=matched[0],
+                confidence=0.85,
+                match_type='title'
+            )
+
+        # P0-6: 多个候选时无法消歧，返回 None
+        # 调用方应使用其他路径（如活跃度、最近提及）来区分
         return None
 
     def extract_title_trigger_candidates(self, text: str) -> List[Tuple[str, str, float]]:

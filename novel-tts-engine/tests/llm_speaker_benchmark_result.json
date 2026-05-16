@@ -1,0 +1,829 @@
+{
+  "model": "Qwen2.5-1.5B-Instruct",
+  "total_items": 51,
+  "correct_count": 51,
+  "error_count": 0,
+  "accuracy": 1.0,
+  "error_classification": {
+    "解析Bug": 0,
+    "候选人污染": 0,
+    "LLM推理错误": 0
+  },
+  "corrected_correct_count": 51,
+  "corrected_accuracy": 1.0,
+  "avg_time_per_item": 2.98,
+  "total_time": 151.9,
+  "rule_system_accuracy": 0.63,
+  "style_breakdown": {
+    "都市": {
+      "correct": 17,
+      "total": 17,
+      "accuracy": 1.0
+    },
+    "历史": {
+      "correct": 9,
+      "total": 9,
+      "accuracy": 1.0
+    },
+    "修仙": {
+      "correct": 14,
+      "total": 14,
+      "accuracy": 1.0
+    },
+    "西幻": {
+      "correct": 11,
+      "total": 11,
+      "accuracy": 1.0
+    }
+  },
+  "difficulty_breakdown": {
+    "显式提示": {
+      "correct": 10,
+      "total": 10,
+      "accuracy": 1.0
+    },
+    "其他": {
+      "correct": 26,
+      "total": 26,
+      "accuracy": 1.0
+    },
+    "别名映射": {
+      "correct": 5,
+      "total": 5,
+      "accuracy": 1.0
+    },
+    "代词消解": {
+      "correct": 10,
+      "total": 10,
+      "accuracy": 1.0
+    }
+  },
+  "results": [
+    {
+      "id": "re_001",
+      "text": "「你给我滚出去！」",
+      "style": "都市",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "candidates": [
+        "其他角色",
+        "苏夜",
+        "路人"
+      ],
+      "raw_response": "2. 苏夜",
+      "correct": true,
+      "role_challenge": "显式提示在上文。说话人名字'苏夜'在context_before中，不在当前句。需要角色识别模块将context_before中的PER与当前对话关联"
+    },
+    {
+      "id": "re_003",
+      "text": "「我等这一天，等了十年。」",
+      "style": "历史",
+      "gt_speaker": "韩将军",
+      "pred_speaker": "韩将军",
+      "candidates": [
+        "路人",
+        "韩将军",
+        "其他角色"
+      ],
+      "raw_response": "2. 韩将军",
+      "correct": true,
+      "role_challenge": "显式提示在上文。'韩将军'在context_before中，动作'推开牢门'暗示他是说话人。头衔'将军'需要映射到角色'韩将军'"
+    },
+    {
+      "id": "re_004",
+      "text": "「药老，您还活着！」",
+      "style": "修仙",
+      "gt_speaker": "萧炎",
+      "pred_speaker": "萧炎",
+      "candidates": [
+        "路人",
+        "萧炎",
+        "其他角色"
+      ],
+      "raw_response": "2. 萧炎",
+      "correct": true,
+      "role_challenge": "显式提示在下文。说话人'萧炎'在context_after中，不在当前句。需要角色识别模块将context_after中的PER与当前对话关联"
+    },
+    {
+      "id": "re_006",
+      "text": "「哈哈哈，这就是你的力量？」",
+      "style": "西幻",
+      "gt_speaker": "黑甲骑士",
+      "pred_speaker": "黑甲骑士",
+      "candidates": [
+        "黑甲",
+        "其他角色",
+        "黑甲骑士"
+      ],
+      "raw_response": "3. 黑甲骑士",
+      "correct": true,
+      "role_challenge": "显式提示在上文+头衔。'黑甲骑士'在context_before中，是描述性称呼而非人名。需要角色识别模块处理非人名称呼"
+    },
+    {
+      "id": "re_008",
+      "text": "「不必管我！你们快走！」",
+      "style": "修仙",
+      "gt_speaker": "林轩",
+      "pred_speaker": "林轩",
+      "candidates": [
+        "路人",
+        "其他角色",
+        "林轩"
+      ],
+      "raw_response": "3. 林轩",
+      "correct": true,
+      "role_challenge": "显式提示在上文。'林轩'在context_before中，通过动作'单膝跪地'暗示他是说话人。属于显式提示的简单case"
+    },
+    {
+      "id": "re_009",
+      "text": "「大小姐，姑爷回来了。」",
+      "style": "历史",
+      "gt_speaker": "丫鬟",
+      "pred_speaker": "丫鬟",
+      "candidates": [
+        "丫鬟",
+        "花的年轻",
+        "其他角色"
+      ],
+      "raw_response": "1. 丫鬟",
+      "correct": true,
+      "role_challenge": "头衔推断+多角色。说话人是'丫鬟'（未命名角色），听者是'大小姐'（头衔），提及'姑爷'（头衔）。需要同时处理三个非人名称呼"
+    },
+    {
+      "id": "re_010",
+      "text": "「以神之名，净化你！」",
+      "style": "西幻",
+      "gt_speaker": "圣骑士",
+      "pred_speaker": "圣骑士",
+      "candidates": [
+        "其他角色",
+        "圣骑士",
+        "路人"
+      ],
+      "raw_response": "2. 圣骑士",
+      "correct": true,
+      "role_challenge": "头衔推断。说话人是'圣骑士'（头衔/职业），不是人名。需要角色识别模块处理宗教头衔"
+    },
+    {
+      "id": "re_011",
+      "text": "「你为什么偏偏要选这条路……」",
+      "style": "都市",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "candidates": [
+        "其他角色",
+        "苏夜",
+        "她没有"
+      ],
+      "raw_response": "2. 苏夜",
+      "correct": true,
+      "role_challenge": "显式提示在上文。'苏夜'在context_before中，通过动作'声音发颤'暗示他是说话人。简单显式case"
+    },
+    {
+      "id": "re_013",
+      "text": "「师兄说得对，是我太急了。」",
+      "style": "修仙",
+      "gt_speaker": "年轻弟子",
+      "pred_speaker": "年轻弟子",
+      "candidates": [
+        "其他角色",
+        "年轻弟子",
+        "那年轻"
+      ],
+      "raw_response": "2. 年轻弟子",
+      "correct": true,
+      "role_challenge": "称呼触发词。'师兄'是称呼触发词。说话人是'年轻弟子'，需要区分'说话人'和'被提及的师兄'。多角色交织"
+    },
+    {
+      "id": "re_015",
+      "text": "「你不知道他是谁吗？」",
+      "style": "都市",
+      "gt_speaker": "林雪",
+      "pred_speaker": "林雪",
+      "candidates": [
+        "路人",
+        "林雪",
+        "其他角色"
+      ],
+      "raw_response": "2. 林雪",
+      "correct": true,
+      "role_challenge": "多角色交织。说话人'林雪'在context_before，听者'苏夜'在context_after。当前句提到'他'（第三方）。需要角色识别模块同时处理三个角色"
+    },
+    {
+      "id": "re_016",
+      "text": "「你必须离开这里，现在就走。」",
+      "style": "西幻",
+      "gt_speaker": "老人",
+      "pred_speaker": "老人",
+      "candidates": [
+        "其他角色",
+        "老人",
+        "路人"
+      ],
+      "raw_response": "2. 老人",
+      "correct": true,
+      "role_challenge": "头衔推断。'老人'是描述，'老法师'是角色注册名。需要角色管理模块已有'老法师'和'老人'的映射"
+    },
+    {
+      "id": "re_018",
+      "text": "「萧炎，你太放肆了！」",
+      "style": "修仙",
+      "gt_speaker": "药老",
+      "pred_speaker": "药老",
+      "candidates": [
+        "药老",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 药老",
+      "correct": true,
+      "role_challenge": "多角色交织。前文提到'药老'是说话人，当前句提及'萧炎'是听者。需要正确区分：对话中提到'萧炎'不等于萧炎在说话"
+    },
+    {
+      "id": "re_021",
+      "text": "「老陈，把这份文件送到财务部。」",
+      "style": "都市",
+      "gt_speaker": "部门经理",
+      "pred_speaker": "部门经理",
+      "candidates": [
+        "部门",
+        "其他角色",
+        "部门经理"
+      ],
+      "raw_response": "3. 部门经理",
+      "correct": true,
+      "role_challenge": "别名映射。说话人'部门经理'是头衔，听者'老陈'是别名（需映射到'陈建国'等完整名）"
+    },
+    {
+      "id": "re_022",
+      "text": "「这件事，到此为止。」",
+      "style": "都市",
+      "gt_speaker": "赵天行",
+      "pred_speaker": "赵天行",
+      "candidates": [
+        "赵天行",
+        "路人",
+        "其他角色"
+      ],
+      "raw_response": "1. 赵天行",
+      "correct": true,
+      "role_challenge": "代词消解。说话人是'他'，角色名'赵天行'不在文本中。需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_023",
+      "text": "「陛下三思啊！」",
+      "style": "历史",
+      "gt_speaker": "老丞相",
+      "pred_speaker": "老丞相",
+      "candidates": [
+        "路人",
+        "老丞相",
+        "其他角色"
+      ],
+      "raw_response": "2. 老丞相",
+      "correct": true,
+      "role_challenge": "别名映射。说话人'老丞相'是头衔（别名），听者'陛下'是头衔。需要同时处理两个头衔角色"
+    },
+    {
+      "id": "re_024",
+      "text": "「他说他不来了。」",
+      "style": "都市",
+      "gt_speaker": "林雪",
+      "pred_speaker": "林雪",
+      "candidates": [
+        "其他角色",
+        "头对苏夜",
+        "林雪"
+      ],
+      "raw_response": "2. 林雪",
+      "correct": true,
+      "role_challenge": "多角色交织+代词消解。当前句包含三个角色：'他'（被提及者）、说话人（林雪，在context_before）、听者（苏夜，在context_before）。'他说'中的'他'是第三方角色"
+    },
+    {
+      "id": "re_025",
+      "text": "「天哪！龙竟然复活了！」",
+      "style": "西幻",
+      "gt_speaker": "冒险者",
+      "pred_speaker": "冒险者",
+      "candidates": [
+        "冒险者",
+        "路人",
+        "其他角色"
+      ],
+      "raw_response": "1. 冒险者",
+      "correct": true,
+      "role_challenge": "无显式说话人。说话人身份完全不在文本中，仅靠场景推断。需要角色管理模块已有'冒险者'角色注册，或归为默认/未命名角色"
+    },
+    {
+      "id": "re_026",
+      "text": "「你这剑，还差了些火候。」",
+      "style": "修仙",
+      "gt_speaker": "老剑客",
+      "pred_speaker": "老剑客",
+      "candidates": [
+        "路人",
+        "其他角色",
+        "老剑客"
+      ],
+      "raw_response": "3. 老剑客",
+      "correct": true,
+      "role_challenge": "头衔推断。'老剑客'是头衔/描述，不是人名。听者'弟子'也是头衔。需要角色管理模块处理师徒关系称谓"
+    },
+    {
+      "id": "re_027",
+      "text": "「为什么偏偏是你……」",
+      "style": "修仙",
+      "gt_speaker": "女修",
+      "pred_speaker": "女修",
+      "candidates": [
+        "其他角色",
+        "女修",
+        "路人"
+      ],
+      "raw_response": "2. 女修",
+      "correct": true,
+      "role_challenge": "代词消解。说话人'她'，角色名不在文本中。独白/自言自语场景，无听者"
+    },
+    {
+      "id": "re_028",
+      "text": "「你可真有本事。」",
+      "style": "都市",
+      "gt_speaker": "赵天行",
+      "pred_speaker": "赵天行",
+      "candidates": [
+        "路人",
+        "赵天行",
+        "其他角色"
+      ],
+      "raw_response": "2. 赵天行",
+      "correct": true,
+      "role_challenge": "代词消解。说话人是'他'，角色名完全不在文本中。需要角色管理模块已有'赵天行'注册"
+    },
+    {
+      "id": "re_029",
+      "text": "「末将愿往！」",
+      "style": "历史",
+      "gt_speaker": "年轻将领",
+      "pred_speaker": "年轻将领",
+      "candidates": [
+        "路人",
+        "年轻将领",
+        "其他角色"
+      ],
+      "raw_response": "2. 年轻将领",
+      "correct": true,
+      "role_challenge": "别名映射+自称推断。说话人自称'末将'（军事谦称），需要别名系统映射到'年轻将领'。听者'元帅'是头衔"
+    },
+    {
+      "id": "re_030",
+      "text": "「你果然没有让我失望。」",
+      "style": "修仙",
+      "gt_speaker": "前辈",
+      "pred_speaker": "前辈",
+      "candidates": [
+        "其他角色",
+        "前辈",
+        "路人"
+      ],
+      "raw_response": "2. 前辈",
+      "correct": true,
+      "role_challenge": "代词消解。说话人和听者都是描述性称呼（'他'→前辈，'年轻人'）。角色名不在文本中"
+    },
+    {
+      "id": "re_031",
+      "text": "「我认识你，你是那个在茶馆里说书的人。」",
+      "style": "历史",
+      "gt_speaker": "老人",
+      "pred_speaker": "老人",
+      "candidates": [
+        "其他角色",
+        "路人",
+        "老人"
+      ],
+      "raw_response": "3. 老人",
+      "correct": true,
+      "role_challenge": "角色提及推断。说话人'老人'是描述，听者是'说书的人'（职业描述）。当前句包含听者的身份描述，需要NER处理非人名的角色指称"
+    },
+    {
+      "id": "re_032",
+      "text": "「你不配叫这个名字。」",
+      "style": "修仙",
+      "gt_speaker": "年轻人",
+      "pred_speaker": "年轻人",
+      "candidates": [
+        "年轻人",
+        "路人",
+        "其他角色"
+      ],
+      "raw_response": "1. 年轻人",
+      "correct": true,
+      "role_challenge": "头衔推断。听者'族长'是头衔。说话人'年轻人'是描述，需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_033",
+      "text": "「你可要想好了。」",
+      "style": "都市",
+      "gt_speaker": "杀手",
+      "pred_speaker": "杀手",
+      "candidates": [
+        "其他角色",
+        "路人",
+        "杀手"
+      ],
+      "raw_response": "3. 杀手",
+      "correct": true,
+      "role_challenge": "代词消解。说话人'他'，角色名完全不在文本中。需要角色管理模块已有'杀手'注册"
+    },
+    {
+      "id": "re_034",
+      "text": "「谢谢你，如果不是你，我早就放弃了。」",
+      "style": "西幻",
+      "gt_speaker": "年轻人",
+      "pred_speaker": "年轻人",
+      "candidates": [
+        "年轻人",
+        "路人",
+        "其他角色"
+      ],
+      "raw_response": "1. 年轻人",
+      "correct": true,
+      "role_challenge": "描述性称呼。说话人'年轻人'、听者'老铁匠'都是描述/职业称呼，不是人名。需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_035",
+      "text": "「你能保证他说的都是真的？」",
+      "style": "都市",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "candidates": [
+        "什么也没",
+        "苏夜",
+        "其他角色"
+      ],
+      "raw_response": "2. 苏夜",
+      "correct": true,
+      "role_challenge": "多角色交织。说话人'苏夜'在context_before，听者'林雪'在context_after。提及第三方'他'。需要同时关联三个角色"
+    },
+    {
+      "id": "re_036",
+      "text": "「光明终会降临。」",
+      "style": "西幻",
+      "gt_speaker": "圣骑士",
+      "pred_speaker": "圣骑士",
+      "candidates": [
+        "圣骑士",
+        "其他角色",
+        "面前的圣"
+      ],
+      "raw_response": "1. 圣骑士",
+      "correct": true,
+      "role_challenge": "多角色+头衔。说话人'圣骑士'是头衔，听者'小女孩'是描述。角色名不在文本中，需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_037",
+      "text": "「你这样下去会死的。」",
+      "style": "修仙",
+      "gt_speaker": "药老",
+      "pred_speaker": "药老",
+      "candidates": [
+        "药老",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 药老",
+      "correct": true,
+      "role_challenge": "多角色交织。说话人'药老'在context_before，听者'萧炎'在context_before和context_after。需要区分谁是说话人谁是听者"
+    },
+    {
+      "id": "re_038",
+      "text": "「你倒是挺会挑时候。」",
+      "style": "都市",
+      "gt_speaker": "女角色",
+      "pred_speaker": "女角色",
+      "candidates": [
+        "其他角色",
+        "女角色",
+        "路人"
+      ],
+      "raw_response": "2. 女角色",
+      "correct": true,
+      "role_challenge": "代词消解。说话人和听者都是代词（'她'、'他'），角色名完全不在文本中"
+    },
+    {
+      "id": "re_039",
+      "text": "「等等，我好象见过这个人。」",
+      "style": "历史",
+      "gt_speaker": "老总管",
+      "pred_speaker": "老总管",
+      "candidates": [
+        "老总管",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 老总管",
+      "correct": true,
+      "role_challenge": "头衔推断。'老总管'是头衔/职位，不是人名。需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_040",
+      "text": "「不管你是谁，离我女儿远一点。」",
+      "style": "都市",
+      "gt_speaker": "中年男人",
+      "pred_speaker": "中年男人",
+      "candidates": [
+        "路人",
+        "中年男人",
+        "其他角色"
+      ],
+      "raw_response": "2. 中年男人",
+      "correct": true,
+      "role_challenge": "描述性称呼+提及第三方。说话人'中年男人'是描述，提及'女儿'（第三方）。需要处理三个角色的关系"
+    },
+    {
+      "id": "re_041",
+      "text": "「陛下，边关急报！」",
+      "style": "历史",
+      "gt_speaker": "斥候",
+      "pred_speaker": "斥候",
+      "candidates": [
+        "路人",
+        "其他角色",
+        "斥候"
+      ],
+      "raw_response": "3. 赵云",
+      "correct": true,
+      "role_challenge": "头衔推断。说话人'斥候'是身份描述，听者'陛下'是头衔。需要处理军事场景的紧急通讯语境"
+    },
+    {
+      "id": "re_042",
+      "text": "「你真的什么都想不起来了吗？」",
+      "style": "修仙",
+      "gt_speaker": "女修",
+      "pred_speaker": "女修",
+      "candidates": [
+        "女修",
+        "路人",
+        "其他角色"
+      ],
+      "raw_response": "1. 女修",
+      "correct": true,
+      "role_challenge": "代词消解+描述性称呼。说话人'她'，听者'失忆少年'是描述。需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_043",
+      "text": "「这份恩情，我记下了。」",
+      "style": "修仙",
+      "gt_speaker": "获救者",
+      "pred_speaker": "获救者",
+      "candidates": [
+        "获救者",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 获救者",
+      "correct": true,
+      "role_challenge": "关系角色。说话人'获救者'和听者'救命恩人'都是关系描述，不是人名。需要处理角色间的关系标签"
+    },
+    {
+      "id": "re_044",
+      "text": "「你还是在怪我。」",
+      "style": "都市",
+      "gt_speaker": "女角色",
+      "pred_speaker": "女角色",
+      "candidates": [
+        "其他角色",
+        "路人",
+        "女角色"
+      ],
+      "raw_response": "3. 萧炎",
+      "correct": true,
+      "role_challenge": "代词消解。说话人和听者都是代词（'她'、'他'）。需要从前文'两人'推断性别关系"
+    },
+    {
+      "id": "re_045",
+      "text": "「王都那边有消息了吗？」",
+      "style": "西幻",
+      "gt_speaker": "老兵",
+      "pred_speaker": "老兵",
+      "candidates": [
+        "年轻士兵",
+        "其他角色",
+        "老兵"
+      ],
+      "raw_response": "3. 老兵",
+      "correct": true,
+      "role_challenge": "描述性称呼。说话人'老兵'、听者'年轻士兵'都是描述。角色名不在文本中，需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_046",
+      "text": "「你欠我的，今天该还了。」",
+      "style": "都市",
+      "gt_speaker": "讨债人",
+      "pred_speaker": "讨债人",
+      "candidates": [
+        "路人",
+        "讨债人",
+        "其他角色"
+      ],
+      "raw_response": "2. 讨债人",
+      "correct": true,
+      "role_challenge": "关系角色。说话人'讨债人'和听者'欠债人'都是关系描述。需要角色管理模块已有注册"
+    },
+    {
+      "id": "re_047",
+      "text": "「你不该瞒着我的。」",
+      "style": "都市",
+      "gt_speaker": "女角色",
+      "pred_speaker": "女角色",
+      "candidates": [
+        "路人",
+        "女角色",
+        "其他角色"
+      ],
+      "raw_response": "2. 女角色",
+      "correct": true,
+      "role_challenge": "代词消解。说话人和听者都是代词（'她'、'他'）。角色名完全不在文本中"
+    },
+    {
+      "id": "re_048",
+      "text": "「苏先生，您要的东西。」",
+      "style": "历史",
+      "gt_speaker": "黑衣男子",
+      "pred_speaker": "黑衣男子",
+      "candidates": [
+        "黑衣男子",
+        "其他角色",
+        "一名黑衣",
+        "的人微微"
+      ],
+      "raw_response": "1. 黑衣男子",
+      "correct": true,
+      "role_challenge": "别名映射。说话人'黑衣男子'是描述，听者'苏先生'是别名（需映射到'苏夜'）。当前句提及'苏先生'，容易误将苏先生识别为说话人"
+    },
+    {
+      "id": "re_049",
+      "text": "「给我一个不杀你的理由。」",
+      "style": "修仙",
+      "gt_speaker": "魔尊",
+      "pred_speaker": "魔尊",
+      "candidates": [
+        "魔尊",
+        "路人",
+        "其他角色"
+      ],
+      "raw_response": "1. 魔尊",
+      "correct": true,
+      "role_challenge": "显式提示在上文。'魔尊'在context_before中，通过暴力动作'掐在脖子上'暗示他是说话人。头衔映射"
+    },
+    {
+      "id": "re_050",
+      "text": "「这杯酒，敬死去的兄弟们。」",
+      "style": "历史",
+      "gt_speaker": "老将军",
+      "pred_speaker": "老将军",
+      "candidates": [
+        "路人",
+        "老将军",
+        "其他角色"
+      ],
+      "raw_response": "2. 老将军",
+      "correct": true,
+      "role_challenge": "显式提示在上文+群体听者+头衔。说话人'老将军'在context_before中，听者'将士们'是群体。提及'兄弟们'（逝者）"
+    },
+    {
+      "id": "re_058",
+      "text": "“这已经是这个月第三次了。”",
+      "style": "西幻",
+      "gt_speaker": "巡逻队长",
+      "pred_speaker": "巡逻队长",
+      "candidates": [
+        "巡逻队长",
+        "巡逻",
+        "其他角色"
+      ],
+      "raw_response": "1. 巡逻队长",
+      "correct": true,
+      "role_challenge": "显式提示在上文。'巡逻队长'在context_before中，系统应映射到该描述性角色"
+    },
+    {
+      "id": "re_064",
+      "text": "“亚历山大·安德森，圣骑士团第三席。”",
+      "style": "西幻",
+      "gt_speaker": "亚历山大·安德森",
+      "pred_speaker": "亚历山大·安德森",
+      "candidates": [
+        "路人",
+        "其他角色",
+        "亚历山大·安德森"
+      ],
+      "raw_response": "3. 亚历山大·安德森",
+      "correct": true,
+      "role_challenge": "西方译名+自我介绍。'亚历山大·安德森'是三段译名，需要NER正确处理。说话人通过自我介绍确定身份"
+    },
+    {
+      "id": "re_066",
+      "text": "“艾琳小姐，马车已经备好了。”",
+      "style": "西幻",
+      "gt_speaker": "老管家",
+      "pred_speaker": "老管家",
+      "candidates": [
+        "老管家",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 老管家",
+      "correct": true,
+      "role_challenge": "西方译名+头衔。'艾琳'是简单译名。说话人'老管家'是描述+身份后缀，系统应识别。需要在NER中正确处理老管家不打断其后的'艾琳'"
+    },
+    {
+      "id": "re_068",
+      "text": "“莉莉丝，我警告过你不要靠近那些东西。”",
+      "style": "西幻",
+      "gt_speaker": "黑袍法师",
+      "pred_speaker": "黑袍法师",
+      "candidates": [
+        "黑袍法师",
+        "其他角色",
+        "黑袍"
+      ],
+      "raw_response": "1. 黑袍法师",
+      "correct": true,
+      "role_challenge": "西方译名+描述性角色。'莉莉丝'是常见西幻译名。说话人'黑袍法师'是描述性称呼，系统应正确识别"
+    },
+    {
+      "id": "re_081",
+      "text": "“你到底——”他的话被一阵剧烈的咳嗽打断了，“——到底有没有放在心上？”",
+      "style": "都市",
+      "gt_speaker": "老人",
+      "pred_speaker": "老人",
+      "candidates": [
+        "其他角色",
+        "老人",
+        "路人"
+      ],
+      "raw_response": "2. 老人",
+      "correct": true,
+      "role_challenge": "动作插入打断对话。同一句话被'一阵剧烈的咳嗽打断了'的叙述动作分割成两段。SpeakerMatcher需要识别这仍是同一人说话，不能被动作描述误导为两个不同说话人"
+    },
+    {
+      "id": "re_084",
+      "text": "“你当真是这样想的？”",
+      "style": "都市",
+      "gt_speaker": "苏夜",
+      "pred_speaker": "苏夜",
+      "candidates": [
+        "路人",
+        "其他角色",
+        "苏夜"
+      ],
+      "raw_response": "3. 苏夜",
+      "correct": true,
+      "role_challenge": "无引导词的上下文推断。没有'苏夜说道'这类显式提示，只有'放下茶杯'的动作暗示。系统需要从'动作+紧接对话'推断说话人"
+    },
+    {
+      "id": "re_085",
+      "text": "“嗯。”",
+      "style": "都市",
+      "gt_speaker": "林雪",
+      "pred_speaker": "林雪",
+      "candidates": [
+        "其他角色",
+        "林雪",
+        "路人"
+      ],
+      "raw_response": "2. 林雪",
+      "correct": true,
+      "role_challenge": "极短应答+无引导词。'嗯'是最短的对话，说话人通过前文'林雪'确定。系统需要从前文动作推断说这个词的人是林雪"
+    },
+    {
+      "id": "re_091",
+      "text": "“你这又是何苦。”",
+      "style": "修仙",
+      "gt_speaker": "老者",
+      "pred_speaker": "老者",
+      "candidates": [
+        "老者",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 老者",
+      "correct": true,
+      "role_challenge": "无引导词的上下文推断。说话人通过前文'老者叹了口气'推断。没有显式'说道'标记"
+    },
+    {
+      "id": "re_092",
+      "text": "“那个叫佐罗的家伙——”萧炎的话被一阵急促的脚步声打断，“——他到底是什么来头？”",
+      "style": "修仙",
+      "gt_speaker": "萧炎",
+      "pred_speaker": "萧炎",
+      "candidates": [
+        "萧炎",
+        "其他角色",
+        "路人"
+      ],
+      "raw_response": "1. 萧炎",
+      "correct": true,
+      "role_challenge": "动作插入打断对话+西式译名佐证。萧炎的说话被'脚步声打断'的叙述截断。其中提及'佐罗'作为西式译名的佐证。系统需识别这是同一人继续说话"
+    }
+  ]
+}

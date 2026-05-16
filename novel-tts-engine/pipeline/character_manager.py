@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from utils.config import (
     CHARACTER_MIN_CONFIDENCE,
     CONTEXT_HINT_CONFIDENCE_THRESHOLD,
+    CHARACTER_ELIGIBLE_MIN_FREQ,
 )
 from pathlib import Path
 import numpy as np
@@ -67,6 +68,8 @@ class CharacterManager:
         self.db_path = Path(db_path) if db_path else DB_PATH
         self._local = threading.local()
         self._ensure_tables()
+        # H-20260516-10: 频次过滤
+        self._frequency_map: Dict[str, Dict[str, int]] = {}
     
     @contextmanager
     def _get_connection(self):
@@ -322,7 +325,39 @@ class CharacterManager:
             cursor.execute("DELETE FROM characters WHERE id = ?", (char_id,))
             conn.commit()
             return cursor.rowcount > 0
-    
+
+    # H-20260516-10: 角色频次追踪（2026-05-16）
+    #
+    # 用途：为角色候选池频次过滤提供后台计数支持
+    # 来源：基于长文本 vs 短文本准确率差异分析
+    # 边界：纯内存计数器，不持久化到 SQLite，不影响现有 CRUD 逻辑
+    # 更新日期：2026-05-16
+    # 维护者：H-20260516-10
+    #
+    # 规则：
+    #   - freq == 0 → 预注册角色，始终可用（从未被 increment）
+    #   - freq >= 1 → 自动发现的角色，需要 >= min_freq 才能进入候选池
+    def increment_frequency(self, name: str, project_id: str = ''):
+        if project_id not in self._frequency_map:
+            self._frequency_map[project_id] = {}
+        self._frequency_map[project_id][name] = self._frequency_map[project_id].get(name, 0) + 1
+
+    def get_frequency(self, name: str, project_id: str = '') -> int:
+        return self._frequency_map.get(project_id, {}).get(name, 0)
+
+    def get_eligible_characters(self, project_id: str = '', min_freq: int = None) -> list:
+        if min_freq is None:
+            min_freq = CHARACTER_ELIGIBLE_MIN_FREQ
+        if min_freq <= 0:
+            return self.get_all_characters(project_id)
+        all_chars = self.get_all_characters(project_id)
+        result = []
+        for c in all_chars:
+            freq = self.get_frequency(c.name, project_id)
+            if freq == 0 or freq >= min_freq:
+                result.append(c)
+        return result
+
     def infer_gender(self, name: str, context: str = None) -> str:
         for title in MALE_TITLES:
             if name.endswith(title) or title in name:
@@ -493,6 +528,52 @@ class CharacterManager:
                     first_appearance=row[4]
                 ))
             return characters
+
+    def build_candidate_list(
+        self, project_id: str, chapter_cache=None,
+        max_candidates: int = 6
+    ) -> list:
+        """构建说话人候选人列表，按活跃度排序。
+
+        用途：为 LLM 兜底提供候选人列表。
+        顺序：已确认角色优先，活跃度高的在前。
+
+        Args:
+            project_id: 项目 ID
+            chapter_cache: 可选章节缓存
+            max_candidates: 最大候选人数量
+
+        Returns:
+            Character 列表
+        """
+        all_chars = self.get_all_characters(project_id)
+        all_chars.sort(
+                key=lambda c: (
+                    0 if c.id and c.id > 0 else 1,
+                    -(getattr(c, 'first_appearance', 0) or 0)
+                )
+            )
+        return all_chars[:max_candidates]
+
+
+class ChapterRoleCache:
+    """章节级角色缓存（用于 LLM 候选人列表构建）。
+
+    用途：在章节处理过程中缓存角色信息，避免重复数据库查询。
+    设计：简单的 dict 包装，按章节 ID 维护角色列表。
+    """
+
+    def __init__(self):
+        self._cache: Dict[int, list] = {}
+
+    def get(self, chapter_id: int, default=None):
+        return self._cache.get(chapter_id, default)
+
+    def set(self, chapter_id: int, characters: list):
+        self._cache[chapter_id] = characters
+
+    def clear(self):
+        self._cache.clear()
 
 
 _character_manager: Optional[CharacterManager] = None

@@ -1,0 +1,204 @@
+你的执行结果非常关键：**方案1+4没有改变无预注册0%的事实**，证明你之前的判断是正确的——系统核心短板不是过滤或引号分类，而是**完全没有名称提取和临时注册机制**。
+
+因此，**继续停留在方案1+4是无意义的**。你面临两个选择：
+
+1. **转向方案2+3：从旁白中提取名称并临时注册**（真正的角色自动发现）
+2. **放弃角色自动发现，回归原任务二/三/四**（优化现有管道，但永远依赖预注册）
+
+我强烈建议**选择1**。理由是：
+- 没有自动发现，系统永远无法实用（用户不可能预注册所有角色）
+- 方案2+3的投入产出比很高：实现一个基于NER+规则的名词短语提取器，将候选名称临时注册到角色库（带有置信度），就能让无预注册场景从0%提升到30%+
+- 原任务二/三/四都是“锦上添花”，而角色自动发现是“核心功能”
+
+## 具体行动
+
+立即实施**方案2：名称提取 + 临时注册**，步骤如下：
+
+1. **在 `speaker_matcher.py` 中添加 `_extract_name_candidates_from_narration` 方法**  
+   - 输入：旁白句子文本  
+   - 输出：候选名称列表（如“赵总监”、“亚瑟”、“艾琳法师”）  
+   - 实现：基于HanLP的NER（PER类型）+ 正则捕获“姓+职位”（“赵总监”）+ 捕获“名称+头衔”（“艾琳法师”）
+
+2. **在 `analyze_dialogue` 中，当没有匹配到任何已注册角色时，调用上述方法**  
+   - 如果提取到候选名称，则通过 `char_manager.add_character(name, project_id, is_temp=True)` 临时注册  
+   - 设置临时角色置信度为0.6（低于正式角色），允许后续覆盖
+
+3. **运行无预注册测试**，预期都市≥25%，西幻≥15%
+
+4. **如果效果明显，再实施方案3（名称归一化：去修饰语、头衔剥离）**
+
+好的，下面给出**方案2（名称提取 + 临时注册）的具体实现代码**，可直接供AI执行。
+
+---
+
+## 实现概览
+
+1. 在 `speaker_matcher.py` 中新增方法 `_extract_name_candidates_from_narration(text: str) -> List[str]`
+   - 使用 HanLP 的 NER 提取 PER 类型实体
+   - 使用正则提取“姓+职位”（如“赵总监”）和“名称+头衔”（如“艾琳法师”）
+   - 去重、过滤明显非人名（如“办公室”）
+
+2. 修改 `analyze_dialogue` 方法：
+   - 当现有匹配策略（`_extract_context_speakers`等）返回空候选或最高置信度 < 0.4 时
+   - 调用上述名称提取方法，将每个候选名称通过 `char_manager.add_character` 临时注册（设置 `is_temp=True` 或 `confidence=0.5`）
+   - 将临时注册的角色作为本次说话人返回（并可选择缓存）
+
+3. 临时角色管理：
+   - 在 `character_manager` 中为 `Character` 增加 `is_temp` 字段（数据库迁移可选，可先用内存标记）
+   - 临时角色参与匹配时置信度降低（例如 ×0.8），且在冷启动后可能被覆盖
+
+---
+
+## 代码实现
+
+### 1. 在 `speaker_matcher.py` 中添加名称提取方法
+
+```python
+# 在 SpeakerMatcher 类中新增
+
+import re
+from typing import List, Set
+
+def _extract_name_candidates_from_narration(self, text: str) -> List[str]:
+    """
+    从旁白文本中提取可能的角色名称候选（无预注册场景）
+    返回：去重后的名称列表
+    """
+    if not text or len(text) < 2:
+        return []
+    
+    candidates = set()
+    
+    # 方法1：HanLP NER 提取 PER 实体（需要 nlp_basics 实例）
+    if hasattr(self, 'nlp') and self.nlp:
+        try:
+            ner_result = self.nlp.extract_entities(text)
+            for ent in ner_result:
+                if ent.type == 'PER' and len(ent.text) >= 2:
+                    # 过滤明显非人名（保留长度2-10的中文或音译）
+                    if re.search(r'[\u4e00-\u9fa5]{2,}', ent.text) or re.search(r'[A-Za-z]{3,}', ent.text):
+                        candidates.add(ent.text.strip())
+        except Exception as e:
+            logger.debug(f"NER 提取失败: {e}")
+    
+    # 方法2：正则捕获“姓+职位”模式（如“赵总监”、“李经理”）
+    # 支持常见姓氏 + 职位后缀
+    surname = r'[赵钱孙李周吴郑王冯陈褚卫蒋沈韩杨朱秦尤许何吕施张孔曹严华金魏陶姜戚谢邹喻柏水窦章云苏潘葛奚范彭郎]'
+    title = r'(?:总(?:监|裁|经理)|部长|局长|处长|科长|主任|队长|团长|法师|骑士|战士|导师|医师|教授|博士)'
+    pattern_surname_title = re.compile(r'(' + surname + r'{1,2}' + title + r')')
+    for match in pattern_surname_title.findall(text):
+        candidates.add(match)
+    
+    # 方法3：正则捕获“名称+头衔”模式（如“亚瑟团长”、“艾琳法师”）
+    # 允许中文名（2-4字）或音译名（2-6字母）后跟头衔
+    name_part = r'(?:[\u4e00-\u9fa5]{2,4}|[A-Za-z]{2,6})'
+    title_part = r'(?:团长|队长|法师|骑士|战士|导师|医师|教授|总监|经理|部长)'
+    pattern_name_title = re.compile(r'(' + name_part + title_part + r')')
+    for match in pattern_name_title.findall(text):
+        candidates.add(match)
+    
+    # 方法4：普通中文姓名（2-3个汉字，非职位后缀）
+    pattern_chinese_name = re.compile(r'([\u4e00-\u9fa5]{2,3})(?![总监经理部长团长队长])')
+    for match in pattern_chinese_name.findall(text):
+        # 避免匹配到常用词如“但是”、“因为”
+        if match not in {'但是', '因为', '所以', '虽然', '然而', '于是', '这个', '那个'}:
+            candidates.add(match)
+    
+    # 过滤明显非人名（物品、抽象词、方位词）
+    blacklist = {'办公室', '会议室', '笔记本', '皮椅', '茶杯', '符文', '魔法卷轴', '眼睛', '手', '头', '声音', '光芒', '气息', '数据', '压力', '能量', '上', '里', '边', '那边', '旁边', '[对话]', '[音效]', '[强调]'}
+    filtered = [c for c in candidates if c not in blacklist and len(c) >= 2]
+    
+    # 去重并返回
+    return list(set(filtered))
+```
+
+### 2. 修改 `analyze_dialogue` 中的匹配后逻辑
+
+在 `analyze_dialogue` 方法中，**当现有策略无法找到有效说话人时**，调用上述方法并临时注册。
+
+找到 `analyze_dialogue` 中决定最终 `speaker` 的位置（通常是在调用了 `_extract_context_speakers` 和 L2 语义匹配之后，如果 `matched_speaker` 仍为空或为“未知”）。在此处插入：
+
+```python
+# 在 analyze_dialogue 方法内，假设 final_speaker 初始为 None
+# ... 现有匹配逻辑 ...
+
+if final_speaker is None or final_speaker.startswith('未知'):
+    # 尝试从旁白中提取新角色名称
+    context_text = context_before + " " + context_after if context_before and context_after else context_before or context_after or ""
+    if context_text:
+        name_candidates = self._extract_name_candidates_from_narration(context_text)
+        if name_candidates:
+            # 取第一个作为候选（可优化为取最频繁或最相关）
+            new_name = name_candidates[0]
+            # 临时注册到角色库
+            try:
+                char = self.char_manager.add_character(
+                    name=new_name,
+                    project_id=self._current_project_id,
+                    aliases=set(name_candidates[1:3]),  # 可选别名
+                    gender='unknown',
+                    is_temp=True  # 需要 character_manager 支持此字段，见下方说明
+                )
+                final_speaker = char.name
+                logger.info(f"临时注册新角色: {new_name} (来源: {context_text[:50]}...)")
+            except Exception as e:
+                logger.warning(f"临时注册失败: {e}")
+                final_speaker = "未知_角色"
+
+# 后续返回 final_speaker
+```
+
+### 3. `character_manager.py` 修改（支持临时角色）
+
+为了支持临时角色，需要在 `Character` 数据类和数据库中添加 `is_temp` 字段。若不想修改数据库，可先用内存属性标记（不持久化）。推荐简单方式：在 `add_character` 中增加参数 `is_temp=False`，如果为 `True`，则设置 `confidence=0.5` 或 `frequency=1`，并存储到 `metadata` 字段（如果 `Character` 有 `metadata` JSON 列）。示例如下：
+
+```python
+# character_manager.py 中 add_character 方法修改
+def add_character(self, name: str, project_id: str, aliases: Set[str] = None,
+                  gender: str = 'unknown', first_appearance: int = 0,
+                  is_temp: bool = False) -> Character:
+    # ... 原有逻辑 ...
+    # 在插入数据库时，如果有 is_temp，可以存入 metadata 字段
+    metadata = json.dumps({'is_temp': is_temp}) if is_temp else None
+    # 执行 INSERT，包含 metadata 列
+    # ...
+```
+
+然后在 `get_eligible_characters` 中，可以过滤掉临时角色（或降低优先级），但为了冷启动，建议保留他们参与匹配（因为本来就是发现的新角色）。
+
+### 4. 测试验证
+
+创建一个快速测试脚本 `test_name_extraction.py`：
+
+```python
+from pipeline.speaker_matcher import SpeakerMatcher
+matcher = SpeakerMatcher(project_id='test')
+text = "赵总监站起身，说道：‘会议开始。’ 亚瑟团长拔出剑。"
+candidates = matcher._extract_name_candidates_from_narration(text)
+print(candidates)  # 期望输出 ['赵总监', '亚瑟团长', '赵', '亚瑟']（取决于正则）
+```
+
+然后运行无预注册长文本测试，预期准确率从 0% 提升至 20%+。
+
+---
+
+## 执行步骤（给 AI）
+
+1. 在 `speaker_matcher.py` 中插入 `_extract_name_candidates_from_narration` 方法。
+2. 在 `analyze_dialogue` 中找到最终 fallback 位置，添加上面“临时注册”代码块。
+3. 修改 `character_manager.py` 的 `add_character` 以支持 `is_temp` 参数（或至少将临时角色标记为低置信度）。
+4. 运行 `tests/test_no_registration.py` 观察准确率变化。
+5. 如果有效，考虑加入名称归一化（去修饰语、头衔剥离），即方案3。
+
+---
+
+## 预期效果
+
+- 都市无预注册准确率：0% → 约 25-35%
+- 西幻无预注册准确率：0% → 约 15-25%
+
+如果效果仍不理想，说明需要更精细的名称提取（如 SRL 或更复杂的共指消解），但这是目前最小投入能获得最大回报的改动。
+
+---
+
+你现在可以把上述代码和步骤交给 AI 执行。执行后请返回测试结果。

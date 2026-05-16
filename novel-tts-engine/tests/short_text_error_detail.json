@@ -1,0 +1,551 @@
+{
+  "total": 243,
+  "correct_count": 184,
+  "error_count": 59,
+  "accuracy": 0.757,
+  "style_errors": {
+    "都市": 16,
+    "西幻": 16,
+    "修仙": 15,
+    "历史": 12
+  },
+  "challenge_errors": {
+    "代词消解": 15,
+    "显式提示": 5,
+    "别名映射": 5,
+    "其他": 34
+  },
+  "error_cases": [
+    {
+      "text": "「这件事，到此为止。」",
+      "style": "都市",
+      "gt_speaker": "赵天行",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人是'他'，角色名'赵天行'不在文本中。需要角色管理模块已有注册",
+      "context_before": "他把一叠材料放进碎纸机。",
+      "context_after": "机器嗡嗡作响，纸屑飞溅。"
+    },
+    {
+      "text": "「他说他不来了。」",
+      "style": "都市",
+      "gt_speaker": "林雪",
+      "pred_speaker": "苏夜",
+      "role_challenge": "多角色交织+代词消解。当前句包含三个角色：'他'（被提及者）、说话人（林雪，在context_before）、听者（苏夜，在context_before）。'他说'中的'他'是第三方角色",
+      "context_before": "林雪看了一眼手机，抬起头对苏夜说。",
+      "context_after": "苏夜的眉头微微皱了一下。"
+    },
+    {
+      "text": "「天哪！龙竟然复活了！」",
+      "style": "西幻",
+      "gt_speaker": "冒险者",
+      "pred_speaker": null,
+      "role_challenge": "无显式说话人。说话人身份完全不在文本中，仅靠场景推断。需要角色管理模块已有'冒险者'角色注册，或归为默认/未命名角色",
+      "context_before": "大地裂开，一道巨大的黑影从深渊中升起。",
+      "context_after": "所有人都呆立在原地。"
+    },
+    {
+      "text": "「为什么偏偏是你……」",
+      "style": "修仙",
+      "gt_speaker": "女修",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人'她'，角色名不在文本中。独白/自言自语场景，无听者",
+      "context_before": "她看着叛徒名单上排在首位的那个名字。",
+      "context_after": "笔从手中滑落。"
+    },
+    {
+      "text": "「你可真有本事。」",
+      "style": "都市",
+      "gt_speaker": "赵天行",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人是'他'，角色名完全不在文本中。需要角色管理模块已有'赵天行'注册",
+      "context_before": "看完那份提案，他放下稿纸摘下眼镜。",
+      "context_after": "语气平静，但屋里的温度似乎骤降了几度。"
+    },
+    {
+      "text": "「末将愿往！」",
+      "style": "历史",
+      "gt_speaker": "年轻将领",
+      "pred_speaker": "元帅",
+      "role_challenge": "别名映射+自称推断。说话人自称'末将'（军事谦称），需要别名系统映射到'年轻将领'。听者'元帅'是头衔",
+      "context_before": "军帐中，元帅环顾左右无人应声。",
+      "context_after": "那年轻将领单膝跪地，目光灼灼。"
+    },
+    {
+      "text": "「你果然没有让我失望。」",
+      "style": "修仙",
+      "gt_speaker": "前辈",
+      "pred_speaker": "年轻人",
+      "role_challenge": "代词消解。说话人和听者都是描述性称呼（'他'→前辈，'年轻人'）。角色名不在文本中",
+      "context_before": "他看着那个年轻人在最后关头做出了正确的选择。",
+      "context_after": "嘴角终于露出了一丝笑意。"
+    },
+    {
+      "text": "「你可要想好了。」",
+      "style": "都市",
+      "gt_speaker": "杀手",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人'他'，角色名完全不在文本中。需要角色管理模块已有'杀手'注册",
+      "context_before": "他把玩着手中的匕首，抬眼看向挡在门前的人。",
+      "context_after": "匕首在指间转了一圈。"
+    },
+    {
+      "text": "「谢谢你，如果不是你，我早就放弃了。」",
+      "style": "西幻",
+      "gt_speaker": "年轻人",
+      "pred_speaker": "人紧紧握着老铁匠",
+      "role_challenge": "描述性称呼。说话人'年轻人'、听者'老铁匠'都是描述/职业称呼，不是人名。需要角色管理模块已有注册",
+      "context_before": "年轻人紧紧握着老铁匠的手。",
+      "context_after": "老铁匠只是憨厚地笑了笑。"
+    },
+    {
+      "text": "「你倒是挺会挑时候。」",
+      "style": "都市",
+      "gt_speaker": "女角色",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人和听者都是代词（'她'、'他'），角色名完全不在文本中",
+      "context_before": "她看了一眼墙上的钟，凌晨三点。",
+      "context_after": "他挠了挠头，有些不好意思。"
+    },
+    {
+      "text": "「你真的什么都想不起来了吗？」",
+      "style": "修仙",
+      "gt_speaker": "女修",
+      "pred_speaker": "她蹲在失忆的少年",
+      "role_challenge": "代词消解+描述性称呼。说话人'她'，听者'失忆少年'是描述。需要角色管理模块已有注册",
+      "context_before": "她蹲在失忆的少年面前，轻声问道。",
+      "context_after": "少年茫然地摇了摇头。"
+    },
+    {
+      "text": "「这份恩情，我记下了。」",
+      "style": "修仙",
+      "gt_speaker": "获救者",
+      "pred_speaker": null,
+      "role_challenge": "关系角色。说话人'获救者'和听者'救命恩人'都是关系描述，不是人名。需要处理角色间的关系标签",
+      "context_before": "他从地上站起来，看着救了自己一命的陌生人。",
+      "context_after": "对方只是摆了摆手。"
+    },
+    {
+      "text": "「你还是在怪我。」",
+      "style": "都市",
+      "gt_speaker": "女角色",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人和听者都是代词（'她'、'他'）。需要从前文'两人'推断性别关系",
+      "context_before": "两人沉默了很久，她终于开口了。",
+      "context_after": "他没有否认。"
+    },
+    {
+      "text": "「王都那边有消息了吗？」",
+      "style": "西幻",
+      "gt_speaker": "老兵",
+      "pred_speaker": "年轻士兵",
+      "role_challenge": "描述性称呼。说话人'老兵'、听者'年轻士兵'都是描述。角色名不在文本中，需要角色管理模块已有注册",
+      "context_before": "边境哨塔上，老兵放下望远镜。",
+      "context_after": "年轻士兵摇了摇头。"
+    },
+    {
+      "text": "「你欠我的，今天该还了。」",
+      "style": "都市",
+      "gt_speaker": "讨债人",
+      "pred_speaker": null,
+      "role_challenge": "关系角色。说话人'讨债人'和听者'欠债人'都是关系描述。需要角色管理模块已有注册",
+      "context_before": "他拦住了从赌场出来的那个人。",
+      "context_after": "那人脸色一变。"
+    },
+    {
+      "text": "「你不该瞒着我的。」",
+      "style": "都市",
+      "gt_speaker": "女角色",
+      "pred_speaker": null,
+      "role_challenge": "代词消解。说话人和听者都是代词（'她'、'他'）。角色名完全不在文本中",
+      "context_before": "她合上日记本，深吸了一口气。",
+      "context_after": "他张了张嘴，最终低下了头。"
+    },
+    {
+      "text": "“亚历山大·安德森，圣骑士团第三席。”",
+      "style": "西幻",
+      "gt_speaker": "亚历山大·安德森",
+      "pred_speaker": "金发骑士",
+      "role_challenge": "西方译名+自我介绍。'亚历山大·安德森'是三段译名，需要NER正确处理。说话人通过自我介绍确定身份",
+      "context_before": "金发骑士摘下头盔，露出棱角分明的脸。",
+      "context_after": "他微微欠身，铠甲发出轻微的金属摩擦声。"
+    },
+    {
+      "text": "“那个叫佐罗的家伙——”萧炎的话被一阵急促的脚步声打断，“——他到底是什么来头？”",
+      "style": "修仙",
+      "gt_speaker": "萧炎",
+      "pred_speaker": "药老",
+      "role_challenge": "动作插入打断对话+西式译名佐证。萧炎的说话被'脚步声打断'的叙述截断。其中提及'佐罗'作为西式译名的佐证。系统需识别这是同一人继续说话",
+      "context_before": "刚刚安静下来，走廊又传来一阵骚动。",
+      "context_after": "药老侧耳听了一阵，眉头越皱越紧。"
+    },
+    {
+      "text": "「系统已经升级完成了。」",
+      "style": "都市",
+      "gt_speaker": "吴工程师",
+      "pred_speaker": "吴工",
+      "role_challenge": "显式提示在上文。'吴工程师'在context_before中做动作",
+      "context_before": "吴工程师敲下最后一行代码，合上电脑。",
+      "context_after": "旁边的测试员开始运行检查。"
+    },
+    {
+      "text": "「今晚加班，大家都有意见？」",
+      "style": "都市",
+      "gt_speaker": "高个子男人",
+      "pred_speaker": "男人",
+      "role_challenge": "描述性角色。'高个子男人'是说话人",
+      "context_before": "站在门口的那个高个子男人扫了一眼。",
+      "context_after": "办公室里的员工面面相觑。"
+    },
+    {
+      "text": "「你先坐，我马上来。」",
+      "style": "都市",
+      "gt_speaker": "矮胖男人",
+      "pred_speaker": "男人",
+      "role_challenge": "描述性角色。'矮胖男人'是说话人",
+      "context_before": "从里间走出来的一个矮胖男人挥了挥手。",
+      "context_after": "来访者在他对面坐下。"
+    },
+    {
+      "text": "「你先回去吧。」",
+      "style": "都市",
+      "gt_speaker": "张伟",
+      "pred_speaker": "李芳",
+      "role_challenge": "多角色交织。说话人在前，被提及者在后",
+      "context_before": "张伟看着李芳，李芳低着头。",
+      "context_after": "王磊站在一旁没说话。"
+    },
+    {
+      "text": "「我觉得这个方案可行。」",
+      "style": "都市",
+      "gt_speaker": "孙工",
+      "pred_speaker": "赵总",
+      "role_challenge": "多角色交织。从发言动作推断说话人",
+      "context_before": "会议室里，孙工先发言。赵总没说话。",
+      "context_after": "周秘书在一旁记录。"
+    },
+    {
+      "text": "「这个我不同意。」",
+      "style": "都市",
+      "gt_speaker": "李芳",
+      "pred_speaker": "张伟",
+      "role_challenge": "多角色交织。摇头动作暗示发言",
+      "context_before": "李芳摇了摇头。张伟看了看她。",
+      "context_after": "王磊在记笔记。"
+    },
+    {
+      "text": "「我来补充一下。」",
+      "style": "都市",
+      "gt_speaker": "赵总",
+      "pred_speaker": "孙工",
+      "role_challenge": "多角色交织。从上下文动作推断",
+      "context_before": "赵总放下笔。他看了看孙工。",
+      "context_after": "孙工点点头，准备记录。"
+    },
+    {
+      "text": "「这个项目的预算需要重新审批。」",
+      "style": "都市",
+      "gt_speaker": "李经理",
+      "pred_speaker": "张总",
+      "role_challenge": "多角色交织。合上报表的动作暗示发言",
+      "context_before": "李经理合上报表。张总皱了皱眉头。",
+      "context_after": "财务小王坐在一旁等着。"
+    },
+    {
+      "text": "「此阵法已破。」",
+      "style": "修仙",
+      "gt_speaker": "青云真人",
+      "pred_speaker": "弟子",
+      "role_challenge": "显式提示在上文。'青云真人'在context_before中做动作",
+      "context_before": "青云真人掐碎手中符箓，长剑指向阵眼。",
+      "context_after": "众弟子纷纷后退。"
+    },
+    {
+      "text": "「师尊，弟子有一事不明。」",
+      "style": "修仙",
+      "gt_speaker": "清虚道长",
+      "pred_speaker": "弟子",
+      "role_challenge": "别名映射。'师尊'是'清虚道长'的别名",
+      "context_before": "清虚道长盘膝坐在蒲团上。",
+      "context_after": "跪在面前的弟子低着头。"
+    },
+    {
+      "text": "「阁主，您要的茶。」",
+      "style": "修仙",
+      "gt_speaker": "柳青",
+      "pred_speaker": "侍女",
+      "role_challenge": "别名映射。'阁主'是'柳青'的尊称",
+      "context_before": "柳青坐在阁楼上翻阅古籍。",
+      "context_after": "侍女端着茶盘走上楼梯。"
+    },
+    {
+      "text": "「放心，为师不会亏待你。」",
+      "style": "修仙",
+      "gt_speaker": "清虚道长",
+      "pred_speaker": "弟子",
+      "role_challenge": "代词消解。'他'指代最近的同性别角色'清虚道长'",
+      "context_before": "清虚道长拍了拍弟子的肩膀。他微微一笑。",
+      "context_after": "弟子感激地磕了个头。"
+    },
+    {
+      "text": "「我已找到了你要的东西。」",
+      "style": "修仙",
+      "gt_speaker": "柳青",
+      "pred_speaker": "在绣花的年轻女子",
+      "role_challenge": "代词消解。'她'指代最近的同性别角色'柳青'",
+      "context_before": "柳青合上古籍。她笑了笑。",
+      "context_after": "对面的女子眼睛一亮。"
+    },
+    {
+      "text": "「你资质不错，可愿入我门下？」",
+      "style": "修仙",
+      "gt_speaker": "中年道人",
+      "pred_speaker": "少年",
+      "role_challenge": "描述性角色。'中年道人'是说话人",
+      "context_before": "坐在主位上的那个中年道人放下茶盏。",
+      "context_after": "站着的少年犹豫了一下。"
+    },
+    {
+      "text": "「此物非凡品，需小心保管。」",
+      "style": "修仙",
+      "gt_speaker": "戴面具的人",
+      "pred_speaker": null,
+      "role_challenge": "描述性角色。'戴面具的人'是说话人",
+      "context_before": "密室里那个戴着面具的人递出一个玉盒。",
+      "context_after": "接盒子的人双手微微颤抖。"
+    },
+    {
+      "text": "「你的剑法太慢了。」",
+      "style": "修仙",
+      "gt_speaker": "精瘦汉子",
+      "pred_speaker": "少年",
+      "role_challenge": "描述性角色。'精瘦汉子'是说话人",
+      "context_before": "演武场的那个精瘦汉子摇了摇头。",
+      "context_after": "练剑的少年不服气地咬了咬牙。"
+    },
+    {
+      "text": "「此阵法有缺陷。」",
+      "style": "修仙",
+      "gt_speaker": "楚天遥",
+      "pred_speaker": "玄机长老",
+      "role_challenge": "多角色交织。从'指出'动作推断",
+      "context_before": "楚天遥指出问题。清虚道长没有反驳。",
+      "context_after": "玄机长老在一旁沉思。"
+    },
+    {
+      "text": "「此剑我已悟了十年。」",
+      "style": "修仙",
+      "gt_speaker": "楚天遥",
+      "pred_speaker": "弟子",
+      "role_challenge": "多角色交织。'拔剑'暗示发言",
+      "context_before": "楚天遥缓缓拔剑。清虚道长眯起眼睛。",
+      "context_after": "周围的弟子屏住呼吸。"
+    },
+    {
+      "text": "「这份契约你必须签字。」",
+      "style": "西幻",
+      "gt_speaker": "使者",
+      "pred_speaker": "法师",
+      "role_challenge": "显式提示在上文。'使者'在context_before中做动作",
+      "context_before": "法师塔的使者拿出一卷魔法羊皮纸。",
+      "context_after": "对面坐着的商人犹豫了一下。"
+    },
+    {
+      "text": "「队长，阵型已经列好了。」",
+      "style": "西幻",
+      "gt_speaker": "威廉",
+      "pred_speaker": "士兵",
+      "role_challenge": "别名映射。'队长'是'威廉'的尊称",
+      "context_before": "威廉检查着盾牌。",
+      "context_after": "身后的士兵等待命令。"
+    },
+    {
+      "text": "「陛下，边境有异动。」",
+      "style": "西幻",
+      "gt_speaker": "查理曼大帝",
+      "pred_speaker": "将军",
+      "role_challenge": "别名映射。'陛下'是'查理曼大帝'的尊称",
+      "context_before": "查理曼大帝坐在王座上翻阅奏折。",
+      "context_after": "将军单膝跪在台阶下。"
+    },
+    {
+      "text": "「圣水已经准备好了。」",
+      "style": "西幻",
+      "gt_speaker": "修女",
+      "pred_speaker": "来访的外宗修士",
+      "role_challenge": "代词消解。'她'指代最近的同性别角色'修女'",
+      "context_before": "修女提着银色的水壶。她的手在微微颤抖。",
+      "context_after": "旁边的修士接过水壶。"
+    },
+    {
+      "text": "「前方有龙息。」",
+      "style": "西幻",
+      "gt_speaker": "高大男人",
+      "pred_speaker": "男人",
+      "role_challenge": "描述性角色。'高大男人'是说话人",
+      "context_before": "队伍最前面的那个高大男人举起了盾牌。",
+      "context_after": "身后的魔法师开始施法。"
+    },
+    {
+      "text": "「你的伤口需要立刻处理。」",
+      "style": "西幻",
+      "gt_speaker": "金发女人",
+      "pred_speaker": "女人",
+      "role_challenge": "描述性角色。'金发女人'是说话人",
+      "context_before": "营地帐篷里的那个金发女人打开了医疗箱。",
+      "context_after": "受伤的佣兵靠在墙上。"
+    },
+    {
+      "text": "「这头龙的鳞片比钢铁还硬。」",
+      "style": "西幻",
+      "gt_speaker": "满身伤痕的战士",
+      "pred_speaker": "法师",
+      "role_challenge": "描述性角色。'满身伤痕的战士'是说话人",
+      "context_before": "龙穴前那个满身伤痕的战士喘着粗气。",
+      "context_after": "身后的法师团正在准备魔法。"
+    },
+    {
+      "text": "「这份地图记载了古代遗迹。」",
+      "style": "西幻",
+      "gt_speaker": "拿着卷轴的女人",
+      "pred_speaker": "女人",
+      "role_challenge": "描述性角色。'拿着卷轴的女人'是说话人",
+      "context_before": "探险队中的那个拿着卷轴的女人摊开了地图。",
+      "context_after": "队长走过来查看。"
+    },
+    {
+      "text": "「龙的弱点在腹部。」",
+      "style": "西幻",
+      "gt_speaker": "老兵",
+      "pred_speaker": "士兵",
+      "role_challenge": "多角色交织。'指出'暗示发言",
+      "context_before": "老兵指出了要害。年轻的士兵点了点头。",
+      "context_after": "法师们在准备魔法。"
+    },
+    {
+      "text": "「黑暗正在逼近。」",
+      "style": "西幻",
+      "gt_speaker": "守夜人",
+      "pred_speaker": "卫兵队长",
+      "role_challenge": "多角色交织。'点燃烽火'暗示发言",
+      "context_before": "守夜人点燃了烽火。卫兵队长跑过来。",
+      "context_after": "城下的百姓开始疏散。"
+    },
+    {
+      "text": "「宝藏的机关我已经破解了。」",
+      "style": "西幻",
+      "gt_speaker": "矮个子矮人",
+      "pred_speaker": "队长",
+      "role_challenge": "多角色交织。'放下工具'暗示发言",
+      "context_before": "矮个子矮人放下了手中的工具。探险队长走过来查看。",
+      "context_after": "身后的矿工们在等待。"
+    },
+    {
+      "text": "「龙息的攻击范围在五十步以内。」",
+      "style": "西幻",
+      "gt_speaker": "老兵",
+      "pred_speaker": "法师",
+      "role_challenge": "多角色交织。'指着前方'暗示发言",
+      "context_before": "老兵指着前方。新兵们认真记着。",
+      "context_after": "法师们在计算距离。"
+    },
+    {
+      "text": "「粮草已备足。」",
+      "style": "历史",
+      "gt_speaker": "粮官",
+      "pred_speaker": "丞相",
+      "role_challenge": "显式提示在上文。'粮官'在context_before中做动作",
+      "context_before": "粮官展开清单，向丞相汇报。",
+      "context_after": "丞相点了点头。"
+    },
+    {
+      "text": "「城门已开，不可有误。」",
+      "style": "历史",
+      "gt_speaker": "守将",
+      "pred_speaker": "士兵",
+      "role_challenge": "代词消解。'他'指代最近的同性别角色'守将'",
+      "context_before": "守将拿起令旗。他的声音传遍了城头。",
+      "context_after": "士兵们纷纷执行命令。"
+    },
+    {
+      "text": "「河堤的工程不能停。」",
+      "style": "历史",
+      "gt_speaker": "工部侍郎",
+      "pred_speaker": "皇帝",
+      "role_challenge": "代词消解。'他'指代最近的同性别角色'工部侍郎'",
+      "context_before": "工部侍郎从河堤上走下来。他向皇帝汇报道。",
+      "context_after": "监工跟在后面记录。"
+    },
+    {
+      "text": "「城墙的高度还需要再加三尺。」",
+      "style": "历史",
+      "gt_speaker": "戴斗笠的工匠",
+      "pred_speaker": null,
+      "role_challenge": "描述性角色。'戴着斗笠的工匠'是说话人",
+      "context_before": "工地上的那个戴着斗笠的工匠指着尺子。",
+      "context_after": "监工走过来查看。"
+    },
+    {
+      "text": "「此计可行，但需谨慎。」",
+      "style": "历史",
+      "gt_speaker": "摇羽扇的谋士",
+      "pred_speaker": "谋士",
+      "role_challenge": "描述性角色。'摇羽扇的谋士'是说话人",
+      "context_before": "书房中那个摇着羽扇的谋士点了点头。",
+      "context_after": "主公在一旁沉思。"
+    },
+    {
+      "text": "「末将愿为先锋。」",
+      "style": "历史",
+      "gt_speaker": "武将",
+      "pred_speaker": "士兵",
+      "role_challenge": "描述性角色。'武将'是说话人",
+      "context_before": "军帐前那个身披铁甲的武将单膝跪地。",
+      "context_after": "身后的士兵发出欢呼。"
+    },
+    {
+      "text": "「此战已无退路。」",
+      "style": "历史",
+      "gt_speaker": "头发花白的老将",
+      "pred_speaker": "老将",
+      "role_challenge": "描述性角色。'头发花白的老将'是说话人",
+      "context_before": "阵前那个头发花白的老将举起令旗。",
+      "context_after": "全军将士齐声呐喊。"
+    },
+    {
+      "text": "「粮草之事不可耽误。」",
+      "style": "历史",
+      "gt_speaker": "粮官",
+      "pred_speaker": "丞相",
+      "role_challenge": "多角色交织。'翻开账本'暗示发言",
+      "context_before": "粮官翻开账本。丞相看了一眼。",
+      "context_after": "副将在旁边等待。"
+    },
+    {
+      "text": "「敌军已到城外。」",
+      "style": "历史",
+      "gt_speaker": "斥候",
+      "pred_speaker": "将军",
+      "role_challenge": "多角色交织。'跪地汇报'暗示发言",
+      "context_before": "斥候跪地汇报。将军拿起地图。",
+      "context_after": "帐中的士兵等待命令。"
+    },
+    {
+      "text": "「此计可行，但需增兵。」",
+      "style": "历史",
+      "gt_speaker": "谋士",
+      "pred_speaker": "将军",
+      "role_challenge": "多角色交织。'展开地图'暗示发言",
+      "context_before": "谋士展开了地图。将军看了看。",
+      "context_after": "身后的副将在等待指示。"
+    },
+    {
+      "text": "「退朝。」",
+      "style": "历史",
+      "gt_speaker": "皇帝",
+      "pred_speaker": "殿外的侍卫",
+      "role_challenge": "多角色交织。'放下奏折'暗示退朝发言",
+      "context_before": "皇帝放下奏折。群臣纷纷跪拜。",
+      "context_after": "殿外的侍卫挺直了腰板。"
+    }
+  ]
+}

@@ -1,0 +1,1346 @@
+[
+  {
+    "gt_id": "GT-修仙-001",
+    "dialogue_text": "“少爷，您终于醒了！”",
+    "speaker": "小翠",
+    "full_paragraph": "\"少爷，您终于醒了！\"一个清脆的声音传来。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-002",
+    "dialogue_text": "“小翠，我睡了多久？”",
+    "speaker": "林轩",
+    "full_paragraph": "\"小翠，我睡了多久？\"林轩轻声问道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-003",
+    "dialogue_text": "“少爷，您昏迷了整整三天！”",
+    "speaker": "小翠",
+    "full_paragraph": "\"少爷，您昏迷了整整三天！\"小翠激动地说道，\"老爷和夫人都担心坏了！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-004",
+    "dialogue_text": "“轩儿！你终于醒了！”",
+    "speaker": "林天豪",
+    "full_paragraph": "\"轩儿！你终于醒了！\"一个中年男子大步走进房间，正是林轩的父亲林天豪。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-005",
+    "dialogue_text": "“父亲。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"父亲。\"林轩恭敬地叫道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-006",
+    "dialogue_text": "“轩儿，你感觉如何？”",
+    "speaker": "林天豪",
+    "full_paragraph": "林天豪走到床边，上下打量着儿子，眼中满是关切：\"轩儿，你感觉如何？有没有哪里不舒服？\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-007",
+    "dialogue_text": "“父亲放心，孩儿已经无碍。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"父亲放心，孩儿已经无碍。\"林轩答道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-008",
+    "dialogue_text": "“那就好，那就好。”",
+    "speaker": "林天豪",
+    "full_paragraph": "\"那就好，那就好。\"林天豪松了一口气，\"你好好休息，有什么需要尽管吩咐下人。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-009",
+    "dialogue_text": "“是，父亲。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"是，父亲。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-010",
+    "dialogue_text": "“既来之，则安之。”",
+    "speaker": "未知",
+    "full_paragraph": "\"既来之，则安之。\"林轩喃喃自语，\"这一世，我定要活出精彩！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-011",
+    "dialogue_text": "“少爷，老奴是王管家。”",
+    "speaker": "王管家",
+    "full_paragraph": "\"少爷，老奴是王管家。\"一个苍老的声音响起。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-012",
+    "dialogue_text": "“进来吧。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"进来吧。\"林轩说道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-013",
+    "dialogue_text": "“少爷，这是您要的书籍。”",
+    "speaker": "王管家",
+    "full_paragraph": "\"少爷，这是您要的书籍。\"王管家递过来几本泛黄的书册。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-014",
+    "dialogue_text": "“辛苦王叔了。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"辛苦王叔了。\"林轩接过书籍，眼中闪过一丝期待。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-015",
+    "dialogue_text": "“少爷客气了，老奴告退。”",
+    "speaker": "王管家",
+    "full_paragraph": "\"少爷客气了，老奴告退。\"王管家说完，便退了出去。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-016",
+    "dialogue_text": "“看来，我需要尽快提升实力。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"看来，我需要尽快提升实力。\"林轩合上书籍，眼中闪过一丝坚定。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-017",
+    "dialogue_text": "“少爷，您休息一下吧。”",
+    "speaker": "小翠",
+    "full_paragraph": "\"少爷，您休息一下吧。\"小翠端着一碗药汤走了过来，\"这是夫人特意为您熬的。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-018",
+    "dialogue_text": "“好。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"好。\"林轩停下动作，接过药汤一饮而尽。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-019",
+    "dialogue_text": "“少爷，您真厉害！”",
+    "speaker": "小翠",
+    "full_paragraph": "\"少爷，您真厉害！\"小翠眼中满是崇拜，\"才几天时间，您的拳法就进步了这么多！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-020",
+    "dialogue_text": "“还差得远呢。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"还差得远呢。\"林轩擦了擦额头的汗水，\"我听说城里有武馆，打算去报名。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-021",
+    "dialogue_text": "“少爷要去武馆？”",
+    "speaker": "小翠",
+    "full_paragraph": "\"少爷要去武馆？\"小翠有些惊讶，\"老爷不是说要请武师来府里教您吗？\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-022",
+    "dialogue_text": "“府里太安逸了，我需要更大的压力。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"府里太安逸了，我需要更大的压力。\"林轩说道，\"而且，我也想见识一下外面的世界。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-023",
+    "dialogue_text": "“要下雨了。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"要下雨了。\"林轩抬头看向天空，乌云密布，看来一场大雨即将来临。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-024",
+    "dialogue_text": "“少爷，我们快回去吧！”",
+    "speaker": "小翠",
+    "full_paragraph": "\"少爷，我们快回去吧！\"小翠急忙说道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-025",
+    "dialogue_text": "“这一世，我一定要站在这个世界的巅峰！”",
+    "speaker": "林轩",
+    "full_paragraph": "\"这一世，我一定要站在这个世界的巅峰！\"林轩暗暗发誓。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-026",
+    "dialogue_text": "“让开！让开！”",
+    "speaker": "赵虎",
+    "full_paragraph": "\"让开！让开！\"一个粗暴的声音传来。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-027",
+    "dialogue_text": "“那是赵家的少爷赵虎。”",
+    "speaker": "路人",
+    "full_paragraph": "\"那是赵家的少爷赵虎。\"旁边有人低声说道，\"听说他已经是淬体境三重的高手了！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-028",
+    "dialogue_text": "“淬体境三重？这么厉害！”",
+    "speaker": "路人",
+    "full_paragraph": "\"淬体境三重？这么厉害！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-029",
+    "dialogue_text": "“可不是嘛，赵家可是我们天元城的三大家族之一！”",
+    "speaker": "路人",
+    "full_paragraph": "\"可不是嘛，赵家可是我们天元城的三大家族之一！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-030",
+    "dialogue_text": "“哟，这不是林家的废物少爷吗？”",
+    "speaker": "赵虎",
+    "full_paragraph": "\"哟，这不是林家的废物少爷吗？\"赵虎嗤笑道，\"听说你昏迷了好几天，怎么，现在又活蹦乱跳了？\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-031",
+    "dialogue_text": "“赵少爷说笑了。让路。”",
+    "speaker": "林轩",
+    "full_paragraph": "“赵少爷说笑了。让路。”",
+    "style": "修仙",
+    "has_context": false
+  },
+  {
+    "gt_id": "GT-修仙-032",
+    "dialogue_text": "“怎么？不敢说话？”",
+    "speaker": "赵虎",
+    "full_paragraph": "\"怎么？不敢说话？\"赵虎冷哼一声，\"也是，你们林家现在就是一群丧家之犬，哪敢得罪我们赵家！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-033",
+    "dialogue_text": "“这林家少爷，胆子不小啊！”",
+    "speaker": "路人",
+    "full_paragraph": "\"这林家少爷，胆子不小啊！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-034",
+    "dialogue_text": "“是啊，敢这么跟赵虎说话！”",
+    "speaker": "路人",
+    "full_paragraph": "\"是啊，敢这么跟赵虎说话，也不怕被报复！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-035",
+    "dialogue_text": "“请出示身份证明。”",
+    "speaker": "考官",
+    "full_paragraph": "\"请出示身份证明。\"门口的护卫拦住了林轩。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-036",
+    "dialogue_text": "“听说这次考核很严格，要通过三关才能成为正式学员！”",
+    "speaker": "路人",
+    "full_paragraph": "\"听说这次考核很严格，要通过三关才能成为正式学员！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-037",
+    "dialogue_text": "“下一个，林轩！”",
+    "speaker": "考官",
+    "full_paragraph": "\"下一个，林轩！\"考官的声音响起。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-038",
+    "dialogue_text": "“请出拳。”",
+    "speaker": "考官",
+    "full_paragraph": "\"请出拳。\"考官说道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-039",
+    "dialogue_text": "“三百斤！”",
+    "speaker": "考官",
+    "full_paragraph": "\"三百斤！\"周围传来一阵惊呼，\"这个成绩，已经达到淬体境二重的标准了！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-040",
+    "dialogue_text": "“恭喜你，林轩，你被录取了！”",
+    "speaker": "考官",
+    "full_paragraph": "\"恭喜你，林轩，你被录取了！\"考官递过来一块令牌，\"这是你的学员令牌，明天开始正式上课。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-041",
+    "dialogue_text": "“多谢考官。”",
+    "speaker": "林轩",
+    "full_paragraph": "\"多谢考官。\"林轩接过令牌，眼中闪过一丝欣喜。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-042",
+    "dialogue_text": "“林轩，你来得真早！”",
+    "speaker": "李铁",
+    "full_paragraph": "\"林轩，你来得真早！\"一个爽朗的声音传来。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-043",
+    "dialogue_text": "“李铁。你怎么也这么早？”",
+    "speaker": "林轩",
+    "full_paragraph": "“李铁。你怎么也这么早？”",
+    "style": "修仙",
+    "has_context": false
+  },
+  {
+    "gt_id": "GT-修仙-044",
+    "dialogue_text": "“哈哈，我这不是怕落后嘛！”",
+    "speaker": "李铁",
+    "full_paragraph": "\"哈哈，我这不是怕落后嘛！\"李铁笑道，\"听说赵虎那家伙也在这个武馆，我可不想被他比下去！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-045",
+    "dialogue_text": "“对了，听说今天有大师兄的授课！”",
+    "speaker": "李铁",
+    "full_paragraph": "\"对了，听说今天有大师兄的授课！\"李铁兴奋地说道，\"大师兄可是淬体境九重的高手，整个武馆年轻一辈的第一人！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-046",
+    "dialogue_text": "“淬体境九重？”",
+    "speaker": "林轩",
+    "full_paragraph": "\"淬体境九重？\"林轩眼中闪过一丝期待，\"那确实值得期待。\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-047",
+    "dialogue_text": "“今天，我要讲的是武道的根基——淬体！”",
+    "speaker": "陈风",
+    "full_paragraph": "\"今天，我要讲的是武道的根基——淬体！\"陈风的声音洪亮，\"淬体，就是淬炼身体，让身体变得更加强大。只有根基扎实，才能走得更远！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-048",
+    "dialogue_text": "“武道一途，没有捷径可走，唯有勤修苦练！”",
+    "speaker": "陈风",
+    "full_paragraph": "\"武道一途，没有捷径可走，唯有勤修苦练！\"陈风最后说道，\"希望各位都能在武道上有所成就！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-049",
+    "dialogue_text": "“你很不错，好好努力，将来必成大器！”",
+    "speaker": "陈风",
+    "full_paragraph": "陈风看着这个虚心求教的少年，眼中闪过一丝欣赏：\"你很不错，好好努力，将来必成大器！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-050",
+    "dialogue_text": "“多谢大师兄指点！”",
+    "speaker": "林轩",
+    "full_paragraph": "\"多谢大师兄指点！\"林轩恭敬地说道。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-051",
+    "dialogue_text": "“林轩！该吃饭了！”",
+    "speaker": "李铁",
+    "full_paragraph": "\"林轩！该吃饭了！\"李铁的声音从远处传来。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-052",
+    "dialogue_text": "“来了！”",
+    "speaker": "林轩",
+    "full_paragraph": "\"来了！\"林轩站起身，向食堂走去。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-053",
+    "dialogue_text": "“林轩，你的进步真快！”",
+    "speaker": "李铁",
+    "full_paragraph": "\"林轩，你的进步真快！\"李铁喘着粗气说道，\"才一个月，你就已经追上我了！\"",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-修仙-054",
+    "dialogue_text": "“是你让着我。再来！”",
+    "speaker": "林轩",
+    "full_paragraph": "“是你让着我。再来！”",
+    "style": "修仙",
+    "has_context": false
+  },
+  {
+    "gt_id": "GT-修仙-055",
+    "dialogue_text": "“明天，又是新的一天！”",
+    "speaker": "未知",
+    "full_paragraph": "\"明天，又是新的一天！\"林轩喃喃自语，然后闭上眼睛，沉沉睡去。",
+    "style": "修仙",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-001",
+    "dialogue_text": "“苏夜，你在这里！”",
+    "speaker": "林雪",
+    "full_paragraph": "\"苏夜，你在这里！\"一个清脆的女声从楼梯口传来。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-002",
+    "dialogue_text": "“林雪，你怎么上来了？”",
+    "speaker": "苏夜",
+    "full_paragraph": "\"林雪，你怎么上来了？\"苏夜收起手中的电光，轻声问道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-003",
+    "dialogue_text": "“公司出事了。”",
+    "speaker": "林雪",
+    "full_paragraph": "\"公司出事了。\"林雪脸色凝重，\"今天有个神秘组织来公司搜查，说是要找什么异能者。\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-004",
+    "dialogue_text": "“今天有个神秘组织来公司搜查”",
+    "speaker": "林雪",
+    "full_paragraph": "\"公司出事了。\"林雪脸色凝重，\"今天有个神秘组织来公司搜查，说是要找什么异能者。\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-005",
+    "dialogue_text": "“他们怎么知道这里有异能者？”",
+    "speaker": "苏夜",
+    "full_paragraph": "苏夜眉头一皱：\"他们怎么知道这里有异能者？\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-006",
+    "dialogue_text": "“苏夜，来会议室一趟。”",
+    "speaker": "老陈",
+    "full_paragraph": "\"苏夜，来会议室一趟。\"是部门经理老陈的声音。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-007",
+    "dialogue_text": "“苏先生，我们是暗影会的调查员。”",
+    "speaker": "黑衣人",
+    "full_paragraph": "一个黑衣人开口了：\"苏先生，我们是暗影会的调查员。最近我们检测到这个区域有异能波动，请问您是否知道什么？\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-008",
+    "dialogue_text": "“我不知道你们在说什么。”",
+    "speaker": "苏夜",
+    "full_paragraph": "苏夜面色平静地回答：\"我不知道你们在说什么。我只是一个普通的程序员。\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-009",
+    "dialogue_text": "“苏夜，快来老地方！”",
+    "speaker": "林雪",
+    "full_paragraph": "\"苏夜，快来老地方！有重要的事情！\"林雪的声音有些急促。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-010",
+    "dialogue_text": "“这是赵天行赵大哥。”",
+    "speaker": "林雪",
+    "full_paragraph": "\"苏夜，这是赵天行赵大哥。\"林雪介绍道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-011",
+    "dialogue_text": "“我是华夏异能者联盟的负责人。”",
+    "speaker": "赵天行",
+    "full_paragraph": "赵天行伸出手：\"苏夜，你好。我是华夏异能者联盟的负责人。\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-012",
+    "dialogue_text": "“明天开始，你来联盟总部报道。”",
+    "speaker": "赵天行",
+    "full_paragraph": "赵天行满意地笑了：\"很好。明天开始，你来联盟总部报道。我会安排最好的导师教你。\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-013",
+    "dialogue_text": "“暗影会的人来了！”",
+    "speaker": "联盟成员",
+    "full_paragraph": "\"暗影会的人来了！\"一个联盟成员冲进来大声喊道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-014",
+    "dialogue_text": "“苏夜，你跟我去前线！”",
+    "speaker": "赵天行",
+    "full_paragraph": "赵天行脸色一变：\"全体戒备！苏夜，你跟我去前线！\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-015",
+    "dialogue_text": "“干得好，苏夜！”",
+    "speaker": "赵天行",
+    "full_paragraph": "赵天行转过身，对苏夜竖起大拇指：\"干得好，苏夜！你的电流攻击非常精准！\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-016",
+    "dialogue_text": "“我建议潜入基地。”",
+    "speaker": "苏夜",
+    "full_paragraph": "\"我建议潜入基地，获取他们的情报。\"苏夜主动请缨。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-017",
+    "dialogue_text": "“太危险了。”",
+    "speaker": "林雪",
+    "full_paragraph": "\"太危险了。\"林雪反对道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-018",
+    "dialogue_text": "“样本准备好了吗？”",
+    "speaker": "男子",
+    "full_paragraph": "\"样本准备好了吗？\"男子对着对讲机说道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-019",
+    "dialogue_text": "“这不是科学，这是犯罪！”",
+    "speaker": "苏夜",
+    "full_paragraph": "\"这不是科学，这是犯罪！\"苏夜怒喝道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-020",
+    "dialogue_text": "“苏夜，你这次立了大功。”",
+    "speaker": "赵天行",
+    "full_paragraph": "\"苏夜，你这次立了大功。\"赵天行拍着苏夜的肩膀说道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-021",
+    "dialogue_text": "“这是大家共同努力的结果。”",
+    "speaker": "苏夜",
+    "full_paragraph": "\"这是大家共同努力的结果。\"苏夜谦虚地说道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-022",
+    "dialogue_text": "“苏夜，你太棒了！”",
+    "speaker": "林雪",
+    "full_paragraph": "林雪走过来，眼中满是喜悦：\"苏夜，你太棒了！\"",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-都市异能-023",
+    "dialogue_text": "“为了守护这个世界！”",
+    "speaker": "三人",
+    "full_paragraph": "\"为了守护这个世界！\"三人齐声说道。",
+    "style": "都市异能",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-001",
+    "dialogue_text": "“北方有异动。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"北方有异动。\"艾德温说，声音中带着担忧。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-002",
+    "dialogue_text": "“我能感觉到魔力的波动。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"我能感觉到魔力的波动。\"伊莉雅走到他身边，望向远方。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-003",
+    "dialogue_text": "“那不是雷声。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"那不是雷声。\"他沉声说道。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-004",
+    "dialogue_text": "“是炎魔，至少有三只。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"是炎魔，至少有三只。\"她睁开眼，神色凝重。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-005",
+    "dialogue_text": "“情况如何？”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"情况如何？\"加尔文问道。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-006",
+    "dialogue_text": "“炎魔入侵，立即组织防御。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"炎魔入侵，立即组织防御。\"艾德温下令。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-007",
+    "dialogue_text": "“是！”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"是！\"加尔文转身去传达命令。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-008",
+    "dialogue_text": "“射击！”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"射击！\"加尔文下令。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-009",
+    "dialogue_text": "“弓箭无效！”",
+    "speaker": "骑士",
+    "full_paragraph": "\"弓箭无效！\"一名骑士喊道。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-010",
+    "dialogue_text": "“换银箭！”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"换银箭！\"艾德温命令道。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-011",
+    "dialogue_text": "“它们在试探我们的实力。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"它们在试探我们的实力。\"伊莉雅说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-012",
+    "dialogue_text": "“根据古籍记载，炎魔不会无缘无故出现。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"根据古籍记载，炎魔不会无缘无故出现。\"伊莉雅说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-013",
+    "dialogue_text": "“一定是有人召唤了它们。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"一定是有人召唤了它们。\"艾德温推测。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-014",
+    "dialogue_text": "“巡逻队在北边发现了痕迹。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"巡逻队在北边发现了痕迹。\"他说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-015",
+    "dialogue_text": "“有人类与炎魔勾结？”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"有人类与炎魔勾结？\"伊莉雅皱眉。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-016",
+    "dialogue_text": "“很有可能。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"很有可能。\"加尔文说，\"我们必须找出这个人。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-017",
+    "dialogue_text": "“明天一早，我带人去北方调查。”",
+    "speaker": "艾德温",
+    "full_paragraph": "艾德温站起身：\"明天一早，我带人去北方调查。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-018",
+    "dialogue_text": "“我和你一起去。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"我和你一起去。\"伊莉雅说，\"我的魔法可以帮助你。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-019",
+    "dialogue_text": "“我留守哨站，组织防御。”",
+    "speaker": "加尔文",
+    "full_paragraph": "加尔文点头：\"我留守哨站，组织防御。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-020",
+    "dialogue_text": "“魔力波动越来越强了。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"魔力波动越来越强了。\"伊莉雅感受着空气中的变化。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-021",
+    "dialogue_text": "“防御！”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"防御！\"艾德温大喊。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-022",
+    "dialogue_text": "“它变强了。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"它变强了。\"伊莉雅说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-023",
+    "dialogue_text": "“就是现在！”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"就是现在！\"艾德温喊道。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-024",
+    "dialogue_text": "“没事吧？”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"没事吧？\"伊莉雅跑过来。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-025",
+    "dialogue_text": "“没事，继续前进。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"没事，继续前进。\"艾德温说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-026",
+    "dialogue_text": "“他在召唤更多的炎魔。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"他在召唤更多的炎魔。\"伊莉雅震惊地说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-027",
+    "dialogue_text": "“分三组，同时攻击。伊莉雅，你负责打断仪式。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"分三组，同时攻击。伊莉雅，你负责打断仪式。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-028",
+    "dialogue_text": "“明白。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"明白。\"伊莉雅点头。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-029",
+    "dialogue_text": "“莫洛克？”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"莫洛克？\"艾德温认出了这个人。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-030",
+    "dialogue_text": "“没想到你会记得我。”",
+    "speaker": "莫洛克",
+    "full_paragraph": "\"没想到你会记得我。\"莫洛克冷笑。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-031",
+    "dialogue_text": "“你为什么要召唤炎魔？”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"你为什么要召唤炎魔？\"艾德温质问。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-032",
+    "dialogue_text": "“为了力量！”",
+    "speaker": "莫洛克",
+    "full_paragraph": "\"为了力量！\"莫洛克张开双臂。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-033",
+    "dialogue_text": "“你疯了！炎魔只会毁灭一切！”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"你疯了！炎魔只会毁灭一切！\"伊莉雅说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-034",
+    "dialogue_text": "“撤退！”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"撤退！\"艾德温下令，\"这只太强了！\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-035",
+    "dialogue_text": "“情况比我们想象的严重。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"情况比我们想象的严重。\"他说，\"莫洛克正在召唤巨型炎魔。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-036",
+    "dialogue_text": "“足以摧毁整个哨站。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"足以摧毁整个哨站。\"伊莉雅接话。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-037",
+    "dialogue_text": "“我们必须请求支援。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"我们必须请求支援。\"艾德温说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-038",
+    "dialogue_text": "“在支援到达之前，我们必须加强防御。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"在支援到达之前，我们必须加强防御。\"加尔文说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-039",
+    "dialogue_text": "“把所有魔法师都调来。”",
+    "speaker": "艾德温",
+    "full_paragraph": "艾德温点头：\"把所有魔法师都调来。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-040",
+    "dialogue_text": "“我有个主意。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "伊莉雅思考了一下：\"我有个主意。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-041",
+    "dialogue_text": "“古籍中提到过，炎魔害怕圣水和银的组合物。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"古籍中提到过，炎魔害怕圣水和银的组合物。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-042",
+    "dialogue_text": "“你能制作吗？”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"你能制作吗？\"艾德温问。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-043",
+    "dialogue_text": "“可以，但需要时间。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"可以，但需要时间。\"伊莉雅说，\"至少两天。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-044",
+    "dialogue_text": "“我们没有两天时间。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"我们没有两天时间。\"加尔文说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-045",
+    "dialogue_text": "“它来了。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"它来了。\"艾德温握紧剑柄。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-046",
+    "dialogue_text": "“全体准备战斗！”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"全体准备战斗！\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-047",
+    "dialogue_text": "“它还有两个小时就会到达。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"它还有两个小时就会到达。\"加尔文报告。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-048",
+    "dialogue_text": "“我们能赢吗？”",
+    "speaker": "年轻骑士",
+    "full_paragraph": "\"我们能赢吗？\"一名年轻骑士小声问。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-049",
+    "dialogue_text": "“我们必须赢。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"我们必须赢。\"艾德温坚定地说，\"身后就是我们的家园。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-050",
+    "dialogue_text": "“这是圣光药剂，能暂时增强你的力量。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"这是圣光药剂，能暂时增强你的力量。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-051",
+    "dialogue_text": "“谢谢你，伊莉雅。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"谢谢你，伊莉雅。\"艾德温接过药水。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-052",
+    "dialogue_text": "“不会失败的。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"不会失败的。\"艾德温微笑，\"我相信你，相信我们每一个人。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-053",
+    "dialogue_text": "“防线已经布置完毕。”",
+    "speaker": "加尔文",
+    "full_paragraph": "加尔文走过来：\"防线已经布置完毕。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-054",
+    "dialogue_text": "“攻击！”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"攻击！\"艾德温下令。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-055",
+    "dialogue_text": "“退守内墙！”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"退守内墙！\"加尔文大喊。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-056",
+    "dialogue_text": "“它的力量太强了。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"它的力量太强了。\"伊莉雅喘着气说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-057",
+    "dialogue_text": "“艾德温！”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"艾德温！\"伊莉雅惊呼。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-058",
+    "dialogue_text": "“赢了吗？”",
+    "speaker": "艾德温",
+    "full_paragraph": "艾德温艰难地睁开眼睛：\"赢了吗？\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-059",
+    "dialogue_text": "“赢了。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"赢了。\"伊莉雅微笑着说，\"你做到了。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-060",
+    "dialogue_text": "“城墙需要完全重建。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"城墙需要完全重建。\"加尔文检查着损毁情况。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-061",
+    "dialogue_text": "“王都的支援什么时候到？”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"王都的支援什么时候到？\"艾德温问。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-062",
+    "dialogue_text": "“预计明天。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"预计明天。\"伊莉雅回答。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-063",
+    "dialogue_text": "“他趁乱逃走了。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"他趁乱逃走了。\"加尔文说，\"但我们找到了他的笔记。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-064",
+    "dialogue_text": "“黑暗势力正在集结，目标是王都。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"黑暗势力正在集结，目标是王都。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-065",
+    "dialogue_text": "“我们必须提前警告国王。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"我们必须提前警告国王。\"艾德温说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-066",
+    "dialogue_text": "“这场战争才刚刚开始。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"好。\"艾德温看着远方的天空，\"这场战争才刚刚开始。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-067",
+    "dialogue_text": "“艾德温骑士，你的英勇事迹已经传遍王都。”",
+    "speaker": "雷纳德",
+    "full_paragraph": "\"艾德温骑士，你的英勇事迹已经传遍王都。\"雷纳德说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-068",
+    "dialogue_text": "“我只是做了该做的事。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"我只是做了该做的事。\"艾德温谦虚地说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-069",
+    "dialogue_text": "“城墙需要重建，但人员伤亡不大。”",
+    "speaker": "加尔文",
+    "full_paragraph": "加尔文递上报告：\"城墙需要重建，但人员伤亡不大。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-070",
+    "dialogue_text": "“这是证据。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "伊莉雅拿出莫洛克的笔记：\"这是证据。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-071",
+    "dialogue_text": "“必须立即报告国王。”",
+    "speaker": "雷纳德",
+    "full_paragraph": "雷纳德看完后，脸色凝重：\"必须立即报告国王。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-072",
+    "dialogue_text": "“我们和你一起回去。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"我们和你一起回去。\"艾德温说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-073",
+    "dialogue_text": "“莫洛克的同党。”",
+    "speaker": "雷纳德",
+    "full_paragraph": "\"莫洛克的同党。\"雷纳德说，\"根据情报，哨站内可能有内奸。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-074",
+    "dialogue_text": "“我们必须尽快查出来。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"我们必须尽快查出来。\"伊莉雅说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-075",
+    "dialogue_text": "“为什么？”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"为什么？\"艾德温在审讯室里问他。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-076",
+    "dialogue_text": "“莫洛克承诺给我力量……”",
+    "speaker": "托马斯",
+    "full_paragraph": "托马斯低着头：\"莫洛克承诺给我力量……\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-077",
+    "dialogue_text": "“你背叛了圣光。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"你背叛了圣光。\"艾德温失望地说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-078",
+    "dialogue_text": "“按军法处置。”",
+    "speaker": "加尔文",
+    "full_paragraph": "\"按军法处置。\"他说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-079",
+    "dialogue_text": "“等等。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"等等。\"伊莉雅突然说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-080",
+    "dialogue_text": "“他可能有更多的情报。”",
+    "speaker": "伊莉雅",
+    "full_paragraph": "\"他可能有更多的情报。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-081",
+    "dialogue_text": "“放过我的家人，他们什么都不知道。”",
+    "speaker": "托马斯",
+    "full_paragraph": "\"放过我的家人，他们什么都不知道。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-082",
+    "dialogue_text": "“我答应你。”",
+    "speaker": "艾德温",
+    "full_paragraph": "艾德温思考了一下：\"我答应你。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-083",
+    "dialogue_text": "“我们必须立刻赶回王都。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"我们必须立刻赶回王都。\"艾德温说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-084",
+    "dialogue_text": "“勇敢的骑士们，感谢你们的到来。”",
+    "speaker": "国王",
+    "full_paragraph": "\"勇敢的骑士们，感谢你们的到来。\"国王说。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-085",
+    "dialogue_text": "“陛下，黑暗势力正在集结。”",
+    "speaker": "艾德温",
+    "full_paragraph": "\"陛下，黑暗势力正在集结。\"艾德温汇报。",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-086",
+    "dialogue_text": "“我们将组建一支新的联军，对抗黑暗。”",
+    "speaker": "国王",
+    "full_paragraph": "“我们将组建一支新的联军，对抗黑暗。”",
+    "style": "西幻",
+    "has_context": false
+  },
+  {
+    "gt_id": "GT-西幻-087",
+    "dialogue_text": "“艾德温，你愿意担任先锋吗？”",
+    "speaker": "国王",
+    "full_paragraph": "\"艾德温，你愿意担任先锋吗？\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-088",
+    "dialogue_text": "“这是我的荣幸，陛下。”",
+    "speaker": "艾德温",
+    "full_paragraph": "艾德温单膝跪地：\"这是我的荣幸，陛下。\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-089",
+    "dialogue_text": "“让我们为了光明，为了正义，为了这个世界！”",
+    "speaker": "国王",
+    "full_paragraph": "\"让我们为了光明，为了正义，为了这个世界！\"",
+    "style": "西幻",
+    "has_context": true
+  },
+  {
+    "gt_id": "GT-西幻-090",
+    "dialogue_text": "“为了光明！”",
+    "speaker": "众人",
+    "full_paragraph": "\"为了光明！\"众人齐声高呼。",
+    "style": "西幻",
+    "has_context": true
+  }
+]

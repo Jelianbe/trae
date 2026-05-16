@@ -1,0 +1,330 @@
+{
+  "total": 39,
+  "correct": 15,
+  "wrong": 17,
+  "unknown": 0,
+  "accuracy": 38.46153846153847,
+  "relaxed": false,
+  "results": [
+    {
+      "index": 1,
+      "text": "敌军还有多久到达？",
+      "expected": "亚瑟",
+      "predicted": "亚瑟",
+      "status": "ok",
+      "match_type": "context_reasoning:同行动作主语",
+      "confidence": 0.6,
+      "prefix_narration": "亚瑟沉声问道"
+    },
+    {
+      "index": 2,
+      "text": "按照斥候的报告，大约两个时辰。",
+      "expected": "艾琳",
+      "predicted": "艾琳",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用",
+      "confidence": 0.6,
+      "prefix_narration": "艾琳法师翻开魔法卷轴，紫色的符文微微闪烁"
+    },
+    {
+      "index": 3,
+      "text": "我们得立刻部署防线！",
+      "expected": "雷恩",
+      "predicted": "雷恩",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用",
+      "confidence": 0.6,
+      "prefix_narration": "雷恩队长拍桌而起"
+    },
+    {
+      "index": 4,
+      "text": "急什么，先听斥候详细汇报。",
+      "expected": "亚瑟",
+      "predicted": "亚瑟",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "亚瑟摇了摇头"
+    },
+    {
+      "index": 5,
+      "text": "敌方有攻城巨兽，我们的外墙可能撑不了多久。",
+      "expected": "艾琳",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": "艾琳冷静地补充道"
+    },
+    {
+      "index": 6,
+      "text": "那更应该抓紧时间，每拖延一刻就多一分危险！",
+      "expected": "雷恩",
+      "predicted": "雷恩",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+      "confidence": 0.35,
+      "prefix_narration": "雷恩急得来回踱步"
+    },
+    {
+      "index": 7,
+      "text": "雷恩，冷静。慌乱只会让士兵们更加不安。",
+      "expected": "亚瑟",
+      "predicted": "亚瑟",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "亚瑟抬起手制止"
+    },
+    {
+      "index": 8,
+      "text": "北门的魔法屏障还能维持一个时辰，但之后需要我重新充能。",
+      "expected": "艾琳",
+      "predicted": "艾琳",
+      "status": "ok",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": "艾琳指向地图上的北门"
+    },
+    {
+      "index": 9,
+      "text": "伤员已经全部转移到地下庇护所，但药品告急。",
+      "expected": "莉莉",
+      "predicted": "莉莉",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用",
+      "confidence": 0.6,
+      "prefix_narration": "莉莉治疗师轻声开口，声音柔和却坚定"
+    },
+    {
+      "index": 10,
+      "text": "让我说说我的看法。",
+      "expected": "加文",
+      "predicted": "加文",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用",
+      "confidence": 0.6,
+      "prefix_narration": "加文浑浊的眼睛望向远方"
+    },
+    {
+      "index": 11,
+      "text": "三十年前那场战役，我们也是这么仓促迎敌。",
+      "expected": "加文",
+      "predicted": "莉莉",
+      "status": "wrong",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": ""
+    },
+    {
+      "index": 12,
+      "text": "结果呢？防线被突破，死了三百个弟兄。",
+      "expected": "加文",
+      "predicted": "雷恩",
+      "status": "wrong",
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r3)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 13,
+      "text": "这次不能再犯同样的错误。",
+      "expected": "加文",
+      "predicted": "雷恩",
+      "status": "wrong",
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r3)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 14,
+      "text": "老加文，你的故事我们听过无数遍了，现在不是说这个的时候！",
+      "expected": "雷恩",
+      "predicted": "莉莉",
+      "status": "wrong",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": "雷恩不耐烦地挥手"
+    },
+    {
+      "index": 15,
+      "text": "但加文爷爷说得对，我们必须'谨慎行事'。",
+      "expected": "莉莉",
+      "predicted": "艾琳",
+      "status": "wrong",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": "莉莉轻声说"
+    },
+    {
+      "index": 16,
+      "text": "这里是我们的薄弱点。",
+      "expected": "艾琳",
+      "predicted": "艾琳",
+      "status": "ok",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": "艾琳指尖划过地图"
+    },
+    {
+      "index": 17,
+      "text": "如果敌军从这里突破，后方直接暴露。",
+      "expected": "艾琳",
+      "predicted": "艾琳",
+      "status": "ok",
+      "match_type": "context_reasoning:描述性角色(近因衰减-r2)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 18,
+      "text": "必须派重兵防守。",
+      "expected": "艾琳",
+      "predicted": "艾琳",
+      "status": "ok",
+      "match_type": "context_reasoning:描述性角色(近因衰减-r2)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 19,
+      "text": "那东侧怎么办？",
+      "expected": "雷恩",
+      "predicted": "雷恩",
+      "status": "ok",
+      "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
+      "confidence": 0.52,
+      "prefix_narration": "雷恩突然插话道"
+    },
+    {
+      "index": 20,
+      "text": "东侧的城墙年久失修，根本挡不住投石机。",
+      "expected": "雷恩",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:描述性角色(后)(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 21,
+      "text": "东侧的确棘手，加文，你有什么建议？",
+      "expected": "亚瑟",
+      "predicted": "亚瑟",
+      "status": "ok",
+      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "亚瑟团长沉吟片刻"
+    },
+    {
+      "index": 22,
+      "text": "可以在东墙后设置第二道防线，用拒马和沙袋。",
+      "expected": "加文",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:描述性角色(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "加文沉思道"
+    },
+    {
+      "index": 23,
+      "text": "亚瑟团长，东侧需要支援的还有伤员转运通道。",
+      "expected": "莉莉",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:描述性角色(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "莉莉忽然想起什么"
+    },
+    {
+      "index": 24,
+      "text": "艾琳，你的魔法能撑多久？",
+      "expected": "雷恩",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:描述性角色(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 25,
+      "text": "如果全力维持，最多半个时辰，之后我需要休息。",
+      "expected": "艾琳",
+      "predicted": "雷恩",
+      "status": "wrong",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "prefix_narration": "艾琳掐指计算"
+    },
+    {
+      "index": 26,
+      "text": "轰！",
+      "expected": "亚瑟",
+      "predicted": "艾琳",
+      "status": "wrong",
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 27,
+      "text": "叮——",
+      "expected": "雷恩",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 28,
+      "text": "他们比预计的来得更快。",
+      "expected": "加文",
+      "predicted": "加文",
+      "status": "ok",
+      "match_type": "context_reasoning:同行动作主语(近因衰减-r5)",
+      "confidence": 0.35,
+      "prefix_narration": "加文沉声道"
+    },
+    {
+      "index": 29,
+      "text": "雷恩，你率弓箭队去东墙。艾琳，加固北门魔法。",
+      "expected": "雷恩",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "亚瑟立刻下令"
+    },
+    {
+      "index": 30,
+      "text": "绝对不能",
+      "expected": "艾琳",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": ""
+    },
+    {
+      "index": 31,
+      "text": "这是命令。",
+      "expected": "艾琳",
+      "predicted": "亚瑟",
+      "status": "wrong",
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+      "confidence": 0.52,
+      "prefix_narration": "他低声说"
+    },
+    {
+      "index": 32,
+      "text": "明白！",
+      "expected": "亚瑟",
+      "predicted": "雷恩",
+      "status": "wrong",
+      "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+      "confidence": 0.52,
+      "prefix_narration": "雷恩咬紧牙关"
+    }
+  ]
+}

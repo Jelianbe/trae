@@ -14,6 +14,8 @@
 import logging
 from typing import Optional, Set
 
+from pipeline.nlp_basics import TITLE_WORDS
+
 logger = logging.getLogger(__name__)
 
 
@@ -74,6 +76,9 @@ class CharacterNameValidator:
             return False
 
         if name in self._blacklist:
+            return False
+
+        if name in TITLE_WORDS:
             return False
 
         # 检查是否以有效姓氏开头

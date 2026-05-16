@@ -1,0 +1,184 @@
+## 角色自动发现与注册模块 - 设计草案 v0.1
+
+### 一、设计目标
+
+在不破坏现有 `speaker_matcher`（有预注册场景）的前提下，增加一个**独立的、可选的**角色发现与注册管道，解决无预注册或预注册不全时的冷启动问题。
+
+**核心原则**：
+- **单一职责**：发现模块只负责“从文本中提取可能的角色名并临时注册”，不参与说话人匹配逻辑。
+- **可插拔**：可以通过配置开关启用/禁用，可以替换不同的提取策略（NER、规则、SRL、LLM）。
+- **渐进增强**：先简单后复杂，逐步提升召回率，同时保持精度。
+- **无侵入**：与现有 `character_manager` 通过明确定义的接口交互，不修改现有 `speaker_matcher` 核心流程（只在 fallback 处调用）。
+
+---
+
+### 二、架构与模块划分
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     PipelineRunner                          │
+│  (可选) 在处理每个章节前/后调用 角色发现模块                    │
+└───────────────────────────┬─────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│              CharacterDiscoveryEngine (新模块)               │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │  1. CandidateExtractor (策略接口)                   │    │
+│  │     - NERExtractor (HanLP)                         │    │
+│  │     - PatternExtractor (正则: 姓+职位, 名+头衔)      │    │
+│  │     - SRLArg0Extractor (未来)                       │    │
+│  │     - LLMExtractor (未来)                           │    │
+│  ├────────────────────────────────────────────────────┤    │
+│  │  2. CandidateFilter & Normalizer                   │    │
+│  │     - 排除非人物（物品、身体部位、抽象词）             │    │
+│  │     - 去除修饰语（“严肃的赵总监” → “赵总监”）        │    │
+│  │     - 头衔剥离（“亚瑟团长” → “亚瑟”，保留“团长”为别名）│    │
+│  │     - 去重（基于归一化后的名称）                     │    │
+│  ├────────────────────────────────────────────────────┤    │
+│  │  3. TemporaryCharacterRegistry                     │    │
+│  │     - 调用 CharacterManager.add_character(..., is_temp=True) │
+│  │     - 记录发现来源、置信度、首次出现位置              │    │
+│  │     - 批量注册（避免重复请求）                       │    │
+│  └────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│              CharacterManager (现有，扩展)                   │
+│  - 支持 is_temp 字段（临时角色）                             │
+│  - 提供 get_temp_characters() / promote_to_permanent()     │
+│  - 匹配时临时角色权重降低（如置信度 * 0.7）                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 三、关键接口定义
+
+#### 3.1 `CandidateExtractor` 抽象基类
+
+```python
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any
+
+class CandidateExtractor(ABC):
+    @abstractmethod
+    def extract(self, text: str, context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """
+        从文本中提取候选角色名
+        返回: [{"name": "赵总监", "source": "pattern_surname_title", "confidence": 0.7, "span": (start, end)}]
+        """
+        pass
+```
+
+#### 3.2 `CharacterDiscoveryEngine`
+
+```python
+class CharacterDiscoveryEngine:
+    def __init__(self, extractors: List[CandidateExtractor], 
+                 filter_normalizer: 'CandidateFilterNormalizer',
+                 registry: 'TemporaryCharacterRegistry'):
+        self.extractors = extractors
+        self.filter_normalizer = filter_normalizer
+        self.registry = registry
+    
+    def discover_from_chapter(self, chapter_text: str, chapter_id: int, project_id: str):
+        """对整个章节进行角色发现并注册临时角色"""
+        all_candidates = []
+        for ext in self.extractors:
+            candidates = ext.extract(chapter_text)
+            all_candidates.extend(candidates)
+        
+        # 过滤+归一化
+        normalized = self.filter_normalizer.process(all_candidates)
+        
+        # 注册到角色库（临时）
+        self.registry.register(normalized, chapter_id, project_id)
+```
+
+#### 3.3 `TemporaryCharacterRegistry`
+
+```python
+class TemporaryCharacterRegistry:
+    def __init__(self, char_manager: CharacterManager):
+        self.char_manager = char_manager
+        self._cache = {}  # 避免重复注册
+    
+    def register(self, candidates: List[Dict], chapter_id: int, project_id: str):
+        for cand in candidates:
+            name = cand['normalized_name']
+            if name in self._cache.get(project_id, set()):
+                continue
+            # 调用 char_manager 添加临时角色
+            self.char_manager.add_character(
+                name=name,
+                project_id=project_id,
+                aliases=set(cand.get('aliases', [])),
+                gender='unknown',
+                first_appearance=chapter_id,
+                is_temp=True,
+                metadata={'source': cand['source'], 'confidence': cand['confidence']}
+            )
+            self._cache.setdefault(project_id, set()).add(name)
+```
+
+---
+
+### 四、集成到现有 `speaker_matcher`
+
+**不改动现有匹配逻辑**，只在 `analyze_dialogue` 的 **最终 fallback 处**（即所有策略都返回“未知”）调用发现模块的**即时发现**（可选），或者完全依赖独立的预处理阶段。
+
+推荐做法：
+- **预处理模式**：在 `PipelineRunner` 处理章节前，先调用 `CharacterDiscoveryEngine.discover_from_chapter` 对整个章节进行一轮发现，把所有潜在角色预注册为临时角色。这样 `speaker_matcher` 就能匹配到它们（尽管置信度低）。
+- **即时模式**：在 `analyze_dialogue` 无法匹配时，调用一个轻量级的 `_quick_discover` 方法，只分析当前句子附近的文本，注册新角色并返回。
+
+**建议先实现预处理模式**，因为它更干净、不影响实时性能，且能一次性注册整章的所有角色。
+
+---
+
+### 五、实施步骤（分阶段）
+
+#### 阶段0：基础设施
+- 在 `character_manager` 中添加 `is_temp` 字段（数据库迁移或内存标志）
+- 修改 `add_character` 支持 `is_temp` 参数
+- 修改 `get_eligible_characters` 支持过滤或排序临时角色
+
+#### 阶段1：简单规则提取器（PatternExtractor）
+- 实现基于正则的提取器（姓+职位，名+头衔，中文姓名）
+- 实现过滤与归一化（去除非人物、去除修饰语、头衔剥离）
+- 实现 `TemporaryCharacterRegistry`
+
+#### 阶段2：集成到 Pipeline
+- 在 `PipelineRunner` 中，处理每个章节前调用 `discover_from_chapter`（可选开关）
+- 确保临时角色参与匹配，但权重低
+
+#### 阶段3：评估与迭代
+- 运行无预注册测试，分析错误
+- 添加 NER 提取器（HanLP PER）
+- 增加文体自适应规则
+
+#### 阶段4：高级提取器（SRL / LLM）
+- 可选，根据需求
+
+---
+
+### 六、风险评估与缓解
+
+| 风险 | 缓解措施 |
+|------|----------|
+| 临时角色过多，干扰匹配 | 降低临时角色置信度因子（如0.6），正式角色优先 |
+| 错误注册（如“办公室”） | 强过滤规则 + 仅当出现次数≥2或出现在对话上下文才注册 |
+| 性能下降（整章提取） | 仅对旁白文本提取，且可限制长度；提取器可缓存 |
+| 与现有角色库冲突（如别名） | 注册前检查是否已存在（大小写归一化），存在则跳过或合并 |
+
+---
+
+### 七、当前决策
+
+现在，你需要决定：
+1. **是否按此设计进行？** 若同意，我将细化每个模块的伪代码/具体实现。
+2. **是否立即开始阶段0和阶段1？** 我可以先提供 `character_manager` 的 `is_temp` 修改代码，以及 `PatternExtractor` 的具体实现。
+3. **预处理模式 vs 即时模式？** 推荐预处理。
+
+等你确认后，我们再继续。
