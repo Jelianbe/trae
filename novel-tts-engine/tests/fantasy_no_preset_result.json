@@ -1,312 +1,298 @@
 {
   "total": 39,
   "judgable": 39,
-  "correct": 14,
-  "wrong": 18,
+  "correct": 0,
+  "wrong": 32,
   "unknown": 0,
-  "accuracy": 0.4375,
-  "discovered_characters": [
-    "[对话]",
-    "亚瑟",
-    "亚瑟团长",
-    "加文",
-    "桌上的烛台",
-    "眼睛",
-    "紫色的符文",
-    "艾琳",
-    "艾琳法师",
-    "莉莉",
-    "莉莉治疗师",
-    "雷恩",
-    "雷恩队长"
-  ],
+  "accuracy": 0.0,
+  "discovered_characters": [],
   "results": [
     {
       "index": 1,
       "text": "敌军还有多久到达？",
       "expected": "亚瑟",
-      "predicted": "亚瑟",
-      "match_type": "context_reasoning:同行动作主语",
-      "confidence": 0.88,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 2,
       "text": "按照斥候的报告，大约两个时辰。",
       "expected": "艾琳",
-      "predicted": "紫色的符文",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 3,
       "text": "我们得立刻部署防线！",
       "expected": "雷恩",
-      "predicted": "艾琳法师",
-      "match_type": "context_reasoning:描述性角色(动作主语)",
-      "confidence": 0.9,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 4,
       "text": "急什么，先听斥候详细汇报。",
       "expected": "亚瑟",
-      "predicted": "雷恩队长",
-      "match_type": "context_reasoning:描述性角色",
-      "confidence": 0.8,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 5,
       "text": "敌方有攻城巨兽，我们的外墙可能撑不了多久。",
       "expected": "艾琳",
-      "predicted": "艾琳",
-      "match_type": "context_reasoning:同行动作主语",
-      "confidence": 0.88,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 6,
       "text": "那更应该抓紧时间，每拖延一刻就多一分危险！",
       "expected": "雷恩",
-      "predicted": "雷恩",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 7,
       "text": "雷恩，冷静。慌乱只会让士兵们更加不安。",
       "expected": "亚瑟",
-      "predicted": "亚瑟",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 8,
       "text": "北门的魔法屏障还能维持一个时辰，但之后需要我重新充能。",
       "expected": "艾琳",
-      "predicted": "艾琳",
-      "match_type": "context_reasoning:同行引用(近因衰减-r4)",
-      "confidence": 0.6699999999999999,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 9,
       "text": "伤员已经全部转移到地下庇护所，但药品告急。",
       "expected": "莉莉",
-      "predicted": "莉莉治疗师",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 10,
       "text": "让我说说我的看法。",
       "expected": "加文",
-      "predicted": "加文",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 11,
       "text": "三十年前那场战役，我们也是这么仓促迎敌。",
       "expected": "加文",
-      "predicted": "[对话]",
-      "match_type": "context_reasoning:语境角色优先(临近)",
-      "confidence": 0.825,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 12,
       "text": "结果呢？防线被突破，死了三百个弟兄。",
       "expected": "加文",
-      "predicted": "眼睛",
-      "match_type": "context_reasoning:语境角色优先(临近)",
-      "confidence": 0.765,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 13,
       "text": "这次不能再犯同样的错误。",
       "expected": "加文",
-      "predicted": "[对话]",
-      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r4)",
-      "confidence": 0.6749999999999999,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 14,
       "text": "老加文，你的故事我们听过无数遍了，现在不是说这个的时候！",
       "expected": "雷恩",
-      "predicted": "雷恩",
-      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-      "confidence": 0.74,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 15,
       "text": "但加文爷爷说得对，我们必须'谨慎行事'。",
       "expected": "莉莉",
-      "predicted": "莉莉",
-      "match_type": "context_reasoning:同行动作主语",
-      "confidence": 0.88,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 16,
       "text": "这里是我们的薄弱点。",
       "expected": "艾琳",
-      "predicted": "艾琳",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 17,
       "text": "如果敌军从这里突破，后方直接暴露。",
       "expected": "艾琳",
-      "predicted": "艾琳法师",
-      "match_type": "context_reasoning:描述性角色",
-      "confidence": 0.8,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 18,
       "text": "必须派重兵防守。",
       "expected": "艾琳",
-      "predicted": "艾琳法师",
-      "match_type": "context_reasoning:描述性角色",
-      "confidence": 0.8,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 19,
       "text": "那东侧怎么办？",
       "expected": "雷恩",
-      "predicted": "雷恩",
-      "match_type": "context_reasoning:同行动作主语",
-      "confidence": 0.88,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 20,
       "text": "东侧的城墙年久失修，根本挡不住投石机。",
       "expected": "雷恩",
-      "predicted": "亚瑟团长",
-      "match_type": "context_reasoning:描述性角色(后)",
-      "confidence": 0.75,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 21,
       "text": "东侧的确棘手，加文，你有什么建议？",
       "expected": "亚瑟",
-      "predicted": "亚瑟团长",
-      "match_type": "context_reasoning:同行引用(近因衰减-r5)",
-      "confidence": 0.57,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 22,
       "text": "可以在东墙后设置第二道防线，用拒马和沙袋。",
       "expected": "加文",
-      "predicted": "加文",
-      "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
-      "confidence": 0.8,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 23,
       "text": "亚瑟团长，东侧需要支援的还有伤员转运通道。",
       "expected": "莉莉",
-      "predicted": "莉莉",
-      "match_type": "context_reasoning:同行引用(近因衰减-r4)",
-      "confidence": 0.6699999999999999,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 24,
       "text": "艾琳，你的魔法能撑多久？",
       "expected": "雷恩",
-      "predicted": "亚瑟团长",
-      "match_type": "context_reasoning:描述性角色(近因衰减-r5)",
-      "confidence": 0.55,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 25,
       "text": "如果全力维持，最多半个时辰，之后我需要休息。",
       "expected": "艾琳",
-      "predicted": "艾琳",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 26,
       "text": "轰！",
       "expected": "亚瑟",
-      "predicted": "雷恩",
-      "match_type": "context_reasoning:语境角色优先(说话动词)",
-      "confidence": 0.85,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 27,
       "text": "叮——",
       "expected": "雷恩",
-      "predicted": "桌上的烛台",
-      "match_type": "context_reasoning:语境角色优先(临近)",
-      "confidence": 0.755,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 28,
       "text": "他们比预计的来得更快。",
       "expected": "加文",
-      "predicted": "加文",
-      "match_type": "context_reasoning:同行动作主语",
-      "confidence": 0.88,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 29,
       "text": "雷恩，你率弓箭队去东墙。艾琳，加固北门魔法。",
       "expected": "雷恩",
-      "predicted": "亚瑟",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 30,
       "text": "绝对不能",
       "expected": "艾琳",
-      "predicted": "加文",
-      "match_type": "context_reasoning:语境角色优先(说话动词)",
-      "confidence": 0.85,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 31,
       "text": "这是命令。",
       "expected": "艾琳",
-      "predicted": "加文",
-      "match_type": "context_reasoning:语境角色优先(说话动词)",
-      "confidence": 0.85,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 32,
       "text": "明白！",
       "expected": "亚瑟",
-      "predicted": "雷恩",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     }
   ]

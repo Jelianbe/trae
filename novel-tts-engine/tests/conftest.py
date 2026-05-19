@@ -30,49 +30,7 @@ def nlp_basics():
 @pytest.fixture(autouse=True)
 def setup_test_environment():
     """自动应用：为每个测试设置干净的环境"""
+    # 测试前清理（如果需要）
     yield
+    # 测试后清理（如果需要）
     pass
-
-
-@pytest.fixture
-def char_manager():
-    """临时数据库隔离 fixture：每个测试函数独立 temp db，互不污染"""
-    import tempfile
-    from pipeline.character_manager import CharacterManager
-    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
-        db_path = f.name
-    try:
-        yield CharacterManager(db_path)
-    finally:
-        if os.path.exists(db_path):
-            try:
-                os.remove(db_path)
-            except PermissionError:
-                pass
-
-
-@pytest.fixture
-def fantasy_characters(char_manager):
-    """注册西幻角色到 char_manager"""
-    characters = [
-        ('亚瑟', 'male', {'亚瑟团长', '团长'}),
-        ('艾琳', 'female', {'艾琳法师'}),
-        ('雷恩', 'male', {'雷恩队长', '队长'}),
-        ('莉莉', 'female', {'莉莉治疗师', '治疗师'}),
-        ('加文', 'male', {'加文老战士', '老战士'}),
-    ]
-    for name, gender, aliases in characters:
-        char_manager.add_character(
-            name=name, project_id='fantasy_baseline',
-            aliases=aliases, gender=gender
-        )
-    return char_manager
-
-
-@pytest.fixture
-def speaker_matcher(char_manager, nlp_basics):
-    """预配角色库的 SpeakerMatcher（西幻）"""
-    from pipeline.speaker_matcher import SpeakerMatcher
-    matcher = SpeakerMatcher(character_manager=char_manager)
-    matcher._current_project_id = 'fantasy_baseline'
-    return matcher

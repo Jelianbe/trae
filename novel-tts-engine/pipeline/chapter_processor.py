@@ -12,10 +12,14 @@ from pipeline.speaker_role_filter import SpeakerRoleFilter
 from pipeline.entity_linker import EntityLinker
 from pipeline.character_manager import CharacterManager
 from pipeline.legacy_rule_matcher import AbstractSpeakerMatcher
+from pipeline.emotion_extractor import get_emotion_extractor
 from pipeline.pipeline_runner import (
     ChapterResult, SentenceData, FragmentData, _is_chinese_char,
 )
 from utils.text_utils import split_sentences_smart
+from utils.config import (
+    EMOTION_EXTRACT_WINDOW, NARRATION_EMOTION_CONFIDENCE_THRESHOLD,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -134,20 +138,24 @@ class ChapterProcessor:
         dialogue_map: Dict[str, str],
     ) -> List[SentenceData]:
         """
-        句子处理（情绪标注已废弃，统一输出 neutral）。
+        情绪标注和句子处理。
         """
         sentences = split_sentences_smart(content)
 
         dialogue_texts = {d.strip() for d in dialogue_map.keys()}
 
         sentence_data_list = []
+        prev_emotion = None
+        prev_confidence = 0.0
 
         for sentence in sentences:
             sentence_data = self._process_single_sentence(
                 sentence, content, linked_entities, dialogue_map,
-                dialogue_texts,
+                dialogue_texts, prev_emotion, prev_confidence,
             )
             sentence_data_list.append(sentence_data)
+            prev_emotion = sentence_data.emotion
+            prev_confidence = sentence_data.emotion_confidence if hasattr(sentence_data, 'emotion_confidence') else 0.0
 
         return sentence_data_list
 
@@ -158,6 +166,8 @@ class ChapterProcessor:
         linked_entities: List[Entity],
         dialogue_map: Dict[str, str],
         dialogue_texts: set,
+        prev_emotion: Optional[str],
+        prev_confidence: float,
     ) -> SentenceData:
         """处理单个句子，返回 SentenceData"""
         sentence_start = content.find(sentence)
@@ -168,14 +178,25 @@ class ChapterProcessor:
         is_dialogue = any(d_text in sentence for d_text in dialogue_texts)
         sentence_type = "dialogue" if is_dialogue else "narration"
 
-        # 情绪标注已废弃，统一输出 neutral
+        emotion_extractor = get_emotion_extractor()
+        emotion_window_start = max(0, sentence_start - EMOTION_EXTRACT_WINDOW)
+        emotion_window_end = min(len(content), sentence_end + EMOTION_EXTRACT_WINDOW)
+        emotion_context = content[emotion_window_start:emotion_window_end]
+        emotion_result = emotion_extractor.classify(
+            emotion_context, context_hint=prev_emotion, context_confidence=prev_confidence
+        )
+
         speaker = ""
+        emotion = emotion_result.emotion_label
 
         if is_dialogue:
             for d_text, d_speaker in dialogue_map.items():
                 if d_text in sentence:
                     speaker = d_speaker
                     break
+        else:
+            if emotion_result.confidence >= NARRATION_EMOTION_CONFIDENCE_THRESHOLD:
+                emotion = emotion_result.emotion_label
 
         sentence_entities = self._link_entities_to_sentence(sentence, linked_entities)
         fragments = self._extract_fragments(sentence, dialogue_map)
@@ -184,12 +205,14 @@ class ChapterProcessor:
             text=sentence,
             type=sentence_type,
             speaker=speaker,
-            emotion="neutral",
-            emotion_class="neutral",
-            emotion_vector=None,
+            emotion=emotion,
+            emotion_class=emotion_result.emotion_class,
+            emotion_vector=emotion_result.emotion_vector,
             entities=sentence_entities,
             fragments=fragments,
         )
+
+        sentence_data.emotion_confidence = emotion_result.confidence
 
         return sentence_data
 

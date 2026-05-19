@@ -4,10 +4,10 @@
     "relaxed": false,
     "total": 91,
     "judgable": 85,
-    "correct": 0,
-    "wrong": 85,
+    "correct": 9,
+    "wrong": 76,
     "unknown": 6,
-    "accuracy": 0.0,
+    "accuracy": 0.10588235294117647,
     "results": [
       {
         "index": 1,
@@ -58,19 +58,19 @@
         "index": 6,
         "text": "赵总监皱起眉头问道：\"谁批准的？\"",
         "expected": "赵总监",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "赵总监",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 7,
         "text": "李经理回答：\"是张总。他说这个功能必须加上。\"",
         "expected": "李经理",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "李经理",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 8,
@@ -121,10 +121,10 @@
         "index": 13,
         "text": "李经理插话道：\"我知道你尽力了，但客户要求更高。\"",
         "expected": "李经理",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "李经理",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 14,
@@ -193,10 +193,10 @@
         "index": 21,
         "text": "孙工喘着气说：\"数据库连接数满了，有人在进行大量查询。\"",
         "expected": "孙工",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "孙工",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 22,
@@ -292,10 +292,10 @@
         "index": 32,
         "text": "李经理关切地问：\"怎么了？\"",
         "expected": "李经理",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "李经理",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 33,
@@ -418,10 +418,10 @@
         "index": 46,
         "text": "张总微笑着说：\"赵总监，听说你来了。\"",
         "expected": "张总",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "张总",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 47,
@@ -526,10 +526,10 @@
         "index": 58,
         "text": "李经理问：\"怎么样？\"",
         "expected": "李经理",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "李经理",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 59,
@@ -643,10 +643,10 @@
         "index": 71,
         "text": "刘秘书回答：\"他说已经恢复正常了。\"",
         "expected": "刘秘书",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "刘秘书",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 72,
@@ -796,10 +796,10 @@
         "index": 88,
         "text": "李经理回答：\"主要是服务器采购那块。\"",
         "expected": "李经理",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "李经理",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 89,
@@ -835,19 +835,19 @@
     "relaxed": false,
     "total": 39,
     "judgable": 32,
-    "correct": 0,
-    "wrong": 32,
+    "correct": 6,
+    "wrong": 26,
     "unknown": 0,
-    "accuracy": 0.0,
+    "accuracy": 0.1875,
     "results": [
       {
         "index": 1,
         "text": "亚瑟沉声问道：\"敌军还有多久到达？\"",
         "expected": "亚瑟",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "亚瑟",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 2,
@@ -880,10 +880,10 @@
         "index": 5,
         "text": "艾琳冷静地补充道：\"敌方有攻城巨兽，我们的外墙可能撑不了多久。\"",
         "expected": "艾琳",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "艾琳",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 6,
@@ -916,9 +916,9 @@
         "index": 9,
         "text": "莉莉治疗师轻声开口，声音柔和却坚定：\"伤员已经全部转移到地下庇护所，但药品告急。\"",
         "expected": "莉莉",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
+        "predicted": "莉莉治疗师",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": false
       },
       {
@@ -970,10 +970,10 @@
         "index": 15,
         "text": "莉莉轻声说：\"但加文爷爷说得对，我们必须'谨慎行事'。\"",
         "expected": "莉莉",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "莉莉",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 16,
@@ -1006,10 +1006,10 @@
         "index": 19,
         "text": "雷恩突然插话道：\"那东侧怎么办？\"",
         "expected": "雷恩",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "雷恩",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 20,
@@ -1033,10 +1033,10 @@
         "index": 22,
         "text": "加文沉思道：\"可以在东墙后设置第二道防线，用拒马和沙袋。\"",
         "expected": "加文",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "加文",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 23,
@@ -1087,10 +1087,10 @@
         "index": 28,
         "text": "加文沉声道：\"他们比预计的来得更快。\"",
         "expected": "加文",
-        "predicted": "UNKNOWN",
-        "match_type": "none",
-        "confidence": 0.0,
-        "is_correct": false
+        "predicted": "加文",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 29,

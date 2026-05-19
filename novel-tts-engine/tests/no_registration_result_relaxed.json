@@ -4,27 +4,27 @@
     "relaxed": true,
     "total": 91,
     "judgable": 85,
-    "correct": 68,
-    "wrong": 17,
+    "correct": 44,
+    "wrong": 41,
     "unknown": 6,
-    "accuracy": 0.8,
+    "accuracy": 0.5176470588235295,
     "results": [
       {
         "index": 1,
         "text": "\"这个项目我来负责。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)",
-        "confidence": 0.75,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 2,
         "text": "\"赵总监，您先了解一下情况。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:语境角色优先(临近)",
-        "confidence": 0.775,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -32,8 +32,8 @@
         "text": "\"系统已经升级完成了。\"",
         "expected": "吴工程师",
         "predicted": "吴工程师",
-        "match_type": "context_reasoning:语境角色优先(临近)",
-        "confidence": 0.75,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -41,8 +41,8 @@
         "text": "\"预算超了多少？\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.775,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -50,8 +50,8 @@
         "text": "\"比原计划多了百分之十五。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r2)",
-        "confidence": 0.715,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -59,8 +59,8 @@
         "text": "赵总监皱起眉头问道：\"谁批准的？\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
-        "confidence": 0.8,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
@@ -68,26 +68,26 @@
         "text": "李经理回答：\"是张总。他说这个功能必须加上。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
         "index": 8,
         "text": "\"各位，这是您要的咖啡。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": false
+        "predicted": "刘秘书",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": true
       },
       {
         "index": 9,
         "text": "\"吴工，你的测试报告呢？\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.79,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -95,35 +95,35 @@
         "text": "\"已经发到您的邮箱了。\"",
         "expected": "吴工程师",
         "predicted": "吴工程师",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
-        "confidence": 0.515,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 11,
         "text": "赵总监放下杯子：\"我看了，性能指标不达标。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 12,
         "text": "\"赵总监，这个我已经优化过三遍了。\"",
         "expected": "吴工程师",
-        "predicted": "吴工程师",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
-        "confidence": 0.545,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 13,
         "text": "李经理插话道：\"我知道你尽力了，但客户要求更高。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
@@ -131,53 +131,53 @@
         "text": "\"刘秘书，下午的会议安排好了吗？\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.81,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 15,
         "text": "刘秘书点头：\"都安排好了，两点在第三会议室。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
         "index": 16,
         "text": "赵总监站起身：\"好，通知张总，我要跟他谈谈。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 17,
         "text": "\"赵总监，张总那边可能不太好沟通。\"",
         "expected": "李经理",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7400000000000001,
+        "predicted": "李经理",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 18,
         "text": "赵总监整理了一下领带：\"我知道，但这个项目不能拖。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 19,
         "text": "\"赵总监！服务器出问题了！\"",
         "expected": "孙工",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "孙工",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -185,44 +185,44 @@
         "text": "\"什么问题？\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.8250000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 21,
         "text": "孙工喘着气说：\"数据库连接数满了，有人在进行大量查询。\"",
         "expected": "孙工",
-        "predicted": "吴工程师",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r3)",
-        "confidence": 0.47,
-        "is_correct": false
+        "predicted": "孙工",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 22,
         "text": "\"是我的测试脚本！我忘了关！\"",
         "expected": "吴工程师",
-        "predicted": "吴工程师",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
-        "confidence": 0.55,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 23,
         "text": "\"马上停掉。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 24,
         "text": "孙工擦了擦额头上的汗水：\"已经停了，但数据已经堆积了。\"",
         "expected": "孙工",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
-        "confidence": 0.57,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
@@ -230,35 +230,35 @@
         "text": "\"孙工，你做事怎么这么不小心。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.66,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 26,
         "text": "孙工低下头：\"对不起，我马上清理。\"",
         "expected": "孙工",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": false
+        "predicted": "孙工",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 27,
         "text": "\"给你十分钟，十分钟后我要看到恢复正常。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7100000000000001,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 28,
         "text": "\"赵总监，张总说他现在没空。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "刘秘书",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -266,116 +266,116 @@
         "text": "\"那下午两点再约。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 30,
         "text": "刘秘书在精致的笔记本上记录着：\"好的。还有，您的电话。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
         "index": 31,
         "text": "\"喂……我知道了。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 32,
         "text": "李经理关切地问：\"怎么了？\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
         "index": 33,
         "text": "赵总监揉了揉疲惫的太阳穴：\"客户那边说方案要改，明天之前要出新版本。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "李经理",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 34,
         "text": "\"赵总监，这个时间太紧了。\"",
         "expected": "吴工程师",
         "predicted": "吴工程师",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
-        "confidence": 0.56,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 35,
         "text": "赵总监看向李经理：\"我知道，所以需要你配合。\"",
         "expected": "赵总监",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
         "index": 36,
         "text": "李经理点头：\"我明白，我下午就召集团队开会。\"",
         "expected": "李经理",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 37,
         "text": "赵总监拿起厚厚的文件夹：\"好，吴工，你负责技术部分。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "李经理",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 38,
         "text": "吴工程师合上电脑：\"没问题，我这就去准备。\"",
         "expected": "吴工程师",
-        "predicted": "吴工程师",
-        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
-        "confidence": 0.57,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 39,
         "text": "\"赵总监，还有什么需要安排的吗？\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": false
+        "predicted": "刘秘书",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": true
       },
       {
         "index": 40,
         "text": "赵总监站起身：\"帮我把项目文档整理一下，我要带回去看。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 41,
         "text": "刘秘书打开电脑：\"好的，我马上发给您。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.77,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
@@ -383,8 +383,8 @@
         "text": "\"李经理，你来一下。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7050000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -392,62 +392,62 @@
         "text": "\"张总那边，你有什么建议？\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 44,
         "text": "\"我觉得应该先跟他对一下需求。\"",
         "expected": "李经理",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.6649999999999999,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 45,
         "text": "\"你安排吧。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 46,
         "text": "张总微笑着说：\"赵总监，听说你来了。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": false
+        "predicted": "张总",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 47,
         "text": "赵总监伸出手：\"张总，正好要找您。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "张总",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 48,
         "text": "张总转身带路：\"去我办公室谈，我让秘书泡茶。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.68,
-        "is_correct": false
+        "predicted": "张总",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 49,
         "text": "\"我的茶叶，一般人喝不到。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
@@ -455,143 +455,143 @@
         "text": "\"张总客气了。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.735,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 51,
         "text": "张总倒了两杯茶：\"说说吧，项目怎么样？\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": false
+        "predicted": "张总",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 52,
         "text": "赵总监接过精致的茶杯：\"进度没问题，但预算需要控制。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "张总",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 53,
         "text": "\"钱不是问题，质量才是关键。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "张总",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 54,
         "text": "赵总监放下茶杯：\"我明白，但超支百分之十五，财务那边不好交代。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 55,
         "text": "\"我去跟财务说。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 56,
         "text": "赵总监站起身：\"那就多谢张总了，我先回去安排工作。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 57,
         "text": "张总点头：\"去吧，有什么困难随时找我。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.77,
-        "is_correct": false
+        "predicted": "张总",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
+        "is_correct": true
       },
       {
         "index": 58,
         "text": "李经理问：\"怎么样？\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
         "index": 59,
         "text": "赵总监坐下：\"张总同意控制预算了，通知团队，下午两点开会。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "李经理",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 60,
         "text": "李经理拿起手机：\"好的，我这就去通知。\"",
         "expected": "李经理",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 61,
         "text": "\"赵总监，这是您要的上季度数据。\"年轻人推了推眼镜。",
         "expected": "UNKNOWN",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "年轻人",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.4,
         "is_correct": false
       },
       {
         "index": 62,
         "text": "赵总监接过文件：\"放桌上吧。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "年轻人",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.4,
+        "is_correct": false
       },
       {
         "index": 63,
         "text": "\"对了，他的那份报告还没交。\"",
         "expected": "UNKNOWN",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": true
+        "predicted": "年轻人",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 64,
         "text": "赵总监抬起头：\"谁的？\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 65,
         "text": "\"就是上周新来的那个实习生。\"年轻人指了指隔壁办公室的方向，\"他说今天一定交。\"",
         "expected": "UNKNOWN",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7100000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -599,8 +599,8 @@
         "text": "\"催一下，别耽误进度。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -608,188 +608,188 @@
         "text": "\"那个新来的，做事挺认真的。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.65,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 68,
         "text": "赵总监翻了翻文件：\"年轻人嘛，多给点机会。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "做事",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 69,
         "text": "\"赵总监，这是您要的项目文档。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "刘秘书",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 70,
         "text": "赵总监翻开厚厚的文档：\"放桌上吧，对了，吴工那边怎么样了？\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 71,
         "text": "刘秘书回答：\"他说已经恢复正常了。\"",
         "expected": "刘秘书",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.77,
-        "is_correct": false
+        "predicted": "刘秘书",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
+        "is_correct": true
       },
       {
         "index": 72,
         "text": "\"让他来我办公室一趟。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 73,
         "text": "\"都通知到了。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.645,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 74,
         "text": "赵总监合上文档：\"好，下午的会，你要准备一下汇报。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 75,
         "text": "李经理打开文件夹：\"我已经准备好了，这是我的报告。\"",
         "expected": "李经理",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 76,
         "text": "\"数据很详细。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.6950000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 77,
         "text": "李经理微笑：\"谢谢，我花了两天时间整理。\"",
         "expected": "李经理",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 78,
         "text": "赵总监把厚厚的报告还给他：\"辛苦了，下午会上由你主讲。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "李经理",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 79,
         "text": "李经理站起身：\"没问题，我先去准备了。\"",
         "expected": "李经理",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 80,
         "text": "\"赵总监，给你介绍一下。\"张总侧过身，\"这是我们技术部的陈主管。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "角色库旁白匹配",
-        "confidence": 0.7,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
         "index": 81,
         "text": "\"赵总监好，以后项目上的技术问题您可以直接找我。\"",
         "expected": "UNKNOWN",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
         "index": 82,
         "text": "赵总监伸出手：\"欢迎加入。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 83,
         "text": "\"她的能力很强，你尽管用。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "张总",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 84,
         "text": "\"行，那我们先过一下进度。\"",
         "expected": "赵总监",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 85,
         "text": "\"你说，我听着。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
-        "is_correct": true
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false
       },
       {
         "index": 86,
         "text": "\"目前进度正常，但预算超了百分之十五。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
-        "confidence": 0.8250000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 87,
         "text": "\"超了这么多？哪部分超的？\"",
         "expected": "UNKNOWN",
-        "predicted": "李经理",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
-        "confidence": 0.57,
+        "predicted": "女人",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": false
       },
       {
@@ -797,35 +797,35 @@
         "text": "李经理回答：\"主要是服务器采购那块。\"",
         "expected": "李经理",
         "predicted": "李经理",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
         "index": 89,
         "text": "\"明白了，我来重新评估一下采购方案。\"",
         "expected": "UNKNOWN",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-        "confidence": 0.64,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
         "index": 90,
         "text": "\"她做事很细致，你放心。\"",
         "expected": "张总",
-        "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.75,
-        "is_correct": false
+        "predicted": "张总",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": true
       },
       {
         "index": 91,
         "text": "\"那就拜托了。\"",
         "expected": "赵总监",
         "predicted": "赵总监",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7300000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       }
     ]
@@ -835,18 +835,18 @@
     "relaxed": true,
     "total": 39,
     "judgable": 32,
-    "correct": 24,
-    "wrong": 8,
+    "correct": 23,
+    "wrong": 9,
     "unknown": 0,
-    "accuracy": 0.75,
+    "accuracy": 0.71875,
     "results": [
       {
         "index": 1,
         "text": "亚瑟沉声问道：\"敌军还有多久到达？\"",
         "expected": "亚瑟",
         "predicted": "亚瑟",
-        "match_type": "context_reasoning:同行动作主语",
-        "confidence": 0.88,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -854,8 +854,8 @@
         "text": "艾琳法师翻开魔法卷轴，紫色的符文微微闪烁：\"按照斥候的报告，大约两个时辰。\"",
         "expected": "艾琳",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:同行引用",
-        "confidence": 0.82,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -863,8 +863,8 @@
         "text": "雷恩队长拍桌而起：\"我们得立刻部署防线！\"",
         "expected": "雷恩",
         "predicted": "雷恩",
-        "match_type": "context_reasoning:同行引用",
-        "confidence": 0.82,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -872,8 +872,8 @@
         "text": "亚瑟摇了摇头：\"急什么，先听斥候详细汇报。\"",
         "expected": "亚瑟",
         "predicted": "亚瑟",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -881,8 +881,8 @@
         "text": "艾琳冷静地补充道：\"敌方有攻城巨兽，我们的外墙可能撑不了多久。\"",
         "expected": "艾琳",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -890,8 +890,8 @@
         "text": "雷恩急得来回踱步：\"那更应该抓紧时间，每拖延一刻就多一分危险！\"",
         "expected": "雷恩",
         "predicted": "雷恩",
-        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
-        "confidence": 0.57,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -899,8 +899,8 @@
         "text": "亚瑟抬起手制止：\"雷恩，冷静。慌乱只会让士兵们更加不安。\"",
         "expected": "亚瑟",
         "predicted": "亚瑟",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -908,17 +908,17 @@
         "text": "艾琳指向地图上的北门：\"北门的魔法屏障还能维持一个时辰，但之后需要我重新充能。\"",
         "expected": "艾琳",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.6699999999999999,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
         "index": 9,
         "text": "莉莉治疗师轻声开口，声音柔和却坚定：\"伤员已经全部转移到地下庇护所，但药品告急。\"",
         "expected": "莉莉",
-        "predicted": "莉莉",
-        "match_type": "context_reasoning:同行引用",
-        "confidence": 0.82,
+        "predicted": "莉莉治疗师",
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.85,
         "is_correct": true
       },
       {
@@ -926,22 +926,13 @@
         "text": "加文浑浊的眼睛望向远方：\"让我说说我的看法。\"",
         "expected": "加文",
         "predicted": "加文",
-        "match_type": "context_reasoning:同行引用",
-        "confidence": 0.82,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
         "index": 11,
         "text": "\"三十年前那场战役，我们也是这么仓促迎敌。\"",
-        "expected": "加文",
-        "predicted": "加文",
-        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r5)",
-        "confidence": 0.6,
-        "is_correct": true
-      },
-      {
-        "index": 12,
-        "text": "\"结果呢？防线被突破，死了三百个弟兄。\"",
         "expected": "加文",
         "predicted": "UNKNOWN",
         "match_type": "none",
@@ -949,12 +940,21 @@
         "is_correct": false
       },
       {
+        "index": 12,
+        "text": "\"结果呢？防线被突破，死了三百个弟兄。\"",
+        "expected": "加文",
+        "predicted": "我们",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
+      },
+      {
         "index": 13,
         "text": "\"这次不能再犯同样的错误。\"",
         "expected": "加文",
-        "predicted": "雷恩",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r3)",
-        "confidence": 0.64,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
@@ -962,8 +962,8 @@
         "text": "雷恩不耐烦地挥手：\"老加文，你的故事我们听过无数遍了，现在不是说这个的时候！\"",
         "expected": "雷恩",
         "predicted": "雷恩",
-        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -971,8 +971,8 @@
         "text": "莉莉轻声说：\"但加文爷爷说得对，我们必须'谨慎行事'。\"",
         "expected": "莉莉",
         "predicted": "莉莉",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r4)",
-        "confidence": 0.73,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -980,8 +980,8 @@
         "text": "艾琳指尖划过地图：\"这里是我们的薄弱点。\"",
         "expected": "艾琳",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -989,17 +989,17 @@
         "text": "\"如果敌军从这里突破，后方直接暴露。\"",
         "expected": "艾琳",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.67,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 18,
         "text": "\"必须派重兵防守。\"",
         "expected": "艾琳",
-        "predicted": "雷恩",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r3)",
-        "confidence": 0.64,
+        "predicted": "敌军",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": false
       },
       {
@@ -1007,8 +1007,8 @@
         "text": "雷恩突然插话道：\"那东侧怎么办？\"",
         "expected": "雷恩",
         "predicted": "雷恩",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
-        "confidence": 0.8,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -1016,8 +1016,8 @@
         "text": "\"东侧的城墙年久失修，根本挡不住投石机。\"",
         "expected": "雷恩",
         "predicted": "雷恩",
-        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r3)",
-        "confidence": 0.785,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
@@ -1025,8 +1025,8 @@
         "text": "亚瑟团长沉吟片刻：\"东侧的确棘手，加文，你有什么建议？\"",
         "expected": "亚瑟",
         "predicted": "亚瑟",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -1034,8 +1034,8 @@
         "text": "加文沉思道：\"可以在东墙后设置第二道防线，用拒马和沙袋。\"",
         "expected": "加文",
         "predicted": "加文",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r5)",
-        "confidence": 0.63,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -1043,26 +1043,26 @@
         "text": "莉莉忽然想起什么：\"亚瑟团长，东侧需要支援的还有伤员转运通道。\"",
         "expected": "莉莉",
         "predicted": "莉莉",
-        "match_type": "context_reasoning:同行引用(近因衰减-r4)",
-        "confidence": 0.6699999999999999,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
         "index": 24,
         "text": "\"艾琳，你的魔法能撑多久？\"雷恩紧接着问道。",
         "expected": "雷恩",
-        "predicted": "亚瑟",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.67,
-        "is_correct": false
+        "predicted": "莉莉",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": true
       },
       {
         "index": 25,
         "text": "艾琳掐指计算：\"如果全力维持，最多半个时辰，之后我需要休息。\"",
         "expected": "艾琳",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -1070,17 +1070,17 @@
         "text": "\"轰！\"城墙外传来一声巨响，震得桌上的烛台剧烈晃动。",
         "expected": "亚瑟",
         "predicted": "艾琳",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.67,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
         "is_correct": true
       },
       {
         "index": 27,
         "text": "\"叮——\"长剑出鞘的声音，加文已经拔出了佩剑。",
         "expected": "雷恩",
-        "predicted": "加文",
-        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r5)",
-        "confidence": 0.47,
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
         "is_correct": false
       },
       {
@@ -1088,8 +1088,8 @@
         "text": "加文沉声道：\"他们比预计的来得更快。\"",
         "expected": "加文",
         "predicted": "加文",
-        "match_type": "context_reasoning:同行动作主语(近因衰减-r5)",
-        "confidence": 0.63,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": true
       },
       {
@@ -1097,26 +1097,26 @@
         "text": "亚瑟立刻下令：\"雷恩，你率弓箭队去东墙。艾琳，加固北门魔法。\"",
         "expected": "雷恩",
         "predicted": "亚瑟",
-        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": false
       },
       {
         "index": 30,
         "text": "\"绝对不能\"放弃阵地！亚瑟加重语气强调。",
         "expected": "艾琳",
-        "predicted": "艾琳",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
-        "confidence": 0.7150000000000001,
-        "is_correct": true
+        "predicted": "亚瑟",
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.55,
+        "is_correct": false
       },
       {
         "index": 31,
         "text": "他低声说：\"这是命令。\"",
         "expected": "艾琳",
         "predicted": "亚瑟",
-        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
-        "confidence": 0.7250000000000001,
+        "match_type": "context_reasoning:SRL_ARG0(未绑定)",
+        "confidence": 0.4,
         "is_correct": false
       },
       {
@@ -1124,8 +1124,8 @@
         "text": "雷恩咬紧牙关：\"明白！\"转身冲出会议室。",
         "expected": "亚瑟",
         "predicted": "雷恩",
-        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
-        "confidence": 0.74,
+        "match_type": "context_reasoning:旁白前缀提取(句法)(未绑定)",
+        "confidence": 0.6,
         "is_correct": false
       }
     ]

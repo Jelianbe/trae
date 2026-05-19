@@ -94,12 +94,16 @@ def run_no_registration(text_path: str, answer_path: str, title: str = "", relax
         )
         
         result = matcher.match_speaker(context)
-        
-        if result and result.character:
-            predicted = result.character.name
+
+        # H-20260517-03: 适配 SpeakerIdentifier
+        # 无论是否绑定角色库，都使用 speaker_id.name 作为预测名
+        if result and result.speaker_id:
+            predicted = result.speaker_id.name
             match_type = result.match_type
             confidence = result.confidence
-            matcher.update_activity(result.character.id, predicted)
+            # 只有绑定角色库时才更新活动度
+            if result.character:
+                matcher.update_activity(result.character.id, predicted)
         else:
             predicted = 'UNKNOWN'
             match_type = 'none'

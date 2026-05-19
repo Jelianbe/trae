@@ -1,0 +1,1128 @@
+{
+  "urban": {
+    "title": "都市异能 - 短文本（有预注册）",
+    "relaxed": true,
+    "total_gt": 23,
+    "matched": 21,
+    "judgable": 18,
+    "correct": 15,
+    "wrong": 3,
+    "unknown": 3,
+    "accuracy": 83.33333333333334,
+    "results": [
+      {
+        "gt_index": 1,
+        "text": "苏夜，你在这里！",
+        "expected": "林雪",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)",
+        "confidence": 0.6,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 2,
+        "text": "林雪，你怎么上来了？",
+        "expected": "苏夜",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.35,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 3,
+        "text": "公司出事了。",
+        "expected": "林雪",
+        "predicted": "林雪",
+        "match_type": "context_reasoning:同行引用",
+        "confidence": 0.6,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 5,
+        "text": "他们怎么知道这里有异能者？",
+        "expected": "苏夜",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+        "confidence": 0.44999999999999996,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 6,
+        "text": "苏夜，来会议室一趟。",
+        "expected": "老陈",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.44999999999999996,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 7,
+        "text": "苏先生，我们是暗影会的调查员。最近我们检测到这个区域有异能波动，请问您是否知道什",
+        "expected": "黑衣人",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.44999999999999996,
+        "is_correct": false,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 8,
+        "text": "我不知道你们在说什么。我只是一个普通的程序员。",
+        "expected": "苏夜",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
+        "confidence": 0.44999999999999996,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 9,
+        "text": "苏夜，快来老地方！有重要的事情！",
+        "expected": "林雪",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.44999999999999996,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 10,
+        "text": "苏夜，这是赵天行赵大哥。",
+        "expected": "林雪",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.44999999999999996,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 11,
+        "text": "苏夜，你好。我是华夏异能者联盟的负责人。",
+        "expected": "赵天行",
+        "predicted": "赵天行",
+        "match_type": "context_reasoning:同行引用",
+        "confidence": 0.82,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 12,
+        "text": "很好。明天开始，你来联盟总部报道。我会安排最好的导师教你。",
+        "expected": "赵天行",
+        "predicted": "赵天行",
+        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 13,
+        "text": "暗影会的人来了！",
+        "expected": "联盟成员",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.52,
+        "is_correct": false,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 14,
+        "text": "全体戒备！苏夜，你跟我去前线！",
+        "expected": "赵天行",
+        "predicted": "赵天行",
+        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 15,
+        "text": "干得好，苏夜！你的电流攻击非常精准！",
+        "expected": "赵天行",
+        "predicted": "赵天行",
+        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 17,
+        "text": "太危险了。",
+        "expected": "林雪",
+        "predicted": "赵天行",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r3)",
+        "confidence": 0.6,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 18,
+        "text": "样本准备好了吗？",
+        "expected": "博士",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.52,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 19,
+        "text": "这不是科学，这是犯罪！",
+        "expected": "苏夜",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.52,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 20,
+        "text": "苏夜，你这次立了大功。",
+        "expected": "赵天行",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+        "confidence": 0.52,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 21,
+        "text": "这是大家共同努力的结果。",
+        "expected": "苏夜",
+        "predicted": "赵天行",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r3)",
+        "confidence": 0.63,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 22,
+        "text": "苏夜，你太棒了！",
+        "expected": "林雪",
+        "predicted": "林雪",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.44999999999999996,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 23,
+        "text": "为了守护这个世界！",
+        "expected": "三人",
+        "predicted": "苏夜",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.52,
+        "is_correct": false,
+        "is_unknown_expected": true
+      }
+    ]
+  },
+  "western": {
+    "title": "西幻 - 短文本（有预注册）",
+    "relaxed": true,
+    "total_gt": 90,
+    "matched": 89,
+    "judgable": 83,
+    "correct": 66,
+    "wrong": 17,
+    "unknown": 6,
+    "accuracy": 79.51807228915662,
+    "results": [
+      {
+        "gt_index": 1,
+        "text": "北方有异动。",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)",
+        "confidence": 0.75,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 2,
+        "text": "我能感觉到魔力的波动。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)",
+        "confidence": 0.95,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 3,
+        "text": "那不是雷声。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.54,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 4,
+        "text": "是炎魔，至少有三只。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.625,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 5,
+        "text": "情况如何？",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(临近)",
+        "confidence": 0.75,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 6,
+        "text": "炎魔入侵，立即组织防御。",
+        "expected": "艾德温",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
+        "confidence": 0.5,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 7,
+        "text": "是！",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
+        "confidence": 0.5,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 8,
+        "text": "射击！",
+        "expected": "加尔文",
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 9,
+        "text": "弓箭无效！",
+        "expected": "骑士",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
+        "confidence": 0.5,
+        "is_correct": true,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 10,
+        "text": "换银箭！",
+        "expected": "艾德温",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r3)",
+        "confidence": 0.47,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 11,
+        "text": "它们在试探我们的实力。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 12,
+        "text": "根据古籍记载，炎魔不会无缘无故出现。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.63,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 13,
+        "text": "一定是有人召唤了它们。",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r1)",
+        "confidence": 0.87,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 14,
+        "text": "巡逻队在北边发现了痕迹。",
+        "expected": "加尔文",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.6,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 15,
+        "text": "有人类与炎魔勾结？",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.635,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 16,
+        "text": "很有可能。",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
+        "confidence": 0.63,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 17,
+        "text": "明天一早，我带人去北方调查。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.6699999999999999,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 18,
+        "text": "我和你一起去。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
+        "confidence": 0.8,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 19,
+        "text": "我留守哨站，组织防御。",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 20,
+        "text": "魔力波动越来越强了。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+        "confidence": 0.57,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 21,
+        "text": "加固防御！魔法组支援！",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+        "confidence": 0.64,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 22,
+        "text": "它变强了。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 23,
+        "text": "就是现在！",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 24,
+        "text": "没事吧？",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.605,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 25,
+        "text": "没事，继续前进。",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.7300000000000001,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 26,
+        "text": "他在召唤更多的炎魔。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 27,
+        "text": "分三组，同时攻击。伊莉雅，你负责打断仪式。",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 28,
+        "text": "明白。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 29,
+        "text": "莫洛克？",
+        "expected": "艾德温",
+        "predicted": "莫洛克",
+        "match_type": "context_reasoning:动态候选(角色库)",
+        "confidence": 0.72,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 30,
+        "text": "没想到你会记得我。",
+        "expected": "莫洛克",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 31,
+        "text": "你为什么要召唤炎魔？",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 32,
+        "text": "为了力量！",
+        "expected": "莫洛克",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r2)",
+        "confidence": 0.8200000000000001,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 33,
+        "text": "你疯了！炎魔只会毁灭一切！",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r2)",
+        "confidence": 0.77,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 34,
+        "text": "撤退！",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 35,
+        "text": "情况比我们想象的严重。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 36,
+        "text": "足以摧毁整个哨站。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 37,
+        "text": "我们必须请求支援。",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.735,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 38,
+        "text": "在支援到达之前，我们必须加强防御。",
+        "expected": "加尔文",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+        "confidence": 0.64,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 39,
+        "text": "把所有魔法师都调来。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 40,
+        "text": "我有个主意。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 41,
+        "text": "古籍中提到过，炎魔害怕圣水和银的组合物。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r2)",
+        "confidence": 0.77,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 42,
+        "text": "你能制作吗？",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 43,
+        "text": "可以，但需要时间。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
+        "confidence": 0.8,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 44,
+        "text": "我们没有两天时间。",
+        "expected": "加尔文",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r1)",
+        "confidence": 0.87,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 45,
+        "text": "它来了。",
+        "expected": "艾德温",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r3)",
+        "confidence": 0.7999999999999999,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 46,
+        "text": "全体准备战斗！",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.7250000000000001,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 47,
+        "text": "它还有两个小时就会到达。",
+        "expected": "加尔文",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+        "confidence": 0.64,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 48,
+        "text": "我们能赢吗？",
+        "expected": "年轻骑士",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.68,
+        "is_correct": false,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 49,
+        "text": "我们必须赢。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
+        "confidence": 0.8,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 50,
+        "text": "这是圣光药剂，能暂时增强你的力量。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r2)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 51,
+        "text": "谢谢你，伊莉雅。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r2)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 52,
+        "text": "不会失败的。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 53,
+        "text": "防线已经布置完毕。",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+        "confidence": 0.6699999999999999,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 54,
+        "text": "攻击！",
+        "expected": "艾德温",
+        "predicted": "UNKNOWN",
+        "match_type": "none",
+        "confidence": 0.0,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 55,
+        "text": "退守内墙！",
+        "expected": "加尔文",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+        "confidence": 0.64,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 56,
+        "text": "它的力量太强了。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
+        "confidence": 0.64,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 57,
+        "text": "艾德温！",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 58,
+        "text": "赢了吗？",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 59,
+        "text": "赢了。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
+        "confidence": 0.8,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 60,
+        "text": "城墙需要完全重建。",
+        "expected": "加尔文",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+        "confidence": 0.64,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 61,
+        "text": "王都的支援什么时候到？",
+        "expected": "艾德温",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
+        "confidence": 0.64,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 62,
+        "text": "预计明天。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r2)",
+        "confidence": 0.87,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 63,
+        "text": "他趁乱逃走了。",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
+        "confidence": 0.73,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 64,
+        "text": "黑暗势力正在集结，目标是王都。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+        "confidence": 0.8250000000000001,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 65,
+        "text": "我们必须提前警告国王。",
+        "expected": "艾德温",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+        "confidence": 0.8,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 66,
+        "text": "好。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 67,
+        "text": "艾德温骑士，你的英勇事迹已经传遍王都。",
+        "expected": "雷纳德",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:语境角色优先(临近)",
+        "confidence": 0.825,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 68,
+        "text": "我只是做了该做的事。",
+        "expected": "艾德温",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r5)",
+        "confidence": 0.625,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 69,
+        "text": "城墙需要重建，但人员伤亡不大。",
+        "expected": "加尔文",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 70,
+        "text": "这是证据。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 71,
+        "text": "必须立即报告国王。",
+        "expected": "雷纳德",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:同行引用(近因衰减-r5)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 72,
+        "text": "我们和你一起回去。",
+        "expected": "艾德温",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r5)",
+        "confidence": 0.5,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 73,
+        "text": "莫洛克的同党。",
+        "expected": "雷纳德",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:同行动作主语(近因衰减-r5)",
+        "confidence": 0.63,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 74,
+        "text": "我们必须尽快查出来。",
+        "expected": "伊莉雅",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.7050000000000001,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 75,
+        "text": "为什么？",
+        "expected": "艾德温",
+        "predicted": "托马斯",
+        "match_type": "context_reasoning:语境角色优先(临近)",
+        "confidence": 0.75,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 76,
+        "text": "莫洛克承诺给我力量……",
+        "expected": "托马斯",
+        "predicted": "托马斯",
+        "match_type": "context_reasoning:同行引用(近因衰减-r5)",
+        "confidence": 0.57,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 77,
+        "text": "你背叛了圣光。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 78,
+        "text": "按军法处置。",
+        "expected": "加尔文",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+        "confidence": 0.77,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 79,
+        "text": "等等。",
+        "expected": "伊莉雅",
+        "predicted": "加尔文",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 80,
+        "text": "他可能有更多的情报。",
+        "expected": "伊莉雅",
+        "predicted": "伊莉雅",
+        "match_type": "context_reasoning:语境角色优先(说话动词)",
+        "confidence": 0.9,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 81,
+        "text": "放过我的家人，他们什么都不知道。",
+        "expected": "托马斯",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r1)",
+        "confidence": 0.87,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 82,
+        "text": "我答应你。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(动作主语)(近因衰减-r1)",
+        "confidence": 0.84,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 83,
+        "text": "我们必须立刻赶回王都。",
+        "expected": "艾德温",
+        "predicted": "托马斯",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r5)",
+        "confidence": 0.7,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 84,
+        "text": "勇敢的骑士们，感谢你们的到来。",
+        "expected": "国王",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r4)",
+        "confidence": 0.7999999999999999,
+        "is_correct": false,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 85,
+        "text": "陛下，黑暗势力正在集结。",
+        "expected": "艾德温",
+        "predicted": "雷纳德",
+        "match_type": "context_reasoning:语境角色优先(说话动词)(动作主语)(近因衰减-r4)",
+        "confidence": 0.7999999999999999,
+        "is_correct": false,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 87,
+        "text": "艾德温，你愿意担任先锋吗？",
+        "expected": "国王",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+        "confidence": 0.64,
+        "is_correct": true,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 88,
+        "text": "这是我的荣幸，陛下。",
+        "expected": "艾德温",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+        "confidence": 0.74,
+        "is_correct": true,
+        "is_unknown_expected": false
+      },
+      {
+        "gt_index": 89,
+        "text": "让我们为了光明，为了正义，为了这个世界！",
+        "expected": "国王",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": true
+      },
+      {
+        "gt_index": 90,
+        "text": "为了光明！",
+        "expected": "众人",
+        "predicted": "艾德温",
+        "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+        "confidence": 0.67,
+        "is_correct": true,
+        "is_unknown_expected": true
+      }
+    ]
+  }
+}

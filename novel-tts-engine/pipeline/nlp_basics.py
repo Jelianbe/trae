@@ -365,28 +365,6 @@ class NLPBasics:
             logger.warning(f"HanLP分析失败: {e}")
             return self._analyze_simple(text, sentences)
 
-    def extract_srl_arg0s(self, text: str) -> List[str]:
-        if not self._initialized or not text or not text.strip():
-            return []
-
-        results = []
-        try:
-            doc = self.pipeline(text)
-            srl_data = doc.get('srl', [])
-        except Exception:
-            return []
-
-        seen = set()
-        for pred_group in srl_data:
-            for item in pred_group:
-                if item[1] == 'ARG0':
-                    arg0_text = item[0]
-                    if arg0_text not in seen:
-                        seen.add(arg0_text)
-                        results.append(arg0_text)
-
-        return results
-
     def _parse_ner_result(self, ner_result: List) -> List[Entity]:
         entities = []
         for ner_item in ner_result:

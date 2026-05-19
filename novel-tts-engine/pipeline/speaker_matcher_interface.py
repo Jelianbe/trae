@@ -20,8 +20,7 @@ class DialogueContext:
     chapter_id: Optional[int] = None
     context_before: Optional[str] = None
     context_after: Optional[str] = None
-    dialogue: Optional[str] = None
-    prefix_narration: Optional[str] = None
+    dialogue: Optional[str] = None  # 纯对话原文，不含 prefix/suffix
 
 
 @dataclass

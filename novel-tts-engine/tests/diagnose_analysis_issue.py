@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import re
-from pipeline.speaker_hint_matcher import DIALOGUE_PATTERNS
+from pipeline.speaker_matcher import DIALOGUE_PATTERNS
 from utils.text_utils import split_sentences_smart
 
 # 测试文本：包含中文引号对话的典型网文片段

@@ -174,7 +174,7 @@ class Evaluator:
         Returns:
             EvaluationResult 包含所有评分指标
         """
-        from pipeline.speaker_hint_matcher import DIALOGUE_PATTERNS
+        from pipeline.speaker_matcher import DIALOGUE_PATTERNS
         
         result = EvaluationResult(test_cases=len(test_cases))
         char_metrics = defaultdict(lambda: CharMetric(name=''))

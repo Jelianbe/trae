@@ -35,7 +35,6 @@ class EntityLinker:
         self.char_manager = char_manager or get_character_manager()
         self._name_cache: Dict[str, Optional[str]] = {}
         self._alias_cache: Dict[str, Optional[str]] = {}
-        self._title_cache: Dict[str, str] = {}
         self._gt_cache: Set[str] = set()
     
     def _build_caches(self):
@@ -48,10 +47,6 @@ class EntityLinker:
             self._name_cache[char.name] = char.name
             for alias in char.aliases:
                 self._alias_cache[alias] = char.name
-            
-            self._title_cache[char.name] = char.name
-            for alias in char.aliases:
-                self._title_cache[alias] = char.name
     
     def set_ground_truth(
         self,

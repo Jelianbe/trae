@@ -69,23 +69,3 @@ SPEECH_VERB_ANCHOR_WINDOW: int = int(os.environ.get('SPEECH_VERB_ANCHOR_WINDOW',
 # 更新日期：2026-05-16
 # 维护者：H-20260516-10
 CHARACTER_ELIGIBLE_MIN_FREQ: int = int(os.environ.get('CHARACTER_ELIGIBLE_MIN_FREQ', '5'))
-
-# SHORT_NAME_CONFIDENCE_PENALTY
-#
-# 用途：候选排序中短名/纯职称词的置信度惩罚因子
-# 来源：v7.0 别名匹配 Bug 修复——基于都市测试集错误分析
-# 边界：0.0~1.0，越低惩罚越重；0 = 完全排除
-# 上限：1 个配置项
-# 更新日期：2026-05-16
-# 维护者：v7.0 别名匹配 Bug 修复
-SHORT_NAME_CONFIDENCE_PENALTY: float = float(os.environ.get('SHORT_NAME_CONFIDENCE_PENALTY', '0.5'))
-
-# SHORT_NAME_CONFIDENCE_CAP
-#
-# 用途：2字及以下角色名的置信度上限
-# 来源：同上
-# 边界：0.0~1.0
-# 上限：1 个配置项
-# 更新日期：2026-05-16
-# 维护者：v7.0 别名匹配 Bug 修复
-SHORT_NAME_CONFIDENCE_CAP: float = float(os.environ.get('SHORT_NAME_CONFIDENCE_CAP', '0.6'))

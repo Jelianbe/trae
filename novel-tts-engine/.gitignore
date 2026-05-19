@@ -1,32 +1,55 @@
-# Python
+﻿# Byte-compiled / optimized / cache
 __pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-dist/
-build/
-*.spec
+*.py[cod]
+*$py.class
+*.so
 
-# Environment
+# Virtual environment
+.venv/
+env/
 venv/
-.env
-installer_files/
-
-# Database
-novel_tts.db
-novel_tts.db.backup
-
-# Audio output
-backend/audio_output/
-
-# Test artifacts
-test-results/
-playwright-report/
-
-# OS
-Thumbs.db
-.DS_Store
 
 # IDE
-.idea/
 .vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backups and temporary files
+backups/
+*.bak
+*.backup_before_*
+debug_*.py
+fix_*.py
+remove_*.py
+replace_*.py
+update_*.py
+write_*.py
+test_phase*.py
+
+# Uploads and output
+.uploads/
+output/
+
+# Models (too large)
+models/
+
+# Database temporary files
+*.db-shm
+*.db-wal
+test_*.db
+test_*.db-shm
+test_*.db-wal
+
+# Analysis reports (keep only baseline)
+analysis_reports/
+
+# TTS submodule
+TTS/
+
+# Data scripts
+data/scripts/

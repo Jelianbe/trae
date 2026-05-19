@@ -7,7 +7,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from pipeline.character_manager import CharacterManager, Character, get_character_manager
-from pipeline.nlp_basics import get_nlp, TITLE_WORDS
+from pipeline.nlp_basics import get_nlp
 from pipeline.semantic_ranker import SemanticRanker, get_semantic_ranker
 from pipeline.descriptive_role_extractor import (
     DescriptiveRoleExtractor, TITLE_TRIGGERS, ACTION_TRIGGERS, ADDRESS_TRIGGERS, TitleTriggerMatcher, AddressTriggerMatcher,
@@ -566,8 +566,6 @@ class SpeakerMatcher:
             for pe in pers:
                 if not self.name_validator.is_valid(pe.text) or self.name_validator.is_verb(pe.text):
                     continue
-                if pe.text in TITLE_WORDS:
-                    continue
 
                 # H-20260516-10: NER 发现的角色名也计入后台频次
                 self.char_manager.increment_frequency(pe.text, self._current_project_id)
@@ -776,22 +774,19 @@ class SpeakerMatcher:
             all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
             sorted_chars = sorted(all_chars, key=lambda c: -len(c.name))
             for char in sorted_chars:
-                if char.name in seen_names:
-                    continue
-                if not self._is_word_boundary_match(nearby_window, char.name):
-                    continue
-                pos = nearby_window.index(char.name)
-                distance = len(nearby_window) - pos
-                proximity_bonus = max(0.10 - 0.005 * distance, 0.0)
-                after_name = nearby_window[pos + len(char.name):pos + len(char.name) + 15]
-                speech_verbs = {'道', '说', '问', '答', '笑道', '说道', '问道', '答道',
-                                '冷喝', '喝道', '冷笑', '叹道', '怒道', '斥道', '叫道', '喊道'}
-                has_speech = any(v in after_name for v in speech_verbs)
-                confidence = min(0.75 + proximity_bonus + (0.10 if has_speech else 0), 0.90)
-                candidates.insert(0, (char.name,
-                    '语境角色优先({})'.format('说话动词' if has_speech else '临近'),
-                    confidence))
-                seen_names.add(char.name)
+                if char.name in nearby_window and char.name not in seen_names:
+                    pos = nearby_window.rindex(char.name)
+                    distance = len(nearby_window) - pos
+                    proximity_bonus = max(0.10 - 0.005 * distance, 0.0)
+                    after_name = nearby_window[pos + len(char.name):pos + len(char.name) + 15]
+                    speech_verbs = {'道', '说', '问', '答', '笑道', '说道', '问道', '答道',
+                                    '冷喝', '喝道', '冷笑', '叹道', '怒道', '斥道', '叫道', '喊道'}
+                    has_speech = any(v in after_name for v in speech_verbs)
+                    confidence = min(0.75 + proximity_bonus + (0.10 if has_speech else 0), 0.90)
+                    candidates.insert(0, (char.name,
+                        '语境角色优先({})'.format('说话动词' if has_speech else '临近'),
+                        confidence))
+                    seen_names.add(char.name)
 
         # 方向3：动态候选（角色库精确匹配 + 别名匹配）
         # H-20260516-10: 改用 get_eligible_characters
@@ -864,29 +859,6 @@ class SpeakerMatcher:
                     enhanced.append((name, reason, confidence))
                 enhanced.sort(key=lambda x: -x[2])
                 candidates = enhanced
-
-        # 短名/纯职称词置信度惩罚（防子串匹配复发）
-        #
-        # 用途：对短名和纯职称词的置信度做上限约束，防止它们在候选排序中
-        #       错误压过完整角色名
-        # 来源：v7.0 别名匹配 Bug 修复发现——"总监"等纯职称词被注册为临时角色后，
-        #       以其较短长度获得不合理的近因衰减优势
-        # 边界：
-        #   - TITLE_WORDS 中的词置信度减半
-        #   - 2字名（不含姓氏）置信度上限 0.60
-        #   - 不影响 3 字以上的正常角色名
-        # 更新日期：2026-05-16
-        # 维护者：v7.0 别名匹配 Bug 修复
-        from utils.config import SHORT_NAME_CONFIDENCE_PENALTY, SHORT_NAME_CONFIDENCE_CAP
-
-        penalized = []
-        for name, reason, confidence in candidates:
-            if name in TITLE_WORDS:
-                confidence *= SHORT_NAME_CONFIDENCE_PENALTY
-            elif len(name) <= 2:
-                confidence = min(confidence, SHORT_NAME_CONFIDENCE_CAP)
-            penalized.append((name, reason, confidence))
-        candidates = sorted(penalized, key=lambda x: -x[2])
 
         # P2-2: 近因衰减（反粘着机制）
         # v7.0 长文本基线显示：连续对话中最近说话人被过度优先
@@ -1098,22 +1070,6 @@ class SpeakerMatcher:
         except Exception:
             persons = []
         return list(set(persons))
-
-    @staticmethod
-    def _is_word_boundary_match(text: str, target: str) -> bool:
-        idx = text.find(target)
-        if idx < 0:
-            return False
-        if idx > 0:
-            prev_char = text[idx - 1]
-            if '\u4e00' <= prev_char <= '\u9fff':
-                return False
-        end = idx + len(target)
-        if end < len(text):
-            next_char = text[end]
-            if '\u4e00' <= next_char <= '\u9fff':
-                return False
-        return True
 
     def match_by_name(self, name: str) -> Optional[MatchResult]:
         char = self.char_manager.get_character_by_name(name)

@@ -33,7 +33,7 @@ def setup_test_db(monkeypatch):
 class TestCharacterManager:
     def test_create_character(self):
         manager = get_character_manager()
-        char = manager.add_character("张三", {"小张", "老张"})
+        char = manager.add_character("张三", project_id="test", aliases={"小张", "老张"})
         assert char is not None
         assert char.id > 0
 

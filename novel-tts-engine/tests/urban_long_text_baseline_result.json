@@ -1,55 +1,55 @@
 {
   "total": 91,
   "judgable": 85,
-  "correct": 59,
-  "wrong": 26,
+  "correct": 56,
+  "wrong": 29,
   "unknown": 6,
-  "accuracy": 0.6941176470588235,
+  "accuracy": 0.6588235294117647,
   "relaxed": false,
   "results": [
     {
       "index": 1,
       "text": "这个项目我来负责。",
       "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 2,
       "text": "赵总监，您先了解一下情况。",
       "expected": "李经理",
-      "predicted": "吴工程师",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "predicted": "赵总监",
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "WRONG"
     },
     {
       "index": 3,
       "text": "系统已经升级完成了。",
       "expected": "吴工程师",
+      "predicted": "吴工程师",
+      "match_type": "context_reasoning:动态候选(角色库)",
+      "confidence": 0.72,
+      "status": "OK"
+    },
+    {
+      "index": 4,
+      "text": "预算超了多少？",
+      "expected": "赵总监",
       "predicted": "李经理",
       "match_type": "context_reasoning:动态候选(角色库)",
       "confidence": 0.72,
       "status": "WRONG"
     },
     {
-      "index": 4,
-      "text": "预算超了多少？",
-      "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
-      "status": "OK"
-    },
-    {
       "index": 5,
       "text": "比原计划多了百分之十五。",
       "expected": "李经理",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
+      "confidence": 0.64,
       "status": "WRONG"
     },
     {
@@ -74,18 +74,18 @@
       "index": 8,
       "text": "各位，这是您要的咖啡。",
       "expected": "刘秘书",
-      "predicted": "刘秘书",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "OK"
+      "predicted": "赵总监",
+      "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r1)",
+      "confidence": 0.77,
+      "status": "WRONG"
     },
     {
       "index": 9,
       "text": "吴工，你的测试报告呢？",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+      "confidence": 0.785,
       "status": "OK"
     },
     {
@@ -93,8 +93,8 @@
       "text": "已经发到您的邮箱了。",
       "expected": "吴工程师",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+      "confidence": 0.77,
       "status": "WRONG"
     },
     {
@@ -110,10 +110,10 @@
       "index": 12,
       "text": "赵总监，这个我已经优化过三遍了。",
       "expected": "吴工程师",
-      "predicted": "吴工程师",
-      "match_type": "context_reasoning:自称推断(自称词:我→吴工)(近因衰减-r2)",
-      "confidence": 0.7200000000000001,
-      "status": "OK"
+      "predicted": "赵总监",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
+      "status": "WRONG"
     },
     {
       "index": 13,
@@ -121,7 +121,7 @@
       "expected": "李经理",
       "predicted": "李经理",
       "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
-      "confidence": 0.73,
+      "confidence": 0.63,
       "status": "OK"
     },
     {
@@ -129,8 +129,8 @@
       "text": "刘秘书，下午的会议安排好了吗？",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+      "confidence": 0.805,
       "status": "OK"
     },
     {
@@ -138,8 +138,8 @@
       "text": "都安排好了，两点在第三会议室。",
       "expected": "刘秘书",
       "predicted": "刘秘书",
-      "match_type": "context_reasoning:同行引用(近因衰减-r4)",
-      "confidence": 0.57,
+      "match_type": "context_reasoning:同行引用",
+      "confidence": 0.82,
       "status": "OK"
     },
     {
@@ -156,8 +156,8 @@
       "text": "赵总监，张总那边可能不太好沟通。",
       "expected": "李经理",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+      "confidence": 0.67,
       "status": "WRONG"
     },
     {
@@ -174,8 +174,8 @@
       "text": "赵总监！服务器出问题了！",
       "expected": "孙工",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-      "confidence": 0.64,
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+      "confidence": 0.67,
       "status": "WRONG"
     },
     {
@@ -183,8 +183,8 @@
       "text": "什么问题？",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r1)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+      "confidence": 0.8200000000000001,
       "status": "OK"
     },
     {
@@ -200,19 +200,19 @@
       "index": 22,
       "text": "是我的测试脚本！我忘了关！",
       "expected": "吴工程师",
-      "predicted": "吴工程师",
-      "match_type": "context_reasoning:自称推断(自称词:我→吴工)(近因衰减-r2)",
-      "confidence": 0.7200000000000001,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 23,
       "text": "马上停掉。",
       "expected": "赵总监",
-      "predicted": "吴工程师",
-      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r2)",
-      "confidence": 0.64,
-      "status": "WRONG"
+      "predicted": "赵总监",
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+      "confidence": 0.7250000000000001,
+      "status": "OK"
     },
     {
       "index": 24,
@@ -227,45 +227,45 @@
       "index": 25,
       "text": "孙工，你做事怎么这么不小心。",
       "expected": "李经理",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(近因衰减-r1)",
-      "confidence": 0.64,
-      "status": "WRONG"
+      "predicted": "李经理",
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r3)",
+      "confidence": 0.7250000000000001,
+      "status": "OK"
     },
     {
       "index": 26,
       "text": "对不起，我马上清理。",
       "expected": "孙工",
-      "predicted": "李经",
-      "match_type": "context_reasoning:自称推断(自称词:我→李经)",
-      "confidence": 0.6,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 27,
       "text": "给你十分钟，十分钟后我要看到恢复正常。",
       "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 28,
       "text": "赵总监，张总说他现在没空。",
       "expected": "刘秘书",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "WRONG"
+      "predicted": "刘秘书",
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r4)",
+      "confidence": 0.64,
+      "status": "OK"
     },
     {
       "index": 29,
       "text": "那下午两点再约。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+      "confidence": 0.7250000000000001,
       "status": "OK"
     },
     {
@@ -273,25 +273,25 @@
       "text": "好的。还有，您的电话。",
       "expected": "刘秘书",
       "predicted": "刘秘书",
-      "match_type": "context_reasoning:同行引用(近因衰减-r3)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:同行引用(近因衰减-r4)",
+      "confidence": 0.6699999999999999,
       "status": "OK"
     },
     {
       "index": 31,
       "text": "喂……我知道了。",
       "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 32,
       "text": "怎么了？",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
+      "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
       "confidence": 0.8,
       "status": "OK"
     },
@@ -300,34 +300,34 @@
       "text": "客户那边说方案要改，明天之前要出新版本。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
+      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "confidence": 0.74,
       "status": "OK"
     },
     {
       "index": 34,
       "text": "赵总监，这个时间太紧了。",
       "expected": "吴工程师",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "predicted": "李经理",
+      "match_type": "context_reasoning:语境角色优先(说话动词)(近因衰减-r3)",
+      "confidence": 0.77,
       "status": "WRONG"
     },
     {
       "index": 35,
       "text": "我知道，所以需要你配合。",
       "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "李经理",
+      "match_type": "context_reasoning:同行引用(近因衰减-r3)",
+      "confidence": 0.74,
+      "status": "WRONG"
     },
     {
       "index": 36,
       "text": "我明白，我下午就召集团队开会。",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+      "match_type": "context_reasoning:同行引用(近因衰减-r3)",
       "confidence": 0.74,
       "status": "OK"
     },
@@ -336,8 +336,8 @@
       "text": "好，吴工，你负责技术部分。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:同行引用(动作主语)",
-      "confidence": 0.9199999999999999,
+      "match_type": "context_reasoning:同行引用(动作主语)(近因衰减-r1)",
+      "confidence": 0.84,
       "status": "OK"
     },
     {
@@ -345,7 +345,7 @@
       "text": "没问题，我这就去准备。",
       "expected": "吴工程师",
       "predicted": "吴工程师",
-      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "match_type": "context_reasoning:同行引用(近因衰减-r2)",
       "confidence": 0.74,
       "status": "OK"
     },
@@ -354,8 +354,8 @@
       "text": "赵总监，还有什么需要安排的吗？",
       "expected": "刘秘书",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)",
-      "confidence": 0.82,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+      "confidence": 0.77,
       "status": "WRONG"
     },
     {
@@ -363,8 +363,8 @@
       "text": "帮我把项目文档整理一下，我要带回去看。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:同行引用",
-      "confidence": 0.82,
+      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "confidence": 0.74,
       "status": "OK"
     },
     {
@@ -372,8 +372,8 @@
       "text": "好的，我马上发给您。",
       "expected": "刘秘书",
       "predicted": "刘秘书",
-      "match_type": "context_reasoning:同行引用(近因衰减-r3)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:同行引用(近因衰减-r4)",
+      "confidence": 0.6699999999999999,
       "status": "OK"
     },
     {
@@ -381,8 +381,8 @@
       "text": "李经理，你来一下。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)",
-      "confidence": 0.82,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r1)",
+      "confidence": 0.77,
       "status": "OK"
     },
     {
@@ -390,17 +390,17 @@
       "text": "张总那边，你有什么建议？",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+      "confidence": 0.7250000000000001,
       "status": "OK"
     },
     {
       "index": 44,
       "text": "我觉得应该先跟他对一下需求。",
       "expected": "李经理",
-      "predicted": "李经",
-      "match_type": "context_reasoning:自称推断(自称词:我→李经)(近因衰减-r5)",
-      "confidence": 0.35,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
@@ -408,8 +408,8 @@
       "text": "你安排吧。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r1)",
+      "confidence": 0.7250000000000001,
       "status": "OK"
     },
     {
@@ -434,18 +434,18 @@
       "index": 48,
       "text": "去我办公室谈，我让秘书泡茶。",
       "expected": "张总",
-      "predicted": "张总",
-      "match_type": "context_reasoning:同行引用(近因衰减-r5)",
-      "confidence": 0.35,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 49,
       "text": "我的茶叶，一般人喝不到。",
       "expected": "张总",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
@@ -453,8 +453,8 @@
       "text": "张总客气了。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.81,
       "status": "OK"
     },
     {
@@ -480,8 +480,8 @@
       "text": "钱不是问题，质量才是关键。",
       "expected": "张总",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "WRONG"
     },
     {
@@ -497,9 +497,9 @@
       "index": 55,
       "text": "我去跟财务说。",
       "expected": "张总",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)",
-      "confidence": 0.82,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
@@ -515,17 +515,17 @@
       "index": 57,
       "text": "去吧，有什么困难随时找我。",
       "expected": "张总",
-      "predicted": "张总",
-      "match_type": "context_reasoning:同行引用(近因衰减-r5)",
-      "confidence": 0.35,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 58,
       "text": "怎么样？",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行动作主语(近因衰减-r1)",
+      "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
       "confidence": 0.8,
       "status": "OK"
     },
@@ -543,7 +543,7 @@
       "text": "好的，我这就去通知。",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "match_type": "context_reasoning:同行引用(近因衰减-r2)",
       "confidence": 0.74,
       "status": "OK"
     },
@@ -551,9 +551,9 @@
       "index": 61,
       "text": "赵总监，这是您要的上季度数据。",
       "expected": "UNKNOWN",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)",
-      "confidence": 0.82,
+      "predicted": "李经理",
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r2)",
+      "confidence": 0.77,
       "status": "SKIP"
     },
     {
@@ -570,8 +570,8 @@
       "text": "对了，他的那份报告还没交。",
       "expected": "UNKNOWN",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "SKIP"
     },
     {
@@ -588,8 +588,8 @@
       "text": "就是上周新来的那个实习生。",
       "expected": "UNKNOWN",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.79,
       "status": "SKIP"
     },
     {
@@ -597,18 +597,18 @@
       "text": "催一下，别耽误进度。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "OK"
     },
     {
       "index": 67,
       "text": "那个新来的，做事挺认真的。",
       "expected": "李经理",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "WRONG"
+      "predicted": "李经理",
+      "match_type": "context_reasoning:语境角色优先(临近)(近因衰减-r2)",
+      "confidence": 0.7150000000000001,
+      "status": "OK"
     },
     {
       "index": 68,
@@ -624,8 +624,8 @@
       "text": "赵总监，这是您要的项目文档。",
       "expected": "刘秘书",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "WRONG"
     },
     {
@@ -642,7 +642,7 @@
       "text": "他说已经恢复正常了。",
       "expected": "刘秘书",
       "predicted": "刘秘书",
-      "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
+      "match_type": "context_reasoning:同行动作主语(近因衰减-r3)",
       "confidence": 0.8,
       "status": "OK"
     },
@@ -650,18 +650,18 @@
       "index": 72,
       "text": "让他来我办公室一趟。",
       "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)",
-      "confidence": 0.82,
-      "status": "OK"
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
+      "status": "WRONG"
     },
     {
       "index": 73,
       "text": "都通知到了。",
       "expected": "李经理",
       "predicted": "刘秘书",
-      "match_type": "context_reasoning:动态候选(角色库)(动作主语)(近因衰减-r2)",
-      "confidence": 0.74,
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r3)",
+      "confidence": 0.77,
       "status": "WRONG"
     },
     {
@@ -678,7 +678,7 @@
       "text": "我已经准备好了，这是我的报告。",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "match_type": "context_reasoning:同行引用(近因衰减-r2)",
       "confidence": 0.74,
       "status": "OK"
     },
@@ -687,8 +687,8 @@
       "text": "数据很详细。",
       "expected": "赵总监",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "OK"
     },
     {
@@ -696,7 +696,7 @@
       "text": "谢谢，我花了两天时间整理。",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行引用(近因衰减-r1)",
+      "match_type": "context_reasoning:同行引用(近因衰减-r2)",
       "confidence": 0.74,
       "status": "OK"
     },
@@ -713,27 +713,27 @@
       "index": 79,
       "text": "没问题，我先去准备了。",
       "expected": "李经理",
-      "predicted": "扎着马尾辫的女人",
-      "match_type": "context_reasoning:描述性角色(后)",
-      "confidence": 0.75,
-      "status": "WRONG"
+      "predicted": "李经理",
+      "match_type": "context_reasoning:同行引用(近因衰减-r2)",
+      "confidence": 0.74,
+      "status": "OK"
     },
     {
       "index": 80,
       "text": "赵总监，给你介绍一下。",
       "expected": "张总",
-      "predicted": "扎马尾的女人",
-      "match_type": "context_reasoning:描述性角色(后)",
-      "confidence": 0.75,
-      "status": "WRONG"
+      "predicted": "张总",
+      "match_type": "context_reasoning:同行引用(近因衰减-r5)",
+      "confidence": 0.35,
+      "status": "OK"
     },
     {
       "index": 81,
       "text": "赵总监好，以后项目上的技术问题您可以直接找我。",
       "expected": "UNKNOWN",
-      "predicted": "扎着马尾辫的女人",
-      "match_type": "context_reasoning:描述性角色(近因衰减-r4)",
-      "confidence": 0.65,
+      "predicted": "赵总监",
+      "match_type": "角色库旁白匹配",
+      "confidence": 0.7,
       "status": "SKIP"
     },
     {
@@ -750,44 +750,44 @@
       "text": "她的能力很强，你尽管用。",
       "expected": "张总",
       "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
+      "match_type": "context_reasoning:语境角色优先(临近)",
+      "confidence": 0.75,
       "status": "WRONG"
     },
     {
       "index": 84,
       "text": "行，那我们先过一下进度。",
       "expected": "赵总监",
-      "predicted": "穿西装的男人",
-      "match_type": "context_reasoning:描述性角色(后)",
-      "confidence": 0.75,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 85,
       "text": "你说，我听着。",
       "expected": "张总",
-      "predicted": "穿西装的男人",
-      "match_type": "context_reasoning:描述性角色(近因衰减-r5)",
-      "confidence": 0.55,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "WRONG"
     },
     {
       "index": 86,
       "text": "目前进度正常，但预算超了百分之十五。",
       "expected": "赵总监",
-      "predicted": "扎马尾的女人",
-      "match_type": "context_reasoning:描述性角色(后)(近因衰减-r4)",
-      "confidence": 0.6,
-      "status": "WRONG"
+      "predicted": "赵总监",
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)",
+      "confidence": 0.9,
+      "status": "OK"
     },
     {
       "index": 87,
       "text": "超了这么多？哪部分超的？",
       "expected": "UNKNOWN",
-      "predicted": "穿西装的女人",
-      "match_type": "context_reasoning:描述性角色(后)",
-      "confidence": 0.75,
+      "predicted": "赵总监",
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)",
+      "confidence": 0.85,
       "status": "SKIP"
     },
     {
@@ -795,36 +795,36 @@
       "text": "主要是服务器采购那块。",
       "expected": "李经理",
       "predicted": "李经理",
-      "match_type": "context_reasoning:同行动作主语",
-      "confidence": 0.88,
+      "match_type": "context_reasoning:同行动作主语(近因衰减-r2)",
+      "confidence": 0.8,
       "status": "OK"
     },
     {
       "index": 89,
       "text": "明白了，我来重新评估一下采购方案。",
       "expected": "UNKNOWN",
-      "predicted": "李经",
-      "match_type": "context_reasoning:自称推断(自称词:我→李经)",
-      "confidence": 0.6,
+      "predicted": "UNKNOWN",
+      "match_type": "none",
+      "confidence": 0.0,
       "status": "SKIP"
     },
     {
       "index": 90,
       "text": "她做事很细致，你放心。",
       "expected": "张总",
-      "predicted": "穿西装的女人",
-      "match_type": "context_reasoning:描述性角色(近因衰减-r5)",
-      "confidence": 0.55,
-      "status": "WRONG"
+      "predicted": "张总",
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r5)",
+      "confidence": 0.35,
+      "status": "OK"
     },
     {
       "index": 91,
       "text": "那就拜托了。",
       "expected": "赵总监",
-      "predicted": "赵总监",
-      "match_type": "context_reasoning:动态候选(角色库)",
-      "confidence": 0.72,
-      "status": "OK"
+      "predicted": "张总",
+      "match_type": "context_reasoning:语境角色优先(临近)(动作主语)(近因衰减-r5)",
+      "confidence": 0.35,
+      "status": "WRONG"
     }
   ]
 }
