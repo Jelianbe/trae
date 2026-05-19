@@ -1,4 +1,8 @@
-﻿# Byte-compiled / optimized / cache
+# Environment variables
+.env
+!.env.example
+
+# Byte-compiled / optimized / cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -37,6 +41,11 @@ output/
 
 # Models (too large)
 models/
+
+# Database
+novel_tts.db
+novel_tts.db-shm
+novel_tts.db-wal
 
 # Database temporary files
 *.db-shm
