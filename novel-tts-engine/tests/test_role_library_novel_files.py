@@ -93,10 +93,11 @@ def extract_roles_from_novel(novel_text, scan_length=150):
                     role_freq[name] = role_freq.get(name, 0) + 1
         
         if role_freq:
-            role_data["roles"] = {
-                "named_characters": role_freq,
-                "descriptive_references": {}
-            }
+            # 转换为角色提取器格式：{角色名: [位置列表]}
+            # import_from_role_extractor 直接从 role_data 读取 named_characters
+            named_characters = {name: [0] * freq for name, freq in role_freq.items()}
+            role_data["named_characters"] = named_characters
+            role_data["descriptive_references"] = {}
             role_data["statistics"] = {
                 "total_quotes": sum(role_freq.values()),
                 "unique_named_characters": len(role_freq),
@@ -208,19 +209,22 @@ def extract_test_dialogues_from_novel(novel_text, novel_name, max_samples=50):
                 full_context = ' '.join(context_before) + ' ' + para_stripped
                 
                 # 匹配模式：XXX说道、XXX说、XXX道（修仙传格式：对话后跟说话人）
+                # 注意：使用 [\u4e00-\u9fa5] 限制只匹配中文字符，避免匹配到动词
                 speaker_patterns = [
-                    r'([^\s，。！？、]{2,4})说道',
-                    r'([^\s，。！？、]{2,4})说[：:，。]',
-                    r'([^\s，。！？、]{2,4})道[：:，。]',
-                    r'([^\s，。！？、]{2,4})问[：:，。]',
-                    r'([^\s，。！？、]{2,4})回答[：:，。]',
-                    r'([^\s，。！？、]{2,4})冷笑',
-                    r'([^\s，。！？、]{2,4})点头',
-                    r'([^\s，。！？、]{2,4})摇头',
-                    r'([^\s，。！？、]{2,4})接过',
-                    r'([^\s，。！？、]{2,4})回头',
-                    r'([^\s，。！？、]{2,4})立刻',
-                    r'([^\s，。！？、]{2,4})推开',
+                    r'([\u4e00-\u9fa5]{2,4})说道',
+                    r'([\u4e00-\u9fa5]{2,4})说[：:，。]',
+                    r'([\u4e00-\u9fa5]{2,4})道[：:，。]',
+                    r'([\u4e00-\u9fa5]{2,4})问[：:，。]',
+                    r'([\u4e00-\u9fa5]{2,4})回答[：:，。]',
+                    r'([\u4e00-\u9fa5]{2,4})冷笑',
+                    r'([\u4e00-\u9fa5]{2,4})点头',
+                    r'([\u4e00-\u9fa5]{2,4})摇头',
+                    r'([\u4e00-\u9fa5]{2,4})接过',
+                    r'([\u4e00-\u9fa5]{2,4})回头',
+                    r'([\u4e00-\u9fa5]{2,4})立刻',
+                    r'([\u4e00-\u9fa5]{2,4})推开',
+                    r'([\u4e00-\u9fa5]{2,4})不高',
+                    r'([\u4e00-\u9fa5]{2,4})不欲',
                 ]
                 
                 for pattern in speaker_patterns:
