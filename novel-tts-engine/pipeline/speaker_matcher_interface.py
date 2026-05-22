@@ -21,6 +21,7 @@ class DialogueContext:
     context_before: Optional[str] = None
     context_after: Optional[str] = None
     dialogue: Optional[str] = None  # 纯对话原文，不含 prefix/suffix
+    prefix_narration: Optional[str] = None  # 纯旁白前缀，已移除[DIALOGUE]占位符
 
 
 @dataclass
