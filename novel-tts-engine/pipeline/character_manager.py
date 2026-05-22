@@ -5,11 +5,13 @@ import logging
 from contextlib import contextmanager
 from typing import Optional, List, Set, Dict, Tuple
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from utils.config import (
     CHARACTER_MIN_CONFIDENCE,
     CONTEXT_HINT_CONFIDENCE_THRESHOLD,
     CHARACTER_ELIGIBLE_MIN_FREQ,
+    PROMOTION_THRESHOLD,
 )
 from pathlib import Path
 import numpy as np
@@ -47,6 +49,26 @@ class Character:
         )
 
 
+@dataclass
+class TempCharacterInfo:
+    """临时角色信息（仅存在于当前 chapter 内存中）。
+    
+    用途：SRL/NER/规则发现的陌生角色名，频次达标后晋升为正式角色
+    来源：角色频率晋升机制（2026-05-16）
+    边界：
+      - 不入 SQLite，仅内存存储
+      - 章节结束时，mention_count < PROMOTION_THRESHOLD 的角色被清理
+      - _frequency 跨章节存活，用于累计频次
+    更新日期：2026-05-22
+    维护者：角色库开发
+    """
+    name: str
+    mention_count: int = 0
+    project_id: str = ''
+    gender: str = 'unknown'
+    first_seen_at: Optional[datetime] = None
+
+
 GENDER_HINTS = {
     'male': {'他', '先生', '公子', '少爷', '老爷', '王爷', '将军', '掌门', '师兄', '师弟', '大哥', '二哥', '三哥', '管家'},
     'female': {'她', '小姐', '姑娘', '夫人', '奶奶', '公主', '娘娘', '师姐', '师妹', '大姐', '二姐', '三姐'},
@@ -68,8 +90,12 @@ class CharacterManager:
         self.db_path = Path(db_path) if db_path else DB_PATH
         self._local = threading.local()
         self._ensure_tables()
-        # H-20260516-10: 频次过滤
+        
+        # H-20260516-10: 角色频次追踪
         self._frequency_map: Dict[str, Dict[str, int]] = {}
+        
+        # 角色频率晋升机制：临时角色存储
+        self._temp_chars: Dict[str, TempCharacterInfo] = {}
     
     @contextmanager
     def _get_connection(self):
@@ -341,6 +367,12 @@ class CharacterManager:
         if project_id not in self._frequency_map:
             self._frequency_map[project_id] = {}
         self._frequency_map[project_id][name] = self._frequency_map[project_id].get(name, 0) + 1
+        
+        # 检测临时角色晋升
+        if name in self._temp_chars:
+            self._temp_chars[name].mention_count += 1
+            if self._temp_chars[name].mention_count >= PROMOTION_THRESHOLD:
+                self._promote_temp_character(name, project_id)
 
     def get_frequency(self, name: str, project_id: str = '') -> int:
         return self._frequency_map.get(project_id, {}).get(name, 0)
@@ -357,6 +389,143 @@ class CharacterManager:
             if freq == 0 or freq >= min_freq:
                 result.append(c)
         return result
+
+    # ========== 角色频率晋升机制 ==========
+
+    def add_temp_character(self, name: str, project_id: str = '',
+                           gender: str = 'unknown') -> bool:
+        """注册临时角色（不入 SQLite）。
+        
+        跨章节继承：如果 _frequency_map 中已有此角色名
+        （上一个章节出现过但未达标），作为初始计数。
+        """
+        if name in self._temp_chars:
+            return False
+        
+        # 检查跨章节频次历史
+        prev_count = self._frequency_map.get(project_id, {}).get(name, 0)
+        
+        self._temp_chars[name] = TempCharacterInfo(
+            name=name, project_id=project_id, gender=gender,
+            mention_count=prev_count,
+            first_seen_at=datetime.now()
+        )
+        
+        # 如果历史频次已达阈值，直接晋升
+        if prev_count >= PROMOTION_THRESHOLD:
+            self._promote_temp_character(name, project_id)
+        
+        return True
+
+    def get_temp_character(self, name: str) -> Optional[TempCharacterInfo]:
+        return self._temp_chars.get(name)
+
+    def get_all_temp_characters(self) -> List[TempCharacterInfo]:
+        return list(self._temp_chars.values())
+
+    def _promote_temp_character(self, name: str, project_id: str):
+        """将临时角色晋升为正式角色（写入 SQLite）。"""
+        temp_info = self._temp_chars.get(name)
+        if not temp_info:
+            return None
+        
+        char = self.add_character(
+            name=name,
+            project_id=project_id,
+            aliases=set(),
+            gender=temp_info.gender
+        )
+        if char:
+            logger.info(f"临时角色晋升: {name} (提及{temp_info.mention_count}次)")
+            del self._temp_chars[name]
+        return char
+
+    def cleanup_temp_characters(self):
+        """章节结束时清理不达标的临时角色。
+        
+        未达标角色记录日志后清除；_frequency_map 保留，跨章节累计。
+        """
+        below = [
+            info for info in self._temp_chars.values()
+            if info.mention_count < PROMOTION_THRESHOLD
+        ]
+        if below:
+            logger.debug(f"清理未达标临时角色: "
+                         f"{[(t.name, t.mention_count) for t in below]}")
+        self._temp_chars.clear()
+
+    def get_all_character_names(self, project_id: str = '') -> Set[str]:
+        """返回所有可匹配的角色名（正式 + 临时）。"""
+        names = set()
+        # 正式角色
+        for char in self.get_all_characters(project_id):
+            names.add(char.name)
+            names.update(char.aliases)
+        # 临时角色
+        for info in self._temp_chars.values():
+            if info.project_id == project_id:
+                names.add(info.name)
+        return names
+
+    def get_eligible_character_names(self, project_id: str = '') -> Set[str]:
+        """返回所有可参与匹配的角色名（过滤低频临时角色）。
+        
+        正式角色全部返回，临时角色按 mention_count 过滤。
+        """
+        names = set()
+        # 正式角色
+        for char in self.get_all_characters(project_id):
+            freq = self.get_frequency(char.name, project_id)
+            if freq == 0 or freq >= CHARACTER_ELIGIBLE_MIN_FREQ:
+                names.add(char.name)
+                names.update(char.aliases)
+        # 临时角色（仅返回 mention_count >= CHARACTER_ELIGIBLE_MIN_FREQ 的）
+        for info in self._temp_chars.values():
+            if info.project_id == project_id and info.mention_count >= CHARACTER_ELIGIBLE_MIN_FREQ:
+                names.add(info.name)
+        return names
+
+    def import_from_role_extractor(self, role_data: Dict, project_id: str = ''):
+        """从角色提取器输出导入角色库。
+        
+        Args:
+            role_data: extract_roles.py 输出的 JSON 数据
+                {
+                    "named_characters": {角色名: [位置列表]},
+                    "descriptive_references": {描述性称呼: [位置列表]},
+                    ...
+                }
+            project_id: 项目ID
+        """
+        imported_count = 0
+        promoted_count = 0
+        
+        # 导入命名角色
+        for name, positions in role_data.get("named_characters", {}).items():
+            freq = len(positions)
+            # 记录频次
+            if project_id not in self._frequency_map:
+                self._frequency_map[project_id] = {}
+            self._frequency_map[project_id][name] = freq
+            
+            # 添加到临时角色
+            self.add_temp_character(name, project_id)
+            imported_count += 1
+            
+            # 检查是否需要晋升
+            if freq >= PROMOTION_THRESHOLD:
+                self._promote_temp_character(name, project_id)
+                promoted_count += 1
+        
+        # 导入描述性称呼（作为临时角色，不参与匹配）
+        for desc, positions in role_data.get("descriptive_references", {}).items():
+            if project_id not in self._frequency_map:
+                self._frequency_map[project_id] = {}
+            self._frequency_map[project_id][desc] = len(positions)
+            # 描述性称呼只记录频次，不加入匹配池
+            # 后续可以通过 _extract_context_speakers 使用
+        
+        logger.info(f"角色库导入完成: {imported_count}个角色, {promoted_count}个已晋升")
 
     def infer_gender(self, name: str, context: str = None) -> str:
         for title in MALE_TITLES:

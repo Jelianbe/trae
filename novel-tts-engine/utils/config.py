@@ -69,3 +69,12 @@ SPEECH_VERB_ANCHOR_WINDOW: int = int(os.environ.get('SPEECH_VERB_ANCHOR_WINDOW',
 # 更新日期：2026-05-16
 # 维护者：H-20260516-10
 CHARACTER_ELIGIBLE_MIN_FREQ: int = int(os.environ.get('CHARACTER_ELIGIBLE_MIN_FREQ', '5'))
+
+# 角色频率晋升机制（2026-05-16，2026-05-22 恢复）
+# PROMOTION_THRESHOLD
+#
+# 用途：临时角色晋升为正式角色所需的提及次数
+# 来源：角色频率晋升机制设计文档（2026-05-16）
+# 边界：设为3表示提及3次后晋升为正式角色
+# 更新日期：2026-05-22
+PROMOTION_THRESHOLD: int = int(os.environ.get('PROMOTION_THRESHOLD', '3'))
