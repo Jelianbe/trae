@@ -39,6 +39,13 @@ test_phase*.py
 .uploads/
 output/
 
+# Logs and audio output
+backend/logs/
+backend/audio_output/
+
+# Frontend node_modules
+frontend/node_modules/
+
 # Models (too large)
 models/
 

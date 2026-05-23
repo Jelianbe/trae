@@ -21,5 +21,12 @@ test_quotation_*.py
 views_b9f2043b5.js
 commit_msg.txt
 
+# ---------- novel-tts-engine 子项目衍生文件 ----------
+# 以下为子项目的衍生文件，根级别兜底防护
+novel-tts-engine/backups/
+novel-tts-engine/frontend/node_modules/
+novel-tts-engine/backend/logs/
+novel-tts-engine/backend/audio_output/
+
 # ---------- novel-tts-engine 子项目（子目录有自己的 .gitignore） ----------
 # 子目录规则位于 novel-tts-engine/.gitignore，会自行生效
