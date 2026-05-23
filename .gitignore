@@ -1,0 +1,25 @@
+# ============================================================
+# Root .gitignore — 保护 git repo 不被大文件污染
+# 本文件控制 d:\trae\ 根目录下的 git tracking
+# ============================================================
+
+# ---------- 项目备份快照（体积巨大，不应进入 git） ----------
+backup_novel-tts-engine_*/
+backup_novel-tts-engine_*.zip
+backup_novel-tts-engine_*.tar.gz
+
+# ---------- 解压/编译产物 ----------
+sonicvale_extracted/
+
+# ---------- 临时/实验目录 ----------
+说说看法/
+新建压缩(zipped)文件/
+AI_IDE_Agent_提示词合集/
+
+# ---------- 零散测试文件 ----------
+test_quotation_*.py
+views_b9f2043b5.js
+commit_msg.txt
+
+# ---------- novel-tts-engine 子项目（子目录有自己的 .gitignore） ----------
+# 子目录规则位于 novel-tts-engine/.gitignore，会自行生效
