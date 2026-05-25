@@ -18,6 +18,11 @@ MAX_INPUT_CHARS = 10 * 1024 * 1024
 # 结果缓存容量限制（最多缓存多少本书的结果）
 MAX_RESULT_CACHE_SIZE: int = int(os.environ.get('MAX_RESULT_CACHE_SIZE', '200'))
 
+# 说话人匹配：候选不足时的阈值（用于 fallback 判断）
+# 来源：基于候选池策略的实际表现统计
+SPEAKER_MATCHER_INSUFFICIENT_CANDIDATES_MAX_COUNT = 3
+SPEAKER_MATCHER_INSUFFICIENT_CANDIDATES_MAX_CONF = 0.5
+
 # Pipeline 硬编码阈值外置（2026-05-07）
 EMOTION_EXTRACT_WINDOW: int = int(os.environ.get('EMOTION_EXTRACT_WINDOW', '20'))
 DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD: float = float(os.environ.get('DIALOGUE_EMOTION_CONFIDENCE_THRESHOLD', '0.5'))

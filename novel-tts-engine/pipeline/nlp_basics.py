@@ -71,6 +71,56 @@ TITLE_WORDS = {
 }
 assert len(TITLE_WORDS) <= 40, f"TITLE_WORDS 超出40条上限（当前{len(TITLE_WORDS)}条）"
 
+
+# SRLArg0
+#
+# 用途：SRL 语义角色标注的 ARG0（动作发出者）结果结构
+# 来源：HanLP SRL 任务的标准输出格式
+# 边界：
+#   - text: 原始 ARG0 文本
+#   - predicate: 对应的谓语动词
+#   - 仅保留人物类 ARG0，非人物在归一化阶段过滤
+# 更新日期：2026-05-23
+# 维护者：项目规则
+@dataclass
+class SRLArg0:
+    text: str
+    predicate: str = ''
+    confidence: float = 1.0
+
+
+# ALL_SPEECH_VERBS
+#
+# 用途：说话动词全集，用于 SRL 中判断是否为说话行为
+# 来源：中文说话动词封闭集合（语言学分类）
+# 边界：
+#   - 仅包含明确表示"说话"行为的动词
+#   - 不包含思考类动词（想/认为等）
+# 上限：约 30 条，不应无限制扩容
+# 更新日期：2026-05-23
+# 维护者：项目规则
+ALL_SPEECH_VERBS = {
+    '说', '道', '问', '答', '喊', '叫', '吼', '嚷', '骂',
+    '叹', '笑', '怒', '哼', '喝', '喃喃', '催促',
+    '说道', '问道', '答道', '笑道', '叹道', '怒道', '喝道',
+    '哼道', '嚷道', '骂道', '喊道', '叫道', '回答', '回应',
+    '沉声道', '低声道', '高声道', '冷冷道', '淡淡道',
+    '轻声道', '大声说', '大声喊', '轻声说', '喃喃道',
+}
+
+# SPEECH_BOUNDARY_WORDS
+#
+# 用途：说话边界词集合，用于分割说话上下文
+# 来源：中文句法边界标记词
+# 边界：标点符号 + 说话动词的常见边界
+# 更新日期：2026-05-23
+# 维护者：项目规则
+SPEECH_BOUNDARY_WORDS = {
+    '。', '！', '？', '……', '——',
+    '说', '道', '问', '答', '喊', '叫',
+}
+
+
 # PROFESSION_TITLES
 #
 # 用途：专门用于职业相关的称呼识别（可作为人名识别的前缀）
@@ -516,6 +566,49 @@ class NLPBasics:
             filtered.append(e)
 
         return filtered
+
+
+def extract_srl_arg0s(text: str) -> List[SRLArg0]:
+    """Extract SRL ARG0 (动作发出者/agent) from text using HanLP.
+
+    Args:
+        text: Input sentence.
+
+    Returns:
+        List of SRLArg0 objects representing action agents.
+
+    Examples:
+        >>> extract_srl_arg0s("张三对李四说：'你好'")
+        [SRLArg0(text='张三', predicate='说')]
+        >>> extract_srl_arg0s("他笑着道：'没事'")
+        [SRLArg0(text='他', predicate='道')]
+    """
+    try:
+        doc = hanlp(text)
+    except Exception:
+        return []
+
+    arg0_list: List[SRLArg0] = []
+    srl_data = getattr(doc, 'srl', None)
+
+    if not srl_data:
+        return arg0_list
+
+    for predicate_info in srl_data:
+        predicate_word = predicate_info.get('predicate', '')
+        args = predicate_info.get('arguments', [])
+        for arg in args:
+            role = arg.get('role', '')
+            arg_text = arg.get('text', '')
+            if role == 'ARG0' and arg_text and predicate_word:
+                # 只保留与说话动词相关的 ARG0
+                if predicate_word in ALL_SPEECH_VERBS:
+                    arg0_list.append(SRLArg0(
+                        text=arg_text,
+                        predicate=predicate_word,
+                    ))
+
+    return arg0_list
 
     def _detect_western_locations(self, tokens: List[str], pos_tags: List[str],
                                   covered: set) -> List[Entity]:

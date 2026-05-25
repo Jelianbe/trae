@@ -145,15 +145,13 @@ def _build_quote_patterns():
     """
     patterns = []
     
-    for lq, rq in [('「', '」'), ('『', '』'), ('"', '"')]:
+    for lq, rq in [('「', '」'), ('『', '』'), ('"', '"'), ("'", "'")]:
         patterns.append(re.compile(
             rf'{re.escape(lq)}'
             rf'([^{re.escape(rq)}]+?)'
             rf'{re.escape(rq)}'
         ))
-    
-    patterns.append(re.compile(r'"([^"]*?)"'))
-    
+
     return patterns
 
 
@@ -249,6 +247,7 @@ def _clean_speaker_name(name: str, nlp=None) -> str:
         '说道', '问道', '答道', '笑道', '叹道', '怒道', '喝道', '哼道', '嚷道',
         '骂道', '回应道', '回答道', '接道', '续道',
         '轻声道', '低声说', '轻声说', '沉声说', '厉声道', '笑着道', '大叫道',
+        '笑着说', '笑着',
         '道', '说', '问', '喊', '叫', '答', '应', '笑', '叹', '怒',
         '喝', '哼', '嚷', '骂', '回',
     ]
@@ -256,6 +255,18 @@ def _clean_speaker_name(name: str, nlp=None) -> str:
     for verb in sorted(SPEECH_VERBS, key=len, reverse=True):
         if name.endswith(verb) and len(name) > len(verb):
             name = name[:-len(verb)]
+            break
+
+    if name.endswith('地') and len(name) > 1:
+        name = name[:-1]
+
+    MODIFIERS = [
+        '轻声', '低声', '高声', '沉声', '厉声', '冷声', '柔声',
+        '急切', '匆匆', '缓缓', '轻轻', '暗暗', '偷偷',
+    ]
+    for modifier in sorted(MODIFIERS, key=len, reverse=True):
+        if name.endswith(modifier) and len(name) > len(modifier):
+            name = name[:-len(modifier)]
             break
     
     return name
