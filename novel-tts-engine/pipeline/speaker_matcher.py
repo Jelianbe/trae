@@ -7,8 +7,9 @@ from collections import defaultdict
 from contextlib import contextmanager
 
 from pipeline.character_manager import CharacterManager, Character, get_character_manager
-from pipeline.nlp_basics import get_nlp
+from pipeline.nlp_basics import get_nlp, extract_srl_arg0s, SRLArg0
 from pipeline.semantic_ranker import SemanticRanker, get_semantic_ranker
+from utils import config as sm_config
 from pipeline.descriptive_role_extractor import (
     DescriptiveRoleExtractor, TITLE_TRIGGERS, ACTION_TRIGGERS, ADDRESS_TRIGGERS, TitleTriggerMatcher, AddressTriggerMatcher,
 )
@@ -787,6 +788,7 @@ class SpeakerMatcher:
                         seen_names.add(role)
 
         # 方向1：语境角色优先（H-20260516-10: 改用 get_eligible_characters 过滤临时角色）
+        # 注意：使用 append 而非 insert(0)，配合 sorted 的 -len(name) 确保最长匹配优先
         if context_before and not candidates:
             nearby_window = context_before[-120:]
             all_chars = self.char_manager.get_eligible_characters(self._current_project_id)
@@ -801,7 +803,7 @@ class SpeakerMatcher:
                                     '冷喝', '喝道', '冷笑', '叹道', '怒道', '斥道', '叫道', '喊道'}
                     has_speech = any(v in after_name for v in speech_verbs)
                     confidence = min(0.75 + proximity_bonus + (0.10 if has_speech else 0), 0.90)
-                    candidates.insert(0, (char.name,
+                    candidates.append((char.name,
                         '语境角色优先({})'.format('说话动词' if has_speech else '临近'),
                         confidence))
                     seen_names.add(char.name)
@@ -1268,6 +1270,99 @@ class SpeakerMatcher:
     def _match_pronoun_in_local_window(self, gender: str) -> Optional[MatchResult]:
         return self.pronoun_resolver.resolve_in_local_window(gender, self._recent_speakers)
 
+    def _collect_signal_candidates(self, context: DialogueContext, narration: str, possessive_excluded: set) -> List[Tuple[str, float, str]]:
+        """并行收集所有信号源的候选说话人。
+
+        收集后按置信度排序，返回 (name, confidence, source) 列表。
+        """
+        all_candidates: List[Tuple[str, float, str]] = []
+        seen_names: set = set()
+
+        # 信号源1: 正则说话人匹配（旁白中的"XX说道"）
+        context_candidates = self._extract_context_speakers(
+            narration,
+            context.context_before or '',
+            context.context_after or '',
+            context.prefix_narration or ''
+        )
+        if context_candidates:
+            for name, reason, confidence in context_candidates:
+                if name not in seen_names and name not in possessive_excluded:
+                    all_candidates.append((name, confidence, f'正则匹配({reason})'))
+                    seen_names.add(name)
+
+        # 信号源2: SRL ARG0 提取（语义角色标注）
+        full_context = (context.context_before or '') + narration + (context.context_after or '')
+        try:
+            srl_arg0s = extract_srl_arg0s(full_context)
+            for arg0 in srl_arg0s:
+                name = arg0.text
+                if name not in seen_names and name not in possessive_excluded and len(name) >= 2:
+                    confidence = sm_config.CONFIDENCE_SRL_ARG0
+                    all_candidates.append((name, confidence, f'SRL_ARG0(谓语={arg0.predicate})'))
+                    seen_names.add(name)
+        except Exception as e:
+            logger.debug(f"SRL提取失败: {e}")
+
+        # 信号源3: 主动 NER 提取角色名
+        try:
+            nlp = get_nlp()
+            nlp_result = nlp.analyze(full_context)
+            for entity in nlp_result.entities:
+                if entity.type == 'PER':
+                    name = entity.text
+                    if name not in seen_names and name not in possessive_excluded and len(name) >= 2:
+                        confidence = entity.confidence * sm_config.CONFIDENCE_NER_MULTIPLIER
+                        all_candidates.append((name, confidence, f'NER_PER(conf={entity.confidence:.2f})'))
+                        seen_names.add(name)
+        except Exception as e:
+            logger.debug(f"NER提取失败: {e}")
+
+        # 信号源4: speaker_hint（显式提示）
+        if context.speaker_hint and context.speaker_hint not in seen_names:
+            if context.speaker_hint in ('他', '她'):
+                hint_result = self.match_by_pronoun(context.speaker_hint, context)
+                if hint_result:
+                    all_candidates.append((hint_result.character.name, hint_result.confidence, 'speaker_hint(pronoun)'))
+                    seen_names.add(hint_result.character.name)
+            else:
+                hint_result = self.match_by_name(context.speaker_hint)
+                if hint_result:
+                    all_candidates.append((hint_result.character.name, hint_result.confidence, 'speaker_hint'))
+                    seen_names.add(hint_result.character.name)
+
+        # 信号源5: mentioned_characters（被动NER）
+        if context.mentioned_characters:
+            for name in context.mentioned_characters:
+                if name not in seen_names and name not in possessive_excluded and len(name) >= 2:
+                    confidence = sm_config.CONFIDENCE_MENTIONED_CHARACTERS
+                    all_candidates.append((name, confidence, 'mentioned_characters'))
+                    seen_names.add(name)
+
+        # 信号源6: 称呼推理
+        if context.text:
+            address_result = self._infer_from_address(context.text, context)
+            if address_result and address_result.character.name not in seen_names:
+                all_candidates.append((address_result.character.name, address_result.confidence, '称呼推理'))
+                seen_names.add(address_result.character.name)
+
+        # 信号源7: 触发词匹配
+        if context.text:
+            trigger_result = self.match_by_trigger_words(context.text, context)
+            if trigger_result and trigger_result.character.name not in seen_names:
+                all_candidates.append((trigger_result.character.name, trigger_result.confidence, '触发词匹配'))
+                seen_names.add(trigger_result.character.name)
+
+        # 信号源8: 角色库旁白匹配（兜底）
+        lib_result = self._match_from_character_library(narration)
+        if lib_result and lib_result.name not in seen_names and lib_result.name not in possessive_excluded:
+            all_candidates.append((lib_result.name, sm_config.CONFIDENCE_CHARACTER_LIBRARY, '角色库旁白'))
+            seen_names.add(lib_result.name)
+
+        # 按置信度降序排序
+        all_candidates.sort(key=lambda x: -x[1])
+        return all_candidates
+
     def match_speaker(self, context: DialogueContext) -> Optional[MatchResult]:
         narration = self._extract_narration(
             context.text,
@@ -1276,160 +1371,51 @@ class SpeakerMatcher:
         )
 
         # N-4: 对话中"X的"所有格排除
-        # 语言学依据：中文所有格结构 X的 中，X 是领有者/话题，极少是说话人自称
-        # 来源：通用句法规则，非静态词表
-        # 边界：只排除 2-4 字人名/称呼 + 的 结构
         possessive_excluded = set()
         dialogue_text = context.dialogue or ''
         if dialogue_text:
             for m in re.finditer(r'([\u4e00-\u9fa5\u2027·]{2,4})的', dialogue_text):
                 possessive_excluded.add(m.group(1))
-        
+
         # H-20260515-05: 称呼排除增强
-        # 对话以"XX，"开头时，XX是被称呼者而非说话者
         if dialogue_text:
             vocative_match = re.match(r'^[\u201c\u201d\u2018\u2019"\'"]*([\u4e00-\u9fa5\u2027·]{2,4})[，,]', dialogue_text)
             if vocative_match:
-                addressed_name = vocative_match.group(1)
-                possessive_excluded.add(addressed_name)
-                logger.debug(f"H-05称呼排除: 对话以'{addressed_name}'开头，视为被称呼者")
+                possessive_excluded.add(vocative_match.group(1))
 
-        if context.context_before or context.context_after:
-            context_candidates = self._extract_context_speakers(
-                narration,
-                context.context_before or '',
-                context.context_after or '',
-                context.prefix_narration or ''
+        # 并行收集所有信号源候选
+        all_candidates = self._collect_signal_candidates(context, narration, possessive_excluded)
+
+        if not all_candidates:
+            return None
+
+        # 代词过滤 + 取最高置信度非代词候选
+        selected = None
+        for name, confidence, source in all_candidates:
+            if name in ('他', '她', '它', '他们', '她们', '它们') or name in PRONOUNS:
+                logger.debug(f"代词过滤: {name} 不应作为说话人")
+                continue
+            if name in ('UNKNOWN', '未知', 'unknown'):
+                continue
+            selected = (name, confidence, source)
+            break
+
+        if not selected:
+            return None
+
+        name, confidence, source = selected
+
+        # 匹配角色库
+        matched_char = self.char_manager.get_character_by_name(name, self._current_project_id)
+        if not matched_char:
+            matched_char = self.char_manager.get_character_by_alias(name, self._current_project_id)
+
+        if matched_char:
+            return MatchResult(
+                character=matched_char,
+                confidence=confidence,
+                match_type=source,
             )
-            if context_candidates:
-                name, reason, confidence = context_candidates[0]
-                # N-4: 排除所有格中的 X
-                if name in possessive_excluded:
-                    logger.debug(f"N-4所有格排除: {name} 在对话中作为所有格出现，排除")
-                    context_candidates = context_candidates[1:]
-                    if context_candidates:
-                        name, reason, confidence = context_candidates[0]
-                
-                # H-20260515-05: 对话轮换模型
-                # 检测context_before中最后一个对话的说话人，如果当前候选是同一人且置信度<0.70，尝试第二候选
-                last_dialogue_speaker = None
-                if context.context_before:
-                    dialogue_patterns = [
-                        r'([\u4e00-\u9fa5\u2027·]{2,4})\s*(?:道|说|问|答|笑道|说道|问道|答道)\s*:?\s*[\u300d\u300f"\'\u2019]',
-                        r'([\u4e00-\u9fa5\u2027·]{2,4})\s*(?:道|说|问|答|笑道|说道|问道|答道)\s*[：:]',
-                    ]
-                    for pattern in dialogue_patterns:
-                        matches = list(re.finditer(pattern, context.context_before))
-                        if matches:
-                            last_match = matches[-1]
-                            last_dialogue_speaker = last_match.group(1)
-                            break
-                
-                if name == last_dialogue_speaker and confidence < 0.70 and len(context_candidates) > 1:
-                    logger.debug(f"H-05对话轮换: '{name}'是上一个对话的说话人，尝试第二候选")
-                    for alt_candidate in context_candidates[1:]:
-                        alt_name, alt_reason, alt_confidence = alt_candidate
-                        if alt_name not in possessive_excluded and not alt_name.startswith('未知_') and alt_name != '未知':
-                            alt_char = self.char_manager.get_character_by_name(alt_name, self._current_project_id)
-                            if alt_char:
-                                return MatchResult(
-                                    character=alt_char,
-                                    confidence=alt_confidence,
-                                    match_type=f'context_reasoning:{alt_reason}(对话轮换)'
-                                )
-                if not name.startswith('未知_') and name != '未知':
-                    char = self.char_manager.get_character_by_name(name, self._current_project_id)
-                    if char:
-                        return MatchResult(
-                            character=char,
-                            confidence=confidence,
-                            match_type=f'context_reasoning:{reason}'
-                        )
-
-        if context.speaker_hint:
-            if context.speaker_hint in ('他', '她'):
-                result = self.match_by_pronoun(context.speaker_hint, context)
-                if result:
-                    return result
-            else:
-                result = self.match_by_name(context.speaker_hint)
-                if result:
-                    return result
-
-                result = self.match_by_alias(context.speaker_hint)
-                if result:
-                    return result
-
-                result = self.match_by_title(context.speaker_hint)
-                if result:
-                    return result
-
-                hint_context = narration if narration else (context.context_before or '') + (context.context_after or '')
-                hint_char = self.char_manager.find_or_create(
-                    context.speaker_hint,
-                    project_id=self._current_project_id,
-                    context=hint_context
-                )
-                if hint_char:
-                    return MatchResult(
-                        character=hint_char,
-                        confidence=0.85,
-                        match_type='speaker_hint_created'
-                    )
-
-        mentioned = context.mentioned_characters or []
-        if mentioned:
-            for name in mentioned:
-                result = self.match_by_name(name)
-                if result:
-                    return result
-
-                result = self.match_by_alias(name)
-                if result:
-                    return result
-
-        if context.chapter_id is not None and self.semantic_ranker.is_available():
-            result = self.match_by_semantic(narration)
-            if result:
-                return result
-
-        trigger_result = self.match_by_trigger_words(narration, context)
-        if trigger_result:
-            matched_name = trigger_result.character.name
-            if matched_name in narration:
-                prefix_pattern = re.compile(
-                    rf'([\u4e00-\u9fa5]){re.escape(matched_name)}'
-                )
-                prefix_matches = prefix_pattern.findall(narration)
-                if prefix_matches:
-                    for prefix_char in prefix_matches:
-                        full_candidate = prefix_char + matched_name
-                        full_char = self.char_manager.get_character_by_name(
-                            full_candidate, self._current_project_id
-                        )
-                        if full_char:
-                            return MatchResult(
-                                character=full_char,
-                                confidence=0.85,
-                                match_type=f'context_reasoning:角色名扩展({full_candidate})'
-                            )
-            return trigger_result
-
-        result = self._infer_from_address(narration, context)
-        if result:
-            return result
-
-        char = self._match_from_character_library(narration)
-        if char:
-            # N-4: 所有格排除检查
-            if char.name not in possessive_excluded:
-                return MatchResult(
-                    character=char,
-                    confidence=0.70,
-                    match_type='角色库旁白匹配'
-                )
-            else:
-                logger.debug(f"N-4所有格排除: {char.name} 在对话中作为所有格出现，排除")
 
         return None
 
