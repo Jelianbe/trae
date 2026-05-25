@@ -157,18 +157,25 @@ def _build_quote_patterns():
 
 DIALOGUE_PATTERNS = _build_quote_patterns()
 
-# 说话人模式：匹配"XX道"、"XX说"等格式
-# 关键：使用贪婪匹配 + 限定名字长度，确保"秦羽问道"提取为"秦羽"
+# SPEAKER_PATTERNS
 #
-# 用途：从"秦羽问道"等文本中提取说话人名字"秦羽"
+# 用途：匹配"XX道"、"XX说"等格式，从"秦羽问道"中提取说话人名字"秦羽"
 # 来源：中文句法结构（主语+谓语+引语），网文常见说话模式统计
 # 边界：仅匹配"说话"类动词，不匹配"思考"类动词
-#       名字长度限制1-6字，覆盖绝大多数中文人名
+#       名字长度限制1-20字，覆盖中文人名和长外国名（亚历山大·尼古拉耶维奇）
+#       支持中点·以兼容外国名（哈利·波特）
+# 更新日期：2026-05-25（同步 speaker_hint_matcher.py：复合动词优先→X对Y说→单字兜底）
+# 维护者：同步自 pipeline/matchers/speaker_hint_matcher.py
+# 注意：按动词长度降序排列（长匹配优先），避免"问道"被"问"+"道"截断
 SPEAKER_PATTERNS = [
-    # 模式1：XX+复合动词（沉声道/低声道/高声道/冷冷道/淡淡道）
-    re.compile(r'([\u4e00-\u9fa5]{1,6})\s*(?:沉声道|低声道|高声道|冷冷道|淡淡道)[：:，,。\s]'),
-    # 模式2：XX+单字动词（道/说/问/喊/叫/答/哼/笑/叹/怒/喝/嚷/骂）
-    re.compile(r'([\u4e00-\u9fa5]{1,6})\s*(?:道|说|问|喊|叫|答|应|笑|叹|怒|喝|哼|嚷|骂)[：:，,。\s]'),
+    # P0: X对Y说 → 只捕获 X（X对Y说中的X是说话人）
+    re.compile(r'([\u4e00-\u9fa5\u2027·]{1,20})\s*对[\u4e00-\u9fa5\u2027·]{1,6}\s*(?:道|说|问)[：:，,。\s]'),
+    # P1: 复合动词（4字+优先）
+    re.compile(r'([\u4e00-\u9fa5\u2027·]{1,20})\s*(?:回答说|喃喃道|催促道|大叫道|大喊道|大声喊道|回答道|回应道|询问道|自言自语|低声道|高声道|沉声道|冷冷道|淡淡道|厉声道|轻声道|轻声说|轻声地说|急切地喊道|小心翼翼地说|小心翼翼道)[：:，,。\s]'),
+    # P2: 双字动词
+    re.compile(r'([\u4e00-\u9fa5\u2027·]{1,20})\s*(?:问道|答道|笑道|叹道|怒道|喝道|哼道|嚷道|骂道|说道|叫道)[：:，,。\s]'),
+    # P3: 单字动词（最后的兜底，仅保留高频独立使用的单字）
+    re.compile(r'([\u4e00-\u9fa5\u2027·]{1,20})\s*(?:道|说|问|叫|答|应|笑|叹)[：:，,。\s]'),
 ]
 
 
@@ -1762,7 +1769,7 @@ class CharacterNameValidator:
         return True
 
     def is_valid_speaker_candidate(self, name: str) -> bool:
-        if not name or len(name) < 2 or len(name) > 8:
+        if not name or len(name) < 2 or len(name) > 20:
             return False
         if name in self._blacklist:
             return False
